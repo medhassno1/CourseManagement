@@ -12,7 +12,7 @@
             android:id="@+id/toolbar_file_select_activity"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="#CFD8DC"
             android:elevation="4dp"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
@@ -22,7 +22,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="#ECEFF1">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,6 +45,6 @@
         android:id="@+id/lv_file_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#fff"/>
+        android:background="#ECEFF1"/>
 
 </LinearLayout>
