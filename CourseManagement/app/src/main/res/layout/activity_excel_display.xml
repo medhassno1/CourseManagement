@@ -9,18 +9,14 @@
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_width="1000dp"
-            android:layout_height="1000dp"
-            android:orientation="vertical"
-            android:background="#000000">
-            <!--<de.codecrafters.tableview.TableView-->
-                <!--android:id="@+id/tableView"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--custom:columnCount="8"-->
-                <!--/>-->
-        </LinearLayout>
+        <ListView
+            android:id="@+id/lv_excel_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="#dcdcdc"
+            android:dividerHeight="2dp">
+
+        </ListView>
     </HorizontalScrollView>
 
 
