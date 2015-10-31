@@ -8,6 +8,7 @@ import com.ftd.schaepher.coursemanagement.R;
 
 /**
  * Created by sxq on 2015/10/31.
+ * 发布任务界面
  */
 public class AddTaskActivity extends AppCompatActivity {
 
