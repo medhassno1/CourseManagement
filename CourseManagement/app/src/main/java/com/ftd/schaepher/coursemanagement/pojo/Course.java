@@ -1,4 +1,4 @@
-package com.ftd.schaepher.coursemanagement;
+package com.ftd.schaepher.coursemanagement.pojo;
 
 /**
  * Created by Administrator on 2015/9/28.

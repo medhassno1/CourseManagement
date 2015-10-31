@@ -1,10 +1,12 @@
-package com.ftd.schaepher.coursemanagement;
+package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+
+import com.ftd.schaepher.coursemanagement.R;
 
 /**
  * Created by sxq on 2015/10/28.
