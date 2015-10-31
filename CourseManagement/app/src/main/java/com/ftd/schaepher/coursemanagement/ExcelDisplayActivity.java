@@ -1,8 +1,13 @@
 package com.ftd.schaepher.coursemanagement;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +23,7 @@ import java.util.List;
 
 /**
  * Created by sxq on 2015/10/30.
+ * 文件查看界面以及点击弹出修改弹窗
  */
 public class ExcelDisplayActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -53,10 +59,33 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     //点击弹出修改弹窗
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        AlertDialog mAlertDialog = initAlertDialog();
+        mAlertDialog.show();
     }
 
-    class ExcelAdapter extends ArrayAdapter<Course> {
+    public AlertDialog initAlertDialog() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
+        LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
+        mBuilder.setView(mInflater.inflate(R.layout.dialog_excel_modify, null))
+                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //点击确认修改逻辑
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //点击取消修改逻辑
+                    }
+                });
+        return mBuilder.create();
+    }
+
+    /**
+     * 文件查看界面listView布局的适配器，引用的布局文件为list_item_excel_display.xml
+     */
+    public class ExcelAdapter extends ArrayAdapter<Course> {
         private int resourceId;
 
         public ExcelAdapter(Context context, int resource, List<Course> objects) {
@@ -89,7 +118,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 view = convertView;
                 mViewHolder = (viewHolder) view.getTag();
             }
-            Log.d("ABS", courseCur.getGrade());
             mViewHolder.tvGrade.setText(courseCur.getGrade());
             mViewHolder.tvMajor.setText(courseCur.getMajor());
             mViewHolder.tvSum.setText(courseCur.getSum());
@@ -119,4 +147,5 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             TextView tvNote;
         }
     }
+
 }
