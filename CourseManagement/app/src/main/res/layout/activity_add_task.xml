@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="5dp"
+    android:orientation="vertical">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <EditText
+            android:id="@+id/edtTx_add_task_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="任务名"
+            android:text="计算机专业"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/edtTx_add_task_team"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="学期"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/edtTx_add_task_teacher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="参与教师"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/edtTx_add_task_department_deadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="系审核截止时间"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/edtTx_add_task_teacher_deadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="教师申报截止时间"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/edtTx_add_task_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="备注"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+    <LinearLayout
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:text="开课表附件"
+            android:gravity="center"
+            android:layout_marginRight="10dp"/>
+        <ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/spilt_line_vertical"
+            android:scaleType="fitXY"
+            android:layout_marginRight="10dp"/>
+        <ImageView
+            android:id="@+id/imgv_add_task_file_img"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/excel_xls"
+            android:layout_marginRight="10dp"/>
+        <TextView
+            android:id="@+id/tv_add_task_file_name"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="计算机专业.xls"/>
+    </LinearLayout>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:src="@drawable/spilt_line_horizontal"
+        android:scaleType="fitXY"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>
