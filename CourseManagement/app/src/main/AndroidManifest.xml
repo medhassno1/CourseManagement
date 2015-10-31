@@ -26,21 +26,17 @@
         <activity android:name=".activities.FileSelectActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <!--<action android:name="android.intent.action.MAIN" />-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".activities.ExcelDisplayActivity" >
             <intent-filter>
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TaskJxbActivity">
+        <activity android:name=".activities.TaskJxbActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
