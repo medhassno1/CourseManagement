@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ftd.schaepher.coursemanagement">
 
+    <!--读取sd卡的权限-->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE">
+    </uses-permission>
+
+    <!--上网的权限-->
+    <uses-permission
+        android:name="android.permission.INTERNET">
+    </uses-permission>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,7 +28,7 @@
             android:name=".activities.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <!--<action android:name="android.intent.action.MAIN" />-->
+                <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

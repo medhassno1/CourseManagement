@@ -24,13 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:gravity="center"/>
-        <TextView
-            android:id="@+id/tv_sum"
-            android:text="专业人数"
-            android:textSize="20sp"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"/>
+
         <TextView
             android:id="@+id/tv_course_name"
             android:text="课程名称"
@@ -39,6 +33,15 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/tv_sum"
+            android:text="专业人数"
+            android:textSize="20sp"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"/>
+
         <TextView
             android:id="@+id/tv_type"
             android:text="选修类型"
