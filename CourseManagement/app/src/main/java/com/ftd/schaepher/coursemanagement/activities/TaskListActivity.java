@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -31,17 +32,17 @@ import java.util.List;
  * Created by sxq on 2015/10/31.
  * 教学办登录默认主界面---任务主界面
  */
-public class TaskJxbActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class TaskListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private List<Task> taskListData;
     private Toolbar mToolbar;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
-    private static final String TAG = "TaskJxbActivity";
+    private static final String TAG = "TaskListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_jxb);
+        setContentView(R.layout.activity_task_list);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_task_jxb);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -80,7 +81,7 @@ public class TaskJxbActivity extends AppCompatActivity implements AdapterView.On
     //点击任务列表项跳转操作
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        startActivity(new Intent(TaskListActivity.this,TaskDetailActivity.class));
     }
 
     //左菜单点击事件
@@ -96,7 +97,7 @@ public class TaskJxbActivity extends AppCompatActivity implements AdapterView.On
             drawer.closeDrawer(GravityCompat.START);
         } else if (isSupportDoubleBackExit) {
             if ((System.currentTimeMillis() - betweenDoubleBackTime) > 2000) {
-                Toast.makeText(TaskJxbActivity.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TaskListActivity.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
                 betweenDoubleBackTime = System.currentTimeMillis();
             } else {
                 System.exit(0);
@@ -113,7 +114,7 @@ public class TaskJxbActivity extends AppCompatActivity implements AdapterView.On
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.task_activity_actions,menu);
+        getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
 
         return true;
     }
@@ -124,6 +125,7 @@ public class TaskJxbActivity extends AppCompatActivity implements AdapterView.On
         switch (id){
             case R.id.action_add_task:
                 Log.i(TAG,"click add icon");
+                startActivity(new Intent(TaskListActivity.this, TaskCreationActivity.class));
                 break;
             default:
                 break;

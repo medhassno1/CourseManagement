@@ -108,7 +108,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.w("first post=", html);
                     if (logResult == -1) {
                         //跳转
-                        Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
                         LoginActivity.this.finish();
                         startActivity(intent);
                     }

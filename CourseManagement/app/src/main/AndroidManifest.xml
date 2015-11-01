@@ -37,44 +37,24 @@
         <activity
             android:name=".activities.FileSelectActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.ExcelDisplayActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
-            android:name=".activities.TaskJxbActivity"
+            android:name=".activities.TaskListActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
-            android:name=".activities.AddTaskActivity"
-            android:parentActivityName=".activities.TaskJxbActivity"
+            android:name=".activities.TaskCreationActivity"
+            android:parentActivityName=".activities.TaskListActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.TaskDetailActivity"
+            android:parentActivityName=".activities.TaskListActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

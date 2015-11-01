@@ -11,12 +11,12 @@ import com.ftd.schaepher.coursemanagement.R;
  * Created by sxq on 2015/10/31.
  * 发布任务界面
  */
-public class AddTaskActivity extends AppCompatActivity {
+public class TaskCreationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_task);
+        setContentView(R.layout.activity_task_creation);
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_add_task);
         setSupportActionBar(mToolbar);
         ActionBar mActionBar = getSupportActionBar();
