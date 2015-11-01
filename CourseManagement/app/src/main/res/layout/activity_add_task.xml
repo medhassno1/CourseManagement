@@ -1,23 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="5dp"
     android:orientation="vertical">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar_add_task"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        </android.support.design.widget.AppBarLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
+
         <EditText
             android:id="@+id/edtTx_add_task_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="任务名"
-            android:text="计算机专业"
-            android:inputType="text" />
+            android:inputType="text"
+            android:text="计算机专业" />
     </android.support.design.widget.TextInputLayout>
+
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -29,6 +48,7 @@
             android:hint="学期"
             android:inputType="text" />
     </android.support.design.widget.TextInputLayout>
+
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -40,6 +60,7 @@
             android:hint="参与教师"
             android:inputType="text" />
     </android.support.design.widget.TextInputLayout>
+
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -51,6 +72,7 @@
             android:hint="系审核截止时间"
             android:inputType="text" />
     </android.support.design.widget.TextInputLayout>
+
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -62,6 +84,7 @@
             android:hint="教师申报截止时间"
             android:inputType="text" />
     </android.support.design.widget.TextInputLayout>
+
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -73,41 +96,47 @@
             android:hint="备注"
             android:inputType="text" />
     </android.support.design.widget.TextInputLayout>
+
     <LinearLayout
-        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="18sp"
-            android:text="开课表附件"
+            android:layout_marginRight="10dp"
             android:gravity="center"
-            android:layout_marginRight="10dp"/>
+            android:text="开课表附件"
+            android:textSize="18sp" />
+
         <ImageView
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:src="@drawable/spilt_line_vertical"
+            android:layout_marginRight="10dp"
             android:scaleType="fitXY"
-            android:layout_marginRight="10dp"/>
+            android:src="@drawable/spilt_line_vertical" />
+
         <ImageView
             android:id="@+id/imgv_add_task_file_img"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
-            android:src="@drawable/excel_xls"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:src="@drawable/excel_xls" />
+
         <TextView
             android:id="@+id/tv_add_task_file_name"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="计算机专业.xls"/>
+            android:text="计算机专业.xls" />
     </LinearLayout>
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:src="@drawable/spilt_line_horizontal"
+        android:layout_marginTop="8dp"
         android:scaleType="fitXY"
-        android:layout_marginTop="8dp"/>
+        android:src="@drawable/spilt_line_horizontal" />
 </LinearLayout>

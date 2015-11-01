@@ -2,15 +2,24 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.pojo.Task;
@@ -22,18 +31,37 @@ import java.util.List;
  * Created by sxq on 2015/10/31.
  * 教学办登录默认主界面---任务主界面
  */
-public class TaskJxbActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class TaskJxbActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private List<Task> taskListData;
+    private Toolbar mToolbar;
+    private boolean isSupportDoubleBackExit;
+    private long betweenDoubleBackTime;
+    private static final String TAG = "TaskJxbActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_jxb);
-        ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setTitle("报课任务列表");
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_task_jxb);
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("报课任务列表");
+        setNavViewConfig();
+        setSupportDoubleBackExit(true);
 
         initTaskListData();
         initTaskListView();
+    }
+
+    private void setNavViewConfig() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void initTaskListData() {
@@ -53,6 +81,54 @@ public class TaskJxbActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+    }
+
+    //左菜单点击事件
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else if (isSupportDoubleBackExit) {
+            if ((System.currentTimeMillis() - betweenDoubleBackTime) > 2000) {
+                Toast.makeText(TaskJxbActivity.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
+                betweenDoubleBackTime = System.currentTimeMillis();
+            } else {
+                System.exit(0);
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public void setSupportDoubleBackExit(boolean isDoubleBackExit) {
+        this.isSupportDoubleBackExit = isDoubleBackExit;
+    }
+
+    //添加标题栏上的按钮图标
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.task_activity_actions,menu);
+
+        return true;
+    }
+    //标题栏上的按钮图标点击事件
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case R.id.action_add_task:
+                Log.i(TAG,"click add icon");
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

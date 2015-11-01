@@ -33,12 +33,11 @@ public class FileSelectActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_select);
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_file_select_activity);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_file_select);
         setSupportActionBar(mToolbar);
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("文件选择");
-        mActionBar.setElevation(4);
 
         initListView();
     }
