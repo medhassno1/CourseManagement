@@ -69,8 +69,7 @@
                 android:text="教学办"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
-                android:checked="true"/>
+                android:layout_marginRight="15dp" />
             <RadioButton
                 android:id="@+id/rdoBtn_department"
                 android:text="系负责人"
@@ -82,7 +81,8 @@
                 android:text="教师"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"/>
+                android:layout_marginRight="15dp"
+                android:checked="true"/>
         </RadioGroup>
 
 
