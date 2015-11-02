@@ -11,6 +11,7 @@ import com.ftd.schaepher.coursemanagement.R;
 
 /**
  * Created by sxq on 2015/11/2.
+ * 教师添加界面
  */
 public class TeacherCreationActivity extends AppCompatActivity {
     @Override

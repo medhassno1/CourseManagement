@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,86 +15,81 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
-import com.ftd.schaepher.coursemanagement.pojo.Task;
+import com.ftd.schaepher.coursemanagement.pojo.Teacher;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
- * Created by sxq on 2015/10/31.
- * 教学办登录默认主界面---任务主界面
+ * Created by sxq on 2015/11/2.
+ * 教师列表界面
  */
-public class TaskListActivity extends AppCompatActivity
-        implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
-    private List<Task> taskListData;
+public class TeacherListActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+    private List<Teacher> teacherListData;
     private Toolbar mToolbar;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
-    private static final String TAG = "TaskListActivity";
+    private static final String TAG = "TeacherListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_list);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar_task_jxb);
+        setContentView(R.layout.activity_teacher_list);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
+        mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("报课任务列表");
+
+
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
-        initTaskListData();
-        initTaskListView();
+        initTeacherListData();
+        initTeacherListView();
     }
 
     private void setNavViewConfig() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    private void initTaskListData() {
-        taskListData = new ArrayList<Task>();
-        Task task = new Task("进行中","计算机专业");
-        taskListData.add(task);
+    private void initTeacherListData() {
+        teacherListData = new ArrayList<Teacher>();
+        Teacher teacher = new Teacher(R.drawable.ic_people,"张三");
+        teacherListData.add(teacher);
     }
 
-    private void initTaskListView() {
-        TaskAdapter mTaskAdapter = new TaskAdapter(this,R.layout.list_item_task,taskListData);
-        ListView mListView = (ListView) findViewById(R.id.lv_task_list);
-        mListView.setAdapter(mTaskAdapter);
-        mListView.setOnItemClickListener(this);
-    }
-
-    //点击任务列表项跳转操作
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        startActivity(new Intent(TaskListActivity.this,TaskDetailActivity.class));
+    private void initTeacherListView() {
+        TeacherAdapter mTeacherAdapter = new TeacherAdapter(this,R.layout.list_item_teacher, teacherListData);
+        ListView mListView = (ListView) findViewById(R.id.lv_teacher_list);
+        mListView.setAdapter(mTeacherAdapter);
     }
 
     //左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.nav_task_list:
+            case R.id.nav_teacher_list:
                 DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout_teacher_list);
                 drawer.closeDrawer(GravityCompat.START);
                 break;
-            case R.id.nav_teacher_list:
+            case R.id.nav_task_list:
                 finish();
-                startActivity( new Intent(TaskListActivity.this,TeacherListActivity.class));
+                startActivity( new Intent(TeacherListActivity.this,TaskListActivity.class));
                 break;
             default:
                 break;
@@ -105,12 +99,12 @@ public class TaskListActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (isSupportDoubleBackExit) {
             if ((System.currentTimeMillis() - betweenDoubleBackTime) > 2000) {
-                Toast.makeText(TaskListActivity.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TeacherListActivity.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
                 betweenDoubleBackTime = System.currentTimeMillis();
             } else {
                 System.exit(0);
@@ -127,7 +121,7 @@ public class TaskListActivity extends AppCompatActivity
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
+        getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
 
         return true;
     }
@@ -136,9 +130,9 @@ public class TaskListActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id){
-            case R.id.action_add_task:
-                Log.i(TAG,"click add icon");
-                startActivity(new Intent(TaskListActivity.this, TaskCreationActivity.class));
+            case R.id.action_add_teacher:
+                Log.i(TAG, "click add icon");
+                startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
                 break;
             default:
                 break;
@@ -149,38 +143,38 @@ public class TaskListActivity extends AppCompatActivity
     /**
      * 任务列表的适配器
      */
-    class TaskAdapter extends ArrayAdapter<Task> {
+    class TeacherAdapter extends ArrayAdapter<Teacher> {
         private int resourceId;
 
-        public TaskAdapter(Context context, int resource, List<Task> objects) {
+        public TeacherAdapter(Context context, int resource, List<Teacher> objects) {
             super(context, resource, objects);
             this.resourceId = resource;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Task task = getItem(position);
+            Teacher teacher = getItem(position);
             View view;
             viewHolder viewHolder;
             if (convertView == null) {
                 view = LayoutInflater.from(getContext()).inflate(resourceId, null);
                 viewHolder = new viewHolder();
-                viewHolder.taskState = (TextView) view.findViewById(R.id.tv_task_state);
-                viewHolder.taskName = (TextView) view.findViewById(R.id.tv_task_name);
+                viewHolder.teacherImageId = (CircleImageView) view.findViewById(R.id.circle_img_teacher);
+                viewHolder.teacherName = (TextView) view.findViewById(R.id.tv_teacher_name);
                 view.setTag(viewHolder);
             } else {
                 view = convertView;
-                viewHolder = (TaskAdapter.viewHolder) view.getTag();
+                viewHolder = (TeacherAdapter.viewHolder) view.getTag();
             }
 
-            viewHolder.taskState.setText(task.getTaskState());
-            viewHolder.taskName.setText(task.getTaskName());
+            viewHolder.teacherImageId.setImageResource(teacher.getTeacherImageId());
+            viewHolder.teacherName.setText(teacher.getTeacherName());
             return view;
         }
 
         class viewHolder {
-            TextView taskState;
-            TextView taskName;
+            CircleImageView teacherImageId;
+            TextView teacherName;
         }
     }
 }
