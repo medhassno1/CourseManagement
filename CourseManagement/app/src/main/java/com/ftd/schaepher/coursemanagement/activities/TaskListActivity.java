@@ -90,7 +90,7 @@ public class TaskListActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.nav_task_list:
-                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout_teacher_list);
+                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout_base);
                 drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_teacher_list:

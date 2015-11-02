@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,7 +34,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * 教师列表界面
  */
 public class TeacherListActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener {
     private List<Teacher> teacherListData;
     private Toolbar mToolbar;
     private boolean isSupportDoubleBackExit;
@@ -77,6 +78,7 @@ public class TeacherListActivity extends AppCompatActivity
         TeacherAdapter mTeacherAdapter = new TeacherAdapter(this,R.layout.list_item_teacher, teacherListData);
         ListView mListView = (ListView) findViewById(R.id.lv_teacher_list);
         mListView.setAdapter(mTeacherAdapter);
+        mListView.setOnItemClickListener(this);
     }
 
     //左菜单点击事件
@@ -138,6 +140,12 @@ public class TeacherListActivity extends AppCompatActivity
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //点击查看教师信息跳转逻辑
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        startActivity(new Intent(TeacherListActivity.this,TeacherDetailActivity.class));
     }
 
     /**
