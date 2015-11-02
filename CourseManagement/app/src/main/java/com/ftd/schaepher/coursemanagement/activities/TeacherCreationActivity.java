@@ -10,24 +10,23 @@ import android.view.MenuItem;
 import com.ftd.schaepher.coursemanagement.R;
 
 /**
- * Created by sxq on 2015/10/31.
- * 发布任务界面
+ * Created by sxq on 2015/11/2.
  */
-public class TaskCreationActivity extends AppCompatActivity {
-
+public class TeacherCreationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_creation);
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_add_task);
+        setContentView(R.layout.activity_teacher_creation);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_creation);
         setSupportActionBar(mToolbar);
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle("发布报课任务");
+        mActionBar.setTitle("添加用户");
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.task_creation_activity_actions, menu);
+        getMenuInflater().inflate(R.menu.teacher_creation_activity_actions, menu);
         return true;
     }
 
@@ -35,4 +34,5 @@ public class TaskCreationActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
+
 }
