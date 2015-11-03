@@ -11,23 +11,24 @@ import com.ftd.schaepher.coursemanagement.R;
 
 /**
  * Created by sxq on 2015/11/2.
- * 教师添加界面
+ * 教师信息界面
  */
-public class TeacherCreationActivity extends AppCompatActivity {
+public class TeacherDetailActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_teacher_creation);
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_creation);
+        setContentView(R.layout.activity_teacher_detail);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_detail);
         setSupportActionBar(mToolbar);
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle("添加用户");
+        mActionBar.setTitle("用户信息");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.teacher_creation_activity_actions, menu);
+        getMenuInflater().inflate(R.menu.teacher_detail_activity_actions, menu);
         return true;
     }
 
@@ -35,5 +36,4 @@ public class TeacherCreationActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
-
 }

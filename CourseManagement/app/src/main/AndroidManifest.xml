@@ -29,7 +29,7 @@
             android:name=".activities.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"></action>
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -40,7 +40,8 @@
         </activity>
         <activity
             android:name=".activities.ExcelDisplayActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.TaskDetailActivity">
         </activity>
         <activity
             android:name=".activities.TaskListActivity"
@@ -58,11 +59,14 @@
         </activity>
         <activity android:name=".activities.TeacherCreationActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:uiOptions="splitActionBarWhenNarrow">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:parentActivityName=".activities.TeacherListActivity">
         </activity>
+        <activity android:name=".activities.TeacherListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".activities.TeacherDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.TeacherListActivity"></activity>
     </application>
 
 </manifest>
