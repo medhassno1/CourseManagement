@@ -32,7 +32,8 @@ import java.util.List;
  * Created by sxq on 2015/10/31.
  * 教学办登录默认主界面---任务主界面
  */
-public class TaskListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class TaskListActivity extends AppCompatActivity
+        implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private List<Task> taskListData;
     private Toolbar mToolbar;
     private boolean isSupportDoubleBackExit;
@@ -87,6 +88,18 @@ public class TaskListActivity extends AppCompatActivity implements AdapterView.O
     //左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_task_list:
+                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout_base);
+                drawer.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.nav_teacher_list:
+                finish();
+                startActivity( new Intent(TaskListActivity.this,TeacherListActivity.class));
+                break;
+            default:
+                break;
+        }
         return false;
     }
 
