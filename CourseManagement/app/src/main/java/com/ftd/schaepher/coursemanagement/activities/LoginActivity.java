@@ -16,11 +16,11 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-
-
-import java.nio.charset.Charset;
+import com.rey.material.widget.ProgressView;
 
 import org.apache.http.Header;
+
+import java.nio.charset.Charset;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity
     private RadioGroup rdoGroup;
     private TextInputLayout layoutUserName;
     private TextInputLayout layoutPassWord;
-    ProgressView proBarLogin;
+    private ProgressView proBarLogin;
 
     private String userName;
     private String password;
