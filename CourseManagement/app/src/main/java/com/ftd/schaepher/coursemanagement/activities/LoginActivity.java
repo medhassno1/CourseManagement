@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +42,7 @@ public class LoginActivity extends AppCompatActivity
     private String password;
     private String identity;
 
+    private SharedPreferences.Editor identitySaveEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +56,20 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
         proBarLogin = (ProgressView) findViewById(R.id.proBar_login);
+        identitySaveEditor = getSharedPreferences("userInformation",MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
+
+        autoSetUserName();
+    }
+
+    private void autoSetUserName() {
+        userName = getSharedPreferences("userInformation",MODE_PRIVATE).getString("userName", "");
+        if (!userName.equals("")){
+            edtTxUserName.setText(userName);
+        }
     }
 
     @Override
@@ -127,7 +139,9 @@ public class LoginActivity extends AppCompatActivity
                         //跳转,同时将选择登录的身份数据传送至下一个界面，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
-                        intent.putExtra("identity",identity);
+                        identitySaveEditor.putString("identity",identity);
+                        identitySaveEditor.putString("userName",userName);
+                        identitySaveEditor.commit();
                         LoginActivity.this.finish();
                         startActivity(intent);
                     } else {
