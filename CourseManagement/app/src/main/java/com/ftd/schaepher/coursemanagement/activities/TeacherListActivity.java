@@ -106,6 +106,10 @@ public class TeacherListActivity extends AppCompatActivity
                 finish();
                 startActivity(new Intent(TeacherListActivity.this, TaskListActivity.class));
                 break;
+            case R.id.nav_logout:
+                finish();
+                startActivity(new Intent(TeacherListActivity.this,LoginActivity.class));
+                break;
             default:
                 break;
         }
