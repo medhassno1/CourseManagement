@@ -22,6 +22,8 @@ import org.apache.http.Header;
 
 import java.nio.charset.Charset;
 
+//import com.rey.material.widget.ProgressView;
+
 /**
  * Created by sxq on 2015/10/28.
  * 登录界面
