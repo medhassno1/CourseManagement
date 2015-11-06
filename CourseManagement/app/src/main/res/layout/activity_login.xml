@@ -11,6 +11,12 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center">
@@ -26,11 +32,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
         android:gravity="bottom"
-        android:orientation="vertical"
-        android:layout_marginBottom="5dp">
+        android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/inputLayout_login_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
@@ -45,6 +52,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/inputLayout_login_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:errorEnabled="true">
@@ -61,44 +69,59 @@
             android:id="@+id/rdoGroup_check_identity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/rdoBtn_jxb"
-                android:text="教学办"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="15dp" />
-            <RadioButton
-                android:id="@+id/rdoBtn_department"
-                android:text="系负责人"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"/>
-            <RadioButton
-                android:id="@+id/rdoBtn_teacher"
-                android:text="教师"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="15dp"
-                android:checked="true"/>
+                android:text="教学办" />
+
+            <RadioButton
+                android:id="@+id/rdoBtn_department"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:text="系负责人" />
+
+            <RadioButton
+                android:id="@+id/rdoBtn_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:checked="true"
+                android:text="教师" />
         </RadioGroup>
 
 
-        <com.andexert.library.RippleView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:elevation="5dp">
+            android:orientation="vertical">
 
-            <Button
+            <com.rey.material.widget.Button
                 android:id="@+id/btn_login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_blue_light"
                 android:text="登录"
-                android:textColor="@color/colorPrimaryDark" />
-        </com.andexert.library.RippleView>
+                android:textColor="@color/colorPrimaryDark"
+                app:rd_enable="true"
+                android:elevation="5dp"/>
+            
+            <com.rey.material.widget.ProgressView
+                android:id="@+id/proBar_login"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                app:pv_autostart="true"
+                app:pv_circular="false"
+                app:pv_progressMode="indeterminate"
+                app_verticalAlign="top"
+                android:visibility="invisible"/>
+        </LinearLayout>
     </LinearLayout>
+    
 </LinearLayout>

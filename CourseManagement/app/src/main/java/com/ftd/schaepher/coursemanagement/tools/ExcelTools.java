@@ -47,7 +47,8 @@ public class ExcelTools {
         return false;
     }
 
-    public List<Course> readExcel() {//读取excel表格的所有数据
+    //读取excel表格的所有数据
+    public List<Course> readExcel() {
         int rows;
         int beginRows=4;
         ArrayList<Course> list = new ArrayList<>();

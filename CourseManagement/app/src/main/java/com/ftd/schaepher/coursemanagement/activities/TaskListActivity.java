@@ -32,9 +32,12 @@ import java.util.List;
  * Created by sxq on 2015/10/31.
  * 教学办登录默认主界面---任务主界面
  */
-public class TaskListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class TaskListActivity extends AppCompatActivity
+        implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private List<Task> taskListData;
     private Toolbar mToolbar;
+
+    private String identity;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private static final String TAG = "TaskListActivity";
@@ -55,6 +58,7 @@ public class TaskListActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void setNavViewConfig() {
+        identity = getSharedPreferences("userInformation",MODE_PRIVATE).getString("identity", null);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -62,17 +66,23 @@ public class TaskListActivity extends AppCompatActivity implements AdapterView.O
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
+
+        if (identity.equals("teacher")){
+            navigationView.getMenu().removeItem(R.id.nav_teacher_list);
+        }
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    //初始化数据，从数据库中获取当前页面所需的数据
     private void initTaskListData() {
         taskListData = new ArrayList<Task>();
-        Task task = new Task("进行中","计算机专业");
+        Task task = new Task("进行中", "计算机专业");
         taskListData.add(task);
     }
 
+    //显示数据，控件与数据绑定
     private void initTaskListView() {
-        TaskAdapter mTaskAdapter = new TaskAdapter(this,R.layout.list_item_task,taskListData);
+        TaskAdapter mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
         ListView mListView = (ListView) findViewById(R.id.lv_task_list);
         mListView.setAdapter(mTaskAdapter);
         mListView.setOnItemClickListener(this);
@@ -81,12 +91,28 @@ public class TaskListActivity extends AppCompatActivity implements AdapterView.O
     //点击任务列表项跳转操作
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        startActivity(new Intent(TaskListActivity.this,TaskDetailActivity.class));
+        startActivity(new Intent(TaskListActivity.this, TaskDetailActivity.class));
     }
 
     //左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_task_list:
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
+                drawer.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.nav_teacher_list:
+                finish();
+                startActivity(new Intent(TaskListActivity.this, TeacherListActivity.class));
+                break;
+            case R.id.nav_logout:
+                finish();
+                startActivity(new Intent(TaskListActivity.this,LoginActivity.class));
+                break;
+            default:
+                break;
+        }
         return false;
     }
 
@@ -114,17 +140,21 @@ public class TaskListActivity extends AppCompatActivity implements AdapterView.O
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        identity = getSharedPreferences("userInformation",MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
-
+        if (identity.equals("teacher")){
+            menu.removeItem(R.id.action_add_task);
+        }
         return true;
     }
+
     //标题栏上的按钮图标点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             case R.id.action_add_task:
-                Log.i(TAG,"click add icon");
+                Log.i(TAG, "click add icon");
                 startActivity(new Intent(TaskListActivity.this, TaskCreationActivity.class));
                 break;
             default:
