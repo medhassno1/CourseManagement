@@ -1,29 +1,29 @@
-package com.ftd.schaepher.coursemanagement.db;
+package com.ftd.schaepher.coursemanagement.pojo;
 import net.tsz.afinal.annotation.sqlite.Id;
 /**
  * Created by lenovo on 2015/11/2.
  */
 public class SystemLeader {
     @Id
-    private String number;
+    private String workNumber;
     private String psw;
     private String name;
-    private String phonenumber;
+    private String telephone;
 
     public String getNumber() {
-        return number;
+        return workNumber;
     }
 
     public void setNumber(String number) {
-        this.number = number;
+        this.workNumber = number;
     }
 
-    public String getPhonenumber() {
-        return phonenumber;
+    public String getTelephone() {
+        return telephone;
     }
 
-    public void setPhonenumber(String phonenumber) {
-        this.phonenumber = phonenumber;
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     public String getName() {
