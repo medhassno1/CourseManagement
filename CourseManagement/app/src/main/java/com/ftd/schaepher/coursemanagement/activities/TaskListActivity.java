@@ -103,12 +103,16 @@ public class TaskListActivity extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_teacher_list:
-                finish();
                 startActivity(new Intent(TaskListActivity.this, TeacherListActivity.class));
+                finish();
                 break;
             case R.id.nav_logout:
-                finish();
                 startActivity(new Intent(TaskListActivity.this,LoginActivity.class));
+                finish();
+                break;
+            case R.id.nav_own_information:
+                startActivity(new Intent(TaskListActivity.this,TeacherDetailActivity.class));
+                onBackPressed();
                 break;
             default:
                 break;
