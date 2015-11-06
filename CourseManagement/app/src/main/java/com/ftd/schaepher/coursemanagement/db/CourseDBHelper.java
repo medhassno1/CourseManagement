@@ -1,12 +1,11 @@
 package com.ftd.schaepher.coursemanagement.db;
 import android.content.Context;
-
+import net.tsz.afinal.FinalDb;
 import com.ftd.schaepher.coursemanagement.pojo.*;
-
 import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.annotation.sqlite.Table;
-
 import java.lang.*;
+
 
 public class CourseDBHelper {
     FinalDb db;
@@ -43,7 +42,7 @@ public class CourseDBHelper {
         TableClass tableClass =new TableClass();
         db.save(tableClass);
     }
-//插入数据
+    //插入数据
     public void insert(Object entity) {
         db.save(entity);
 
