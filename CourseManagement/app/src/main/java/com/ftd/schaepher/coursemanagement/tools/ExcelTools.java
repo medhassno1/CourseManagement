@@ -37,7 +37,7 @@ public class ExcelTools {
         path=filePath;
     }
 
-    public boolean checkFileName(){
+    public boolean isTrueFileName(){
         if(!new File(path).exists()) {
             Toast.makeText(context, "该文件不存在！", Toast.LENGTH_LONG).show();
         }else if(!path.endsWith(".xls")) {   //判断是否是excel文件
@@ -55,7 +55,7 @@ public class ExcelTools {
         ArrayList<Course> list = new ArrayList<>();
         Log.i("Data", "目录是否可读");
 
-        if(checkFileName()) {
+        if(isTrueFileName()) {
             try {
                 Workbook book = Workbook.getWorkbook(new File(path));//工作簿
                 sheet = book.getSheet(0);//工作表
@@ -111,7 +111,7 @@ public class ExcelTools {
         ArrayList<Teacher> list = new ArrayList<>();
         Log.i("Data", "目录是否可读");
 
-        if(checkFileName()) {
+        if(isTrueFileName()) {
             try {
                 Workbook book = Workbook.getWorkbook(new File(path));//工作簿
                 sheet = book.getSheet(0);//工作表
