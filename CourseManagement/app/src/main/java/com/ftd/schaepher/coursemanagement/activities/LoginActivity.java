@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -18,9 +19,11 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
 
+import org.apache.http.Header;
+
 import java.nio.charset.Charset;
 
-import org.apache.http.Header;
+//import com.rey.material.widget.ProgressView;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -41,6 +44,7 @@ public class LoginActivity extends AppCompatActivity
     private String password;
     private String identity;
 
+    private SharedPreferences.Editor ownInfomationSaveEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +58,20 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
         proBarLogin = (ProgressView) findViewById(R.id.proBar_login);
+        ownInfomationSaveEditor = getSharedPreferences("userInformation",MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
+
+        autoSetUserName();
+    }
+
+    private void autoSetUserName() {
+        userName = getSharedPreferences("userInformation",MODE_PRIVATE).getString("userName", "");
+        if (!userName.equals("")){
+            edtTxUserName.setText(userName);
+        }
     }
 
     @Override
@@ -77,7 +91,7 @@ public class LoginActivity extends AppCompatActivity
                         }
                     }
                 }
-                if (checkEdit()) {
+                if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
                     Login();
                 }
@@ -89,7 +103,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     /*检查账号密码*/
-    private boolean checkEdit() {
+    private boolean isTrueForm() {
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")){
                 layoutUserName.setError(getString(R.string.nullUserName));
@@ -127,7 +141,9 @@ public class LoginActivity extends AppCompatActivity
                         //跳转,同时将选择登录的身份数据传送至下一个界面，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
-                        intent.putExtra("identity",identity);
+                        ownInfomationSaveEditor.putString("identity", identity);
+                        ownInfomationSaveEditor.putString("userName", userName);
+                        ownInfomationSaveEditor.commit();
                         LoginActivity.this.finish();
                         startActivity(intent);
                     } else {

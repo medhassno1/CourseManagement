@@ -1,14 +1,14 @@
-package com.ftd.schaepher.coursemanagement.db;
+package com.ftd.schaepher.coursemanagement.pojo;
 import net.tsz.afinal.annotation.sqlite.Id;
 /**
  * Created by lenovo on 2015/10/31.
  */
-public class TeachingDepartment {
+public class TableTeachingDepartment {
     @Id
-    private String number;
+    private String workNumber;
     private String pwd;
     private String name;
-    private String phonenumber;
+    private String telephone;
 
     public String getname() {
         return name;
@@ -17,7 +17,7 @@ public class TeachingDepartment {
         this.name = name;
     }
     public String getnumber() {
-        return number;
+        return workNumber;
     }
     public void setnumber(String name) {
         this.name = name;
@@ -29,10 +29,10 @@ public class TeachingDepartment {
         this.pwd = name;
     }
     public String getphonenumber() {
-        return phonenumber;
+        return telephone;
     }
     public void setphonenumber(String name) {
-        this.phonenumber = name;
+        this.telephone = name;
     }
 
 }
