@@ -1,7 +1,11 @@
 package com.ftd.schaepher.coursemanagement.db;
 import android.content.Context;
-
 import net.tsz.afinal.FinalDb;
+import com.ftd.schaepher.coursemanagement.pojo.*;
+import net.tsz.afinal.FinalDb;
+import net.tsz.afinal.annotation.sqlite.Table;
+import java.lang.*;
+
 
 public class CourseDBHelper {
     FinalDb db;
@@ -11,22 +15,22 @@ public class CourseDBHelper {
     }
 
     public void creatTableTeacher() {
-        Teacher teacher = new Teacher();
+        TableTeacher teacher = new TableTeacher();
         db.save(teacher);
     }
 
     public void creatTableTeachingDepartment() {
-        TeachingDepartment teachingDepartmentr = new TeachingDepartment();
-        db.save(teachingDepartmentr);
+        TableTeachingDepartment tableTeachingDepartmentr = new TableTeachingDepartment();
+        db.save(tableTeachingDepartmentr);
     }
 
     public void creatTableMajor(){
-        Major major = new Major();
-        db.save(major);
+        TableMajor tableMajor = new TableMajor();
+        db.save(tableMajor);
     }
 
     public void creatTableSystem(){
-        System system =new System();
+        com.ftd.schaepher.coursemanagement.pojo.System system =new com.ftd.schaepher.coursemanagement.pojo.System();
         db.save(system);
     }
 
@@ -35,8 +39,8 @@ public class CourseDBHelper {
         db.save(systemLeader);
     }
     private void creatTableClassTable(){
-        ClassTable classTable =new ClassTable();
-        db.save(classTable);
+        TableClass tableClass =new TableClass();
+        db.save(tableClass);
     }
     //插入数据
     public void insert(Object entity) {

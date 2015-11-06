@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ftd.schaepher.coursemanagement.db.Teacher;
 import com.ftd.schaepher.coursemanagement.pojo.Course;
+import com.ftd.schaepher.coursemanagement.pojo.Teacher;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,8 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
+
+
 
 /**
  * Created by Schaepher on 2015/10/27.
@@ -131,8 +133,7 @@ public class ExcelTools {
                 for (int i = beginRows; i <= rows; i++) {
                    Teacher teacher = new Teacher();
 
-                    teacher.setNumber(getCellValue(i, 1));//导入教师信息
-                    teacher.setName(getCellValue(i, 2));
+                    teacher.setTeacherName(getCellValue(i, 1));//导入教师信息
 
                     Log.i("Data", getCellValue(i, 9));
                     list.add(teacher);
@@ -150,7 +151,7 @@ public class ExcelTools {
     }
 
     public String getCellValue(int row,int col){//获取i行j列的单元格的值
-        Cell c = sheet.getCell(col-1, row-1);
+        Cell c = sheet.getCell(col - 1, row - 1);
         return c.getContents().trim();//返回去空格的值
     }
 
