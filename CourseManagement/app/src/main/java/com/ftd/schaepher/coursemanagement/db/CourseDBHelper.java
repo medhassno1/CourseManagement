@@ -1,14 +1,7 @@
 package com.ftd.schaepher.coursemanagement.db;
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
-import android.util.Log;
-import android.widget.TextView;
-import net.tsz.afinal.FinalDb;
-import net.tsz.afinal.annotation.view.ViewInject;
 
-import java.lang.*;
-import java.util.Date;
-import java.util.List;
+import net.tsz.afinal.FinalDb;
 
 public class CourseDBHelper {
     FinalDb db;
@@ -45,7 +38,7 @@ public class CourseDBHelper {
         ClassTable classTable =new ClassTable();
         db.save(classTable);
     }
-//插入数据
+    //插入数据
     public void insert(Object entity) {
         db.save(entity);
 

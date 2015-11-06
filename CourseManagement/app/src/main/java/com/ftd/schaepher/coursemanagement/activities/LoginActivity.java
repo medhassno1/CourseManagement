@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity
                         }
                     }
                 }
-                if (checkEdit()) {
+                if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
                     Login();
                 }
@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     /*检查账号密码*/
-    private boolean checkEdit() {
+    private boolean isTrueForm() {
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")){
                 layoutUserName.setError(getString(R.string.nullUserName));
