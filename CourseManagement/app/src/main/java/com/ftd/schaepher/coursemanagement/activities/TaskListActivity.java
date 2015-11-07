@@ -114,6 +114,11 @@ public class TaskListActivity extends AppCompatActivity
                 startActivity(new Intent(TaskListActivity.this,TeacherDetailActivity.class));
                 onBackPressed();
                 break;
+            //这个是临时用来跳转文件选择界面的
+            case R.id.nav_setting:
+                startActivity(new Intent(TaskListActivity.this, FileSelectActivity.class));
+                onBackPressed();
+                break;
             default:
                 break;
         }

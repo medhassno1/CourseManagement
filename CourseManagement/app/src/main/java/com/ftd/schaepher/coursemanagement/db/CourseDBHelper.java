@@ -1,10 +1,13 @@
 package com.ftd.schaepher.coursemanagement.db;
 import android.content.Context;
+
+import com.ftd.schaepher.coursemanagement.pojo.SystemLeader;
+import com.ftd.schaepher.coursemanagement.pojo.TableClass;
+import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
+import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
+
 import net.tsz.afinal.FinalDb;
-import com.ftd.schaepher.coursemanagement.pojo.*;
-import net.tsz.afinal.FinalDb;
-import net.tsz.afinal.annotation.sqlite.Table;
-import java.lang.*;
 
 
 public class CourseDBHelper {
