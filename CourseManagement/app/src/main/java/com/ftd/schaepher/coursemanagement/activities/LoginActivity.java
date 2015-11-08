@@ -19,9 +19,11 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
 
+import org.apache.http.Header;
+
 import java.nio.charset.Charset;
 
-import org.apache.http.Header;
+//import com.rey.material.widget.ProgressView;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -89,7 +91,7 @@ public class LoginActivity extends AppCompatActivity
                         }
                     }
                 }
-                if (checkEdit()) {
+                if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
                     Login();
                 }
@@ -101,7 +103,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     /*检查账号密码*/
-    private boolean checkEdit() {
+    private boolean isTrueForm() {
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")){
                 layoutUserName.setError(getString(R.string.nullUserName));

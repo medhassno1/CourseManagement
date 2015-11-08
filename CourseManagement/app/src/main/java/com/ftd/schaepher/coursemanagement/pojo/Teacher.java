@@ -7,6 +7,8 @@ public class Teacher {
     private int teacherImageId;
     private String teacherName;
 
+    public Teacher(){}
+
     public Teacher(int teacherImageId, String teacherName) {
         this.teacherImageId = teacherImageId;
         this.teacherName = teacherName;
