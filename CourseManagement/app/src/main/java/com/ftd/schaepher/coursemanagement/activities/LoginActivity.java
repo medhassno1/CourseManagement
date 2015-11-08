@@ -107,6 +107,12 @@ public class LoginActivity extends AppCompatActivity
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")){
                 layoutUserName.setError(getString(R.string.nullUserName));
+                Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
+                ownInfomationSaveEditor.putString("identity", identity);
+                ownInfomationSaveEditor.putString("userName", userName);
+                ownInfomationSaveEditor.commit();
+                LoginActivity.this.finish();
+                startActivity(intent);
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));

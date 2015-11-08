@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -40,7 +42,14 @@ public class FileSelectActivity extends AppCompatActivity
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_select);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_file_select);
+        setSupportActionBar(mToolbar);
+        ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setTitle("选择文件");
+
         initView();
+
     }
 
     private void initView() {
@@ -50,7 +59,7 @@ public class FileSelectActivity extends AppCompatActivity
         lvFileList.setOnItemClickListener(this);
 
         String sdCardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-        Log.i("path",sdCardRoot);
+        Log.i("path", sdCardRoot);
         File folder = new File(sdCardRoot);
         initData(folder);
     }
