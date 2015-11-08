@@ -1,17 +1,14 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
@@ -23,7 +20,7 @@ import java.util.Calendar;
  * Created by sxq on 2015/10/31.
  * 发布任务界面
  */
-public class TaskCreationActivity extends AppCompatActivity implements  View.OnFocusChangeListener {
+public class TaskCreationActivity extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
     private EditText edtTxDepartmentDeadline;
     private EditText edtTxTeacherDeadline;
 
@@ -41,9 +38,12 @@ public class TaskCreationActivity extends AppCompatActivity implements  View.OnF
         edtTxTeacherDeadline = (EditText) findViewById(R.id.edtTx_add_task_teacher_deadline);
         edtTxTeacherDeadline.setOnFocusChangeListener(this);
         edtTxDepartmentDeadline.setOnFocusChangeListener(this);
+        edtTxDepartmentDeadline.setOnClickListener(this);
+        edtTxTeacherDeadline.setOnClickListener(this);
         edtTxDepartmentDeadline.setInputType(InputType.TYPE_NULL);
         edtTxTeacherDeadline.setInputType(InputType.TYPE_NULL);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.task_creation_activity_actions, menu);
@@ -57,31 +57,48 @@ public class TaskCreationActivity extends AppCompatActivity implements  View.OnF
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
+        switch (v.getId()) {
+            case R.id.edtTx_add_task_department_deadline:
+                if (hasFocus) {
+                    onClick(v);
+                }
+                break;
+            case R.id.edtTx_add_task_teacher_deadline:
+                if (hasFocus) {
+                    onClick(v);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    //弹出时间选择器供选择
+    @Override
+    public void onClick(View v) {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.edtTx_add_task_department_deadline:
-                if (hasFocus){
-                    new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            edtTxDepartmentDeadline.setText(String.format("%d-%d-%d",year,monthOfYear,dayOfMonth));
-                        }
-                    }, year,month,day).show();
-                }
+                new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        edtTxDepartmentDeadline.setText(String.format("%d-%d-%d", year, monthOfYear, dayOfMonth));
+                    }
+                }, year, month, day).show();
                 break;
+
             case R.id.edtTx_add_task_teacher_deadline:
-                if (hasFocus){
-                    new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            edtTxTeacherDeadline.setText(String.format("%d-%d-%d",year,monthOfYear,dayOfMonth));
-                        }
-                    }, year,month,day).show();
-                }
+                new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        edtTxTeacherDeadline.setText(String.format("%d-%d-%d", year, monthOfYear, dayOfMonth));
+                    }
+                }, year, month, day).show();
                 break;
+
             default:
                 break;
         }
