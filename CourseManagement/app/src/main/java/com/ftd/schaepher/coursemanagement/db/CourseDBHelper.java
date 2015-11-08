@@ -4,7 +4,6 @@ import android.content.Context;
 import com.ftd.schaepher.coursemanagement.pojo.*;
 
 import net.tsz.afinal.FinalDb;
-import net.tsz.afinal.annotation.sqlite.Table;
 
 import java.lang.*;
 
@@ -20,6 +19,11 @@ public class CourseDBHelper {
         db.save(teacher);
     }
 
+    /**
+     * 功能：
+     * @param
+     * @return
+     */
     public void creatTableTeachingDepartment() {
         TableTeachingDepartment tableTeachingDepartmentr = new TableTeachingDepartment();
         db.save(tableTeachingDepartmentr);
@@ -31,15 +35,16 @@ public class CourseDBHelper {
     }
 
     public void creatTableSystem(){
-        com.ftd.schaepher.coursemanagement.pojo.System system =new com.ftd.schaepher.coursemanagement.pojo.System();
-        db.save(system);
+        TableSystem tableSystem =new TableSystem();
+        db.save(tableSystem);
     }
 
-    private void creatTableSystemLeader(){
-        SystemLeader systemLeader =new SystemLeader();
-        db.save(systemLeader);
+    public void creatTableSystemLeader(){
+        TableSystemLeader tableSystemLeader =new TableSystemLeader();
+        db.save(tableSystemLeader);
     }
-    private void creatTableClassTable(){
+
+    public void creatTableClass(){
         TableClass tableClass =new TableClass();
         db.save(tableClass);
     }

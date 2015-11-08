@@ -3,7 +3,7 @@ import net.tsz.afinal.annotation.sqlite.Id;
 /**
  * Created by lenovo on 2015/11/2.
  */
-public class SystemLeader {
+public class TableSystemLeader {
     @Id
     private String workNumber;
     private String psw;
