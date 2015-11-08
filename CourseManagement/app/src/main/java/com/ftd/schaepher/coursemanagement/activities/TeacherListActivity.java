@@ -39,7 +39,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * 教师列表界面
  */
 public class TeacherListActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        AdapterView.OnItemClickListener, MenuItem.OnMenuItemClickListener {
     private Toolbar mToolbar;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
@@ -66,8 +67,8 @@ public class TeacherListActivity extends AppCompatActivity
         initTeacherListData();
         initTeacherListView();
 
-        set_eSearch_TextChanged();//设置eSearch搜索框的文本改变时监听器
-        set_ivDeleteText_OnClick();//设置叉叉的监听器
+        setSearchTextChanged();//设置eSearch搜索框的文本改变时监听器
+        setIvDeleteTextOnClick();//设置叉叉的监听器
     }
 
     private void setNavViewConfig() {
@@ -145,29 +146,31 @@ public class TeacherListActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
-
+        MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
+        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
+        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
         return true;
-    }
-
-    //标题栏上的按钮图标点击事件
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_add_teacher:
-                Log.i(TAG, "click add icon");
-                startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     //点击查看教师信息跳转逻辑
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         startActivity(new Intent(TeacherListActivity.this, TeacherDetailActivity.class));
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.add_teacher_from_input:
+                startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
+                break;
+            case R.id.add_teacher_from_file:
+                startActivity(new Intent(TeacherListActivity.this, FileSelectActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     /**
@@ -211,7 +214,7 @@ public class TeacherListActivity extends AppCompatActivity
     /**
      * 设置搜索框的文本更改时的监听器
      */
-    private void set_eSearch_TextChanged() {
+    private void setSearchTextChanged() {
         eSearch = (EditText) findViewById(R.id.etSearch);
 
         eSearch.addTextChangedListener(new TextWatcher() {
@@ -256,7 +259,7 @@ public class TeacherListActivity extends AppCompatActivity
     /**
      * 设置叉叉的点击事件，即清空功能
      */
-    private void set_ivDeleteText_OnClick() {
+    private void setIvDeleteTextOnClick() {
         ivDeleteText = (ImageView) findViewById(R.id.ivDeleteText);
         ivDeleteText.setOnClickListener(new View.OnClickListener() {
 
