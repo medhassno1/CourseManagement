@@ -30,6 +30,7 @@ public class ExcelTools {
     //这是个静态路径，默认为qq接收文件夹
     public String path = "mnt/sdcard/course.xls";
 
+    public ExcelTools(){}
     public ExcelTools(Context con){
         context = con;
     }
