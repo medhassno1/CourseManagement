@@ -7,7 +7,6 @@ import net.tsz.afinal.annotation.sqlite.Id;
  */
 public class TableMajor {
     @Id
-    private String majornumber;
     private String major;
 
     public String getMajor() {
@@ -18,13 +17,7 @@ public class TableMajor {
         this.major = major;
     }
 
-    public String getMajornumber() {
-        return majornumber;
-    }
 
-    public void setMajornumber(String majornumber) {
-        this.majornumber = majornumber;
-    }
 }
 
 
