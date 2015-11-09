@@ -1,13 +1,17 @@
 package com.ftd.schaepher.coursemanagement.db;
+
 import android.content.Context;
 
-import com.ftd.schaepher.coursemanagement.pojo.SystemLeader;
 import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
+import com.ftd.schaepher.coursemanagement.pojo.TableSystem;
+import com.ftd.schaepher.coursemanagement.pojo.TableSystemLeader;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
 
 import net.tsz.afinal.FinalDb;
+
+import java.util.List;
 
 
 public class CourseDBHelper {
@@ -66,11 +70,11 @@ public class CourseDBHelper {
     }
     //查
 
-    public void findById(String id,Class<?> clazz){
-        db.findById(id,clazz);
+    public Object findById(String id,Class<?> clazz){
+       return db.findById(id,clazz);
     }
-    public void findall(Class<?> clazz){
-        db.findAll(clazz);
+    public List findall(Class<?> clazz){
+         return db.findAll(clazz);
     }
 
 

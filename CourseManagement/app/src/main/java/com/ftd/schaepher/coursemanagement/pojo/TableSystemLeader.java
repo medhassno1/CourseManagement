@@ -1,8 +1,10 @@
 package com.ftd.schaepher.coursemanagement.pojo;
 import net.tsz.afinal.annotation.sqlite.Id;
+import net.tsz.afinal.annotation.sqlite.Table;
 /**
  * Created by lenovo on 2015/11/2.
  */
+@Table(name="TableSystemLeader")
 public class TableSystemLeader {
     @Id
     private String workNumber;
@@ -10,12 +12,12 @@ public class TableSystemLeader {
     private String name;
     private String telephone;
 
-    public String getNumber() {
+    public String getWorkNumber() {
         return workNumber;
     }
 
-    public void setNumber(String number) {
-        this.workNumber = number;
+    public void setWorkNumber(String workNumber) {
+        this.workNumber = workNumber;
     }
 
     public String getTelephone() {
