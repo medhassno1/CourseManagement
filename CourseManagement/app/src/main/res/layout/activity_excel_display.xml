@@ -32,7 +32,6 @@
             android:id="@+id/lv_excel_display"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="#dcdcdc"
             android:dividerHeight="2dp">
 
         </ListView>

@@ -6,5 +6,14 @@
         android:icon="@drawable/ic_add_white_48dp"
         android:title="添加"
         app:showAsAction="always|withText"
-        />
+        >
+        <menu>
+            <item
+                android:id="@+id/add_teacher_from_input"
+                android:title="手动输入"/>
+            <item
+                android:id="@+id/add_teacher_from_file"
+                android:title="从文件导入"/>
+        </menu>
+    </item>
 </menu>

@@ -67,8 +67,7 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".activities.TeacherDetailActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activities.TeacherListActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <receiver android:name=".tools.ConnectionChangeReceiver">
             <intent-filter>

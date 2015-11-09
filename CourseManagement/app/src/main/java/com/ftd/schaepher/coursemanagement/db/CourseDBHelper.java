@@ -1,6 +1,6 @@
 package com.ftd.schaepher.coursemanagement.db;
-import android.content.Context;
 
+import android.content.Context;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
@@ -11,8 +11,8 @@ import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
 
 import net.tsz.afinal.FinalDb;
 
-import java.lang.*;
 import java.util.List;
+
 
 public class CourseDBHelper {
     FinalDb db;
@@ -55,7 +55,7 @@ public class CourseDBHelper {
         TableClass tableClass =new TableClass();
         db.save(tableClass);
     }
-//插入数据
+    //插入数据
     public void insert(Object entity) {
         db.save(entity);
 
@@ -73,7 +73,7 @@ public class CourseDBHelper {
     public Object findById(String id,Class<?> clazz){
        return db.findById(id,clazz);
     }
-    public List  findall(Class<?> clazz){
+    public List findall(Class<?> clazz){
          return db.findAll(clazz);
     }
 

@@ -58,7 +58,7 @@ public class TaskListActivity extends AppCompatActivity
     }
 
     private void setNavViewConfig() {
-        identity = getSharedPreferences("userInformation",MODE_PRIVATE).getString("identity", null);
+        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -67,7 +67,7 @@ public class TaskListActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
 
-        if (identity.equals("teacher")){
+        if (identity.equals("teacher")) {
             navigationView.getMenu().removeItem(R.id.nav_teacher_list);
         }
         navigationView.setNavigationItemSelectedListener(this);
@@ -103,12 +103,16 @@ public class TaskListActivity extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_teacher_list:
-                finish();
                 startActivity(new Intent(TaskListActivity.this, TeacherListActivity.class));
+                finish();
                 break;
             case R.id.nav_logout:
+                startActivity(new Intent(TaskListActivity.this, LoginActivity.class));
                 finish();
-                startActivity(new Intent(TaskListActivity.this,LoginActivity.class));
+                break;
+            case R.id.nav_own_information:
+                startActivity(new Intent(TaskListActivity.this, TeacherDetailActivity.class));
+                onBackPressed();
                 break;
             default:
                 break;
@@ -140,9 +144,9 @@ public class TaskListActivity extends AppCompatActivity
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        identity = getSharedPreferences("userInformation",MODE_PRIVATE).getString("identity", null);
+        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
-        if (identity.equals("teacher")){
+        if (identity.equals("teacher")) {
             menu.removeItem(R.id.action_add_task);
         }
         return true;
@@ -200,4 +204,5 @@ public class TaskListActivity extends AppCompatActivity
             TextView taskName;
         }
     }
+
 }

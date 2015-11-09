@@ -20,9 +20,11 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
 
+import org.apache.http.Header;
+
 import java.nio.charset.Charset;
 
-import org.apache.http.Header;
+//import com.rey.material.widget.ProgressView;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -43,7 +45,7 @@ public class LoginActivity extends AppCompatActivity
     private String password;
     private String identity;
 
-    private SharedPreferences.Editor identitySaveEditor;
+    private SharedPreferences.Editor ownInfomationSaveEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +60,11 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
         proBarLogin = (ProgressView) findViewById(R.id.proBar_login);
-        identitySaveEditor = getSharedPreferences("userInformation",MODE_PRIVATE).edit();
+        ownInfomationSaveEditor = getSharedPreferences("userInformation",MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
-        Initialize initialize =new Initialize();
-        initialize.init(this);
         autoSetUserName();
     }
 
@@ -92,7 +92,7 @@ public class LoginActivity extends AppCompatActivity
                         }
                     }
                 }
-                if (checkEdit()) {
+                if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
                     Login();
                 }
@@ -104,7 +104,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     /*检查账号密码*/
-    private boolean checkEdit() {
+    private boolean isTrueForm() {
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")){
                 layoutUserName.setError(getString(R.string.nullUserName));
@@ -142,9 +142,9 @@ public class LoginActivity extends AppCompatActivity
                         //跳转,同时将选择登录的身份数据传送至下一个界面，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
-                        identitySaveEditor.putString("identity",identity);
-                        identitySaveEditor.putString("userName",userName);
-                        identitySaveEditor.commit();
+                        ownInfomationSaveEditor.putString("identity", identity);
+                        ownInfomationSaveEditor.putString("userName", userName);
+                        ownInfomationSaveEditor.commit();
                         LoginActivity.this.finish();
                         startActivity(intent);
                     } else {
