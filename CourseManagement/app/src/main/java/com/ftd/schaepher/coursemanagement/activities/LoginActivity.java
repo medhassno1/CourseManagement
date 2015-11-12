@@ -20,11 +20,14 @@ import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.ParseJson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -37,7 +40,7 @@ import java.util.List;
  */
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, View.OnFocusChangeListener {
-
+    private static final String TAG = "LoginActivity";
     private Button btnLogin;
     private EditText edtTxUserName;
     private EditText edtTxPassWord;
@@ -50,7 +53,7 @@ public class LoginActivity extends AppCompatActivity
     private String password;
     private String identity;
 
-    private SharedPreferences.Editor ownInfomationSaveEditor;
+    private SharedPreferences.Editor ownInformationSaveEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,17 +68,18 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
         proBarLogin = (ProgressView) findViewById(R.id.proBar_login);
-        ownInfomationSaveEditor = getSharedPreferences("userInformation",MODE_PRIVATE).edit();
+        ownInformationSaveEditor = getSharedPreferences("userInformation", MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
         autoSetUserName();
+        loginTest();
     }
 
     private void autoSetUserName() {
-        userName = getSharedPreferences("userInformation",MODE_PRIVATE).getString("userName", "");
-        if (!userName.equals("")){
+        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
+        if (!userName.equals("")) {
             edtTxUserName.setText(userName);
         }
     }
@@ -87,11 +91,12 @@ public class LoginActivity extends AppCompatActivity
                 userName = edtTxUserName.getText().toString().trim();
                 password = edtTxPassWord.getText().toString().trim();
                 for (int i = 0; i < rdoGroup.getChildCount(); i++) {
-                    RadioButton rdoBtnIdent = (RadioButton) rdoGroup.getChildAt(i);
-                    if (rdoBtnIdent.isChecked()) {
-                        identity = rdoBtnIdent.getText().toString().trim();
-                        if (identity.equals("教师")) {  //由于服务端暂时只有教师和负责人两种身份,
-                            identity = "teacher";        //这里暂时也只有这两种身份，后期再修改
+                    RadioButton rdoBtnId = (RadioButton) rdoGroup.getChildAt(i);
+                    if (rdoBtnId.isChecked()) {
+                        identity = rdoBtnId.getText().toString().trim();
+                        // 由于服务端暂时只有教师和负责人两种身份,这里暂时也只有这两种身份，后期再修改
+                        if (identity.equals("教师")) {
+                            identity = "teacher";
                         } else {
                             identity = "manager";
                         }
@@ -99,7 +104,8 @@ public class LoginActivity extends AppCompatActivity
                 }
                 if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
-                    Login();
+                    login();
+//                    loginTest();
                 }
 
                 break;
@@ -111,7 +117,7 @@ public class LoginActivity extends AppCompatActivity
     /*检查账号密码*/
     private boolean isTrueForm() {
         if (userName.equals("") || password.equals("")) {
-            if (userName.equals("")){
+            if (userName.equals("")) {
                 layoutUserName.setError(getString(R.string.nullUserName));
 //                Initialize initialize = new Initialize();
 //                initialize.init(this); 
@@ -134,7 +140,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     //处理登录逻辑
-    public void Login() {
+    public void login() {
         RequestParams params = new RequestParams();
         params.add("login-user", userName);
         params.add("login-password", password);
@@ -155,9 +161,9 @@ public class LoginActivity extends AppCompatActivity
                         //跳转,同时将选择登录的身份数据传送至下一个界面，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
-                        ownInfomationSaveEditor.putString("identity", identity);
-                        ownInfomationSaveEditor.putString("userName", userName);
-                        ownInfomationSaveEditor.commit();
+                        ownInformationSaveEditor.putString("identity", identity);
+                        ownInformationSaveEditor.putString("userName", userName);
+                        ownInformationSaveEditor.commit();
                         LoginActivity.this.finish();
                         startActivity(intent);
                     } else {
@@ -177,7 +183,7 @@ public class LoginActivity extends AppCompatActivity
                 }
             });
         } catch (Exception e) {
-            Log.e("Login()", e.toString());
+            Log.e(TAG, e.toString());
         }
     }
 
@@ -192,5 +198,31 @@ public class LoginActivity extends AppCompatActivity
         if (!edtTxPassWord.getText().toString().equals("")) {
             layoutPassWord.setError(null);
         }
+    }
+
+
+    // 用来测试login的类
+    public void loginTest() {
+        ownInformationSaveEditor.putString("userName", userName);
+        ownInformationSaveEditor.commit();
+        NetworkManager.post(NetworkManager.URL_JSON, null, new BaseJsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int i, Header[] headers, String s, Object o) {
+                Log.w(TAG, s);
+                ParseJson parseJson = new ParseJson();
+                parseJson.toTeacher(s);
+            }
+
+            @Override
+            public void onFailure(int i, Header[] headers, Throwable throwable, String s, Object o) {
+
+            }
+
+            @Override
+            protected Object parseResponse(String s, boolean b) throws Throwable {
+                JSONArray array = new JSONArray(s);
+                return array;
+            }
+        });
     }
 }
