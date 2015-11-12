@@ -7,18 +7,16 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableTask;
-import com.rey.material.app.Dialog;
-import com.rey.material.app.DialogFragment;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
 
@@ -51,6 +49,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         initWidgetAndListener();
     }
 
+    //初始化控件及绑定监听事件
     private void initWidgetAndListener() {
         edtTxDepartmentDeadline = (EditText) findViewById(R.id.edtTx_add_task_department_deadline);
         edtTxTeacherDeadline = (EditText) findViewById(R.id.edtTx_add_task_teacher_deadline);
@@ -111,13 +110,16 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         }
     }
 
+    //获取即将发布的任务的信息
     private TableTask getNewTaskInfomation() {
         TableTask newTask = new TableTask();
         newTask.setYear("2015");
         newTask.setSemester("02");
+        newTask.setTaskState("0");
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
         newTask.setRemark(edtTxTaskRemark.getText().toString());
+        newTask.setRelativeTable(taskNameChineseMapEnglisg(edtTxTaskName.getText().toString())+"201502");
         return newTask;
     }
 
@@ -200,6 +202,31 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
 
             default:
                 break;
+        }
+    }
+
+    //任务名映射
+    public String taskNameChineseMapEnglisg(String string){
+        Log.d("TAG", string);
+        switch (string){
+            case "计算机（卓越班）":
+                return "tc_com_exc";
+            case "计算机专业":
+                return "tc_com_nor";
+            case "计算机（实验班）":
+                return "tc_com_ope";
+            case "信息安全专业":
+                return "tc_inf_sec";
+            case "数学类":
+                return "tc_math_nor";
+            case "数学类（实验班）":
+                return "tc_math_ope";
+            case "网络工程专业":
+                return "tc_net_pro";
+            case "软件工程专业":
+                return "tc_soft_pro";
+            default:
+                return null;
         }
     }
 }
