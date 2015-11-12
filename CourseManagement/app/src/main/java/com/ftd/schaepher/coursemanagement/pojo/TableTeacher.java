@@ -14,6 +14,24 @@ public class TableTeacher {
     private String pwd;
     private String name;
     private String telephone;
+    private String department;
+    private String major;
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getMajor() {
+        return major;
+    }
+
+    public void setMajor(String major) {
+        this.major = major;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
 
     public String getWorkNumber() {
         return workNumber;
