@@ -14,7 +14,11 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.pojo.TableClass;
+import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
+import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -23,6 +27,7 @@ import com.rey.material.widget.ProgressView;
 import org.apache.http.Header;
 
 import java.nio.charset.Charset;
+import java.util.List;
 
 //import com.rey.material.widget.ProgressView;
 
@@ -108,6 +113,14 @@ public class LoginActivity extends AppCompatActivity
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")){
                 layoutUserName.setError(getString(R.string.nullUserName));
+//                Initialize initialize = new Initialize();
+//                initialize.init(this); 
+                Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
+                ownInfomationSaveEditor.putString("identity", identity);
+                ownInfomationSaveEditor.putString("userName", userName);
+                ownInfomationSaveEditor.commit();
+                LoginActivity.this.finish();
+                startActivity(intent);
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));
