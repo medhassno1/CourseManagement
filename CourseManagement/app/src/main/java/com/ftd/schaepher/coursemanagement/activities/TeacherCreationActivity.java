@@ -1,5 +1,7 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
 import com.rey.material.app.SimpleDialog;
 
 /**
@@ -18,9 +22,12 @@ import com.rey.material.app.SimpleDialog;
  * 教师添加界面
  */
 public class TeacherCreationActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
+    private EditText edtTxTeacherNumber;
+    private EditText edtTxPassword;
+    private EditText edtTxTeacherName;
+    private EditText edtTxPhoneNumber;
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
-    private EditText edtTxNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +39,14 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("添加用户");
 
-        edtTxNumber = (EditText)findViewById(R.id.edtTx_teacher_creation_username);
-        edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_creation_department);
-        edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
-        edtTxNumber.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);//工号输入框的格式
+        edtTxTeacherNumber = (EditText)findViewById(R.id.edtTx_teacher_creation_username);
+        edtTxPassword = (EditText)findViewById(R.id.edtTx_teacher_creation_password);
+        edtTxTeacherName = (EditText)findViewById(R.id.edtTx_teacher_creation_name);
+        edtTxPhoneNumber = (EditText)findViewById(R.id.edtTx_teacher_creation_phone_number);
+        edtTxDepartment = (EditText)findViewById(R.id.edtTx_teacher_creation_department);
+        edtTxMajor = (EditText)findViewById(R.id.edtTx_teacher_creation_major);
+
+        edtTxTeacherNumber.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);//工号输入框的格式
         edtTxDepartment.setInputType(InputType.TYPE_NULL);
         edtTxMajor.setInputType(InputType.TYPE_NULL);
         edtTxDepartment.setOnClickListener(this);
@@ -51,12 +62,32 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.action_confim_add_teacher:
+                new AlertDialog.Builder(this).setTitle("提示").setMessage("是否确认添加").setPositiveButton
+                        (android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                CourseDBHelper dbHelper = new CourseDBHelper();
+                                dbHelper.creatDataBase(TeacherCreationActivity.this);
+                                TableTeacher teacher = getTeacherData();
+                                dbHelper.insert(teacher);
+
+                                finish();
+                            }
+                        }).setNegativeButton
+                        (android.R.string.cancel, new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -141,5 +172,20 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
             default:
                 break;
         }
+    }
+
+    /**
+     * 获得界面数据
+     */
+    private TableTeacher getTeacherData(){
+        TableTeacher teacher = new TableTeacher();
+        teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+        teacher.setPwd(edtTxPassword.getText().toString().trim());
+        teacher.setName(edtTxTeacherName.getText().toString().trim());
+        teacher.setDepartment(edtTxDepartment.getText().toString().trim());
+        teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+        teacher.setMajor(edtTxMajor.getText().toString().trim());
+
+        return teacher;
     }
 }

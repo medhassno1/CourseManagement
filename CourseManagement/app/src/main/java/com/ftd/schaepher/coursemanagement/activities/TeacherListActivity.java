@@ -182,11 +182,11 @@ public class TeacherListActivity extends AppCompatActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intend = new Intent();
         intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
-        intend.putExtra("teacherID", list.get(position).getPwd());
+        intend.putExtra("teacherID", list.get(position).getWorkNumber());
         startActivity(intend);
 
         Log.i("str", position + "    " + id);
-        Log.i("str",list.get(position).getPwd()+list.get(position).getName());
+        Log.i("str",list.get(position).getWorkNumber()+list.get(position).getName());
     }
 
     @Override
