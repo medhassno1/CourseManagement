@@ -7,8 +7,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -17,9 +17,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.Course;
-import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 
 import java.util.ArrayList;
@@ -51,6 +51,13 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         initExcelListView();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initExcelData();
+        initExcelListView();
+    }
+
     private void initExcelData() {
         excelData = new ArrayList<Course>();
         Course excelHeader = new Course("年级", "专业", "专业人数", "课程名称", "选修类型", "学分", "学时",
@@ -62,12 +69,11 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         excelListData = dbHelper.findall(TableClass.class);
         for (int i = 0; i < excelListData.size(); i++) {
             TableClass listCur = excelListData.get(i);
-            Course courseCur = new Course(listCur.getGrade(),listCur.getMajor(),listCur.getNum(),
-                    listCur.getClassName(),listCur.getClassType(),listCur.getClassCredit(),
-                    listCur.getClassTime(),listCur.getOpTime(),listCur.getPrTime(),null,null,null);
+            Course courseCur = new Course(listCur.getGrade(), listCur.getMajor(), listCur.getNum(),
+                    listCur.getClassName(), listCur.getClassType(), listCur.getClassCredit(),
+                    listCur.getClassTime(), listCur.getOpTime(), listCur.getPrTime(),
+                    listCur.getTimePeriod(), listCur.getTeacherName(), listCur.getRemark());
             excelData.add(courseCur);
-            Log.d("TAG",courseCur.toString());
-            Log.d("TAG",listCur.getClassName()+listCur.getClassType());
         }
     }
 
@@ -83,7 +89,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     //点击弹出修改弹窗
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (position != 0){
+        if (position != 0) {
             AlertDialog mAlertDialog = initAlertDialog(position);
             mAlertDialog.show();
         }
@@ -93,7 +99,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
-        initAlertDialogData(position,alertDialogView);
+        initAlertDialogData(position, alertDialogView);
         mBuilder.setView(alertDialogView)
                 .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
@@ -103,17 +109,14 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
                         EditText edtTxDialogNote =
                                 (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
-                        Log.d("fromtoend", edtTxDialogNote.getText().toString());
+
                         TableClass courseModify = new TableClass();
                         courseModify.setClassName(excelData.get(position).getCourseName());
                         courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
                         courseModify.setRemark(edtTxDialogNote.getText().toString());
                         courseModify.setTeacherName("张三");
                         dbHelper.update(courseModify);
-                        excelData.get(position).setFromToEnd(edtTxDialogFromToEnd.getText().toString());
-                        excelData.get(position).setTeacher("张三");
-                        excelData.get(position).setNote(edtTxDialogNote.getText().toString());
-                        mExcelAdapter.notifyDataSetChanged();
+                        onResume();
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -124,20 +127,21 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 });
         return mBuilder.create();
     }
+
     //设置弹窗的数据
-    private void initAlertDialogData(int position,View v) {
+    private void initAlertDialogData(int position, View v) {
         position = position - 1;
-        TextView tvDialogGrade = (TextView)v.findViewById(R.id.tv_dialog_grade);
-        TextView tvDialogMajor = (TextView)v.findViewById(R.id.tv_dialog_major);
-        TextView tvDialogNum = (TextView)v.findViewById(R.id.tv_dialog_sum);
-        TextView tvDialogCourseName = (TextView)v.findViewById(R.id.tv_dialog_course_name);
-        TextView tvDialogType = (TextView)v.findViewById(R.id.tv_dialog_type);
-        TextView tvDialogCredit = (TextView)v.findViewById(R.id.tv_dialog_credit);
-        TextView tvDialogClassHour = (TextView)v.findViewById(R.id.tv_dialog_class_hour);
-        TextView tvDialogExperimentHour = (TextView)v.findViewById(R.id.tv_dialog_experiment_hour);
-        TextView tvDialogComputerHour = (TextView)v.findViewById(R.id.tv_dialog_computer_hour);
+        TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
+        TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
+        TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
+        TextView tvDialogCourseName = (TextView) v.findViewById(R.id.tv_dialog_course_name);
+        TextView tvDialogType = (TextView) v.findViewById(R.id.tv_dialog_type);
+        TextView tvDialogCredit = (TextView) v.findViewById(R.id.tv_dialog_credit);
+        TextView tvDialogClassHour = (TextView) v.findViewById(R.id.tv_dialog_class_hour);
+        TextView tvDialogExperimentHour = (TextView) v.findViewById(R.id.tv_dialog_experiment_hour);
+        TextView tvDialogComputerHour = (TextView) v.findViewById(R.id.tv_dialog_computer_hour);
         EditText edtTxDialogFromtoEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
-        EditText edtTxDialogNote= (EditText) v.findViewById(R.id.edtTx_dialog_note);
+        EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
 
         tvDialogGrade.setText(excelListData.get(position).getGrade());
         tvDialogMajor.setText(excelListData.get(position).getMajor());
@@ -150,6 +154,17 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tvDialogComputerHour.setText(excelListData.get(position).getPrTime());
         edtTxDialogFromtoEnd.setText(excelListData.get(position).getTimePeriod());
         edtTxDialogNote.setText(excelListData.get(position).getRemark());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**

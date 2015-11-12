@@ -14,11 +14,6 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
-import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.db.Initialize;
-import com.ftd.schaepher.coursemanagement.pojo.TableClass;
-import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.ParseJson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -30,7 +25,6 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 
 import java.nio.charset.Charset;
-import java.util.List;
 
 //import com.rey.material.widget.ProgressView;
 
@@ -119,14 +113,6 @@ public class LoginActivity extends AppCompatActivity
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")) {
                 layoutUserName.setError(getString(R.string.nullUserName));
-//                Initialize initialize = new Initialize();
-//                initialize.init(this); 
-                Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
-                ownInfomationSaveEditor.putString("identity", identity);
-                ownInfomationSaveEditor.putString("userName", userName);
-                ownInfomationSaveEditor.commit();
-                LoginActivity.this.finish();
-                startActivity(intent);
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));
@@ -158,7 +144,7 @@ public class LoginActivity extends AppCompatActivity
                     //打印获得的网页
                     Log.w("first post=", html);
                     if (logResult == -1) {
-                        //跳转,同时将选择登录的身份数据传送至下一个界面，方便下一个界面根据不同身份做相应修改
+                        //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
                         ownInformationSaveEditor.putString("identity", identity);
