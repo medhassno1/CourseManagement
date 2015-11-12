@@ -1,8 +1,6 @@
 package com.ftd.schaepher.coursemanagement.db;
 
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
-
 
 import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
@@ -10,8 +8,6 @@ import com.ftd.schaepher.coursemanagement.pojo.TableSystem;
 import com.ftd.schaepher.coursemanagement.pojo.TableSystemLeader;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
-
-import net.tsz.afinal.FinalDb;
 
 /**
  * Created by lenovo on 2015/11/6.
@@ -83,7 +79,7 @@ public class Initialize {
         TableTeacher tableTeacher =new TableTeacher();
         tableTeacher.setWorkNumber("02501");
         tableTeacher.setPwd("02501");
-        tableTeacher.setName("陈楠楠");
+        tableTeacher.setName("陈楠楠1111");
         tableTeacher.setTelephone("00000000005");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02502");

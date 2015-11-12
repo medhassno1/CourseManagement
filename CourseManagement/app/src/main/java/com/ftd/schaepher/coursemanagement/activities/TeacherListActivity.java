@@ -27,7 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
-import com.ftd.schaepher.coursemanagement.pojo.Teacher;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,8 @@ public class TeacherListActivity extends AppCompatActivity
     private Handler myhandler = new Handler();
     private static final String TAG = "TeacherListActivity";
 
-    private List<Teacher> teacherListData;
+    private List<TableTeacher> teacherListData;//
+    private List<TableTeacher> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +66,25 @@ public class TeacherListActivity extends AppCompatActivity
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
-        initTeacherListData();
-        initTeacherListView();
+        /*Initialize initialize = new Initialize();
+        initialize.init(this);*/
+
+        updateTeacherDataList();
+
 
         setSearchTextChanged();//设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick();//设置叉叉的监听器
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateTeacherDataList();
+    }
+
+    public void updateTeacherDataList(){
+        initTeacherListData();
+        initTeacherListView();
     }
 
     private void setNavViewConfig() {
@@ -83,9 +99,18 @@ public class TeacherListActivity extends AppCompatActivity
     }
 
     private void initTeacherListData() {
-        teacherListData = new ArrayList<Teacher>();
-        Teacher teacher = new Teacher(R.drawable.ic_people, "张三");
-        teacherListData.add(teacher);
+        teacherListData = new ArrayList<>();
+        CourseDBHelper dbHelper = new CourseDBHelper();
+        dbHelper.creatDataBase(this);
+
+        list = dbHelper.findall(TableTeacher.class);
+        Log.i("string", list.size() + "");
+
+        for(int i=0;i<list.size();i++){
+            teacherListData.add(list.get(i));
+            Log.i("string",list.get(i).getName());
+        }
+
     }
 
     private void initTeacherListView() {
@@ -155,7 +180,13 @@ public class TeacherListActivity extends AppCompatActivity
     //点击查看教师信息跳转逻辑
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        startActivity(new Intent(TeacherListActivity.this, TeacherDetailActivity.class));
+        Intent intend = new Intent();
+        intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
+        intend.putExtra("teacherID", list.get(position).getPwd());
+        startActivity(intend);
+
+        Log.i("str", position + "    " + id);
+        Log.i("str",list.get(position).getPwd()+list.get(position).getName());
     }
 
     @Override
@@ -176,17 +207,18 @@ public class TeacherListActivity extends AppCompatActivity
     /**
      * 任务列表的适配器
      */
-    class TeacherAdapter extends ArrayAdapter<Teacher> {
+    class TeacherAdapter extends ArrayAdapter<TableTeacher> {
         private int resourceId;
 
-        public TeacherAdapter(Context context, int resource, List<Teacher> objects) {
+        public TeacherAdapter(Context context, int resource, List<TableTeacher> objects) {
             super(context, resource, objects);
             this.resourceId = resource;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Teacher teacher = getItem(position);
+           // Teacher teacher = getItem(position);
+            TableTeacher teacher = getItem(position);
             View view;
             viewHolder viewHolder;
             if (convertView == null) {
@@ -200,8 +232,8 @@ public class TeacherListActivity extends AppCompatActivity
                 viewHolder = (TeacherAdapter.viewHolder) view.getTag();
             }
 
-            viewHolder.teacherImageId.setImageResource(teacher.getTeacherImageId());
-            viewHolder.teacherName.setText(teacher.getTeacherName());
+            viewHolder.teacherImageId.setImageResource(R.drawable.ic_people);
+            viewHolder.teacherName.setText(teacher.getName());
             return view;
         }
 

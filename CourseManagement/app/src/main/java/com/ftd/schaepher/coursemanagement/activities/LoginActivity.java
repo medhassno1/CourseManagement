@@ -152,6 +152,8 @@ public class LoginActivity extends AppCompatActivity
                         ownInformationSaveEditor.commit();
                         LoginActivity.this.finish();
                         startActivity(intent);
+
+
                     } else {
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "账号或密码错误",
