@@ -5,7 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.pojo.Course;
-import com.ftd.schaepher.coursemanagement.pojo.Teacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +40,10 @@ public class ExcelTools {
         path=filePath;
     }
 
+    /**
+     * 判断文件名
+     * @return
+     */
     public boolean isTrueFileName(){
         if(!new File(path).exists()) {
             Toast.makeText(context, "该文件不存在！", Toast.LENGTH_LONG).show();
@@ -66,7 +70,7 @@ public class ExcelTools {
 
                 Log.i("Data", "行数" + rows);
 
-                for (int i = 1; i <= rows; i++) {       //【判断从第几行导入数据
+                for (int i = 1; i <= rows; i++) {       //判断从第几行导入数据
                     Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
                     if (getCellValue(i, 1).matches("^[0-9]+$")) {    //匹配数字
                         beginRows = i;
@@ -108,10 +112,10 @@ public class ExcelTools {
 
 
     //读取course表格的所有数据
-    public List<Teacher> readTeacherExcel() {
+    public List<TableTeacher> readTeacherExcel() {
         int rows;
         int beginRows=4;
-        ArrayList<Teacher> list = new ArrayList<>();
+        ArrayList<TableTeacher> list = new ArrayList<>();
         Log.i("Data", "目录是否可读");
 
         if(isTrueFileName()) {
@@ -122,7 +126,7 @@ public class ExcelTools {
 
                 Log.i("Data", "行数" + rows);
 
-                for (int i = 1; i <= rows; i++) {       //【判断从第几行导入数据
+                for (int i = 1; i <= rows; i++) {       //判断从第几行导入数据
                     Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
                     if (getCellValue(i, 1).matches("^[0-9]+$")) {    //匹配数字
                         beginRows = i;
@@ -132,11 +136,16 @@ public class ExcelTools {
                 }
 
                 for (int i = beginRows; i <= rows; i++) {
-                   Teacher teacher = new Teacher();
+                   TableTeacher teacher = new TableTeacher();
 
-                    teacher.setTeacherName(getCellValue(i, 1));//导入教师信息
+                    teacher.setWorkNumber(getCellValue(i, 1));//导入教师信息
+                    teacher.setPwd(getCellValue(i, 2));
+                    teacher.setName(getCellValue(i,3));
+                    teacher.setTelephone(getCellValue(i,4));
+                    teacher.setDepartment(getCellValue(i,5));
+                    teacher.setMajor(getCellValue(i,6));
 
-                    Log.i("Data", getCellValue(i, 9));
+                    Log.i("Data", getCellValue(i,5));
                     list.add(teacher);
                 }
             } catch (BiffException e) {
@@ -151,7 +160,11 @@ public class ExcelTools {
         return list;
     }
 
-    public String getCellValue(int row,int col){//获取i行j列的单元格的值
+    /**
+     * 获取表格i行j列的单元格的值
+     *
+     */
+    public String getCellValue(int row,int col){
         Cell c = sheet.getCell(col - 1, row - 1);
         return c.getContents().trim();//返回去空格的值
     }

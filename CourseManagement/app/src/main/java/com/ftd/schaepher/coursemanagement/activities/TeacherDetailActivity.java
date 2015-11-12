@@ -120,9 +120,6 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
                             }
                         }).show();
-
-
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
