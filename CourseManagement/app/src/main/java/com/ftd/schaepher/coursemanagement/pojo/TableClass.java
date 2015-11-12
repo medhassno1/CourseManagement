@@ -14,6 +14,9 @@ public class TableClass {
     private String classTime;
     private String opTime;
     private String prTime;
+    private String timePeriod;
+    private String teacherName;
+    private String remark;
 
     public String getClassName() {
         return className;
@@ -39,12 +42,12 @@ public class TableClass {
         this.opTime = opTime;
     }
 
-    public String getTime() {
+    public String getClassTime() {
         return classTime;
     }
 
-    public void setTime(String time) {
-        this.classTime = time;
+    public void setClassTime(String classTime) {
+        this.classTime = classTime;
     }
 
     public String getClassCredit() {
@@ -55,20 +58,20 @@ public class TableClass {
         this.classCredit = classCredit;
     }
 
-    public String getType() {
-        return classType;
-    }
-
-    public void setType(String type) {
-        this.classType = type;
-    }
-
     public String getMajor() {
         return major;
     }
 
     public void setMajor(String major) {
         this.major = major;
+    }
+
+    public String getClassType() {
+        return classType;
+    }
+
+    public void setClassType(String classType) {
+        this.classType = classType;
     }
 
     public String getNum() {
@@ -86,4 +89,29 @@ public class TableClass {
     public void setGrade(String grade) {
         this.grade = grade;
     }
+
+    public String getTimePeriod() {
+        return timePeriod;
+    }
+
+    public void setTimePeriod(String timePeriod) {
+        this.timePeriod = timePeriod;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
 }

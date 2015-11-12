@@ -42,8 +42,7 @@
         </activity>
         <activity
             android:name=".activities.ExcelDisplayActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activities.TaskDetailActivity">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activities.TaskListActivity"
@@ -51,17 +50,14 @@
         </activity>
         <activity
             android:name=".activities.TaskCreationActivity"
-            android:parentActivityName=".activities.TaskListActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activities.TaskDetailActivity"
-            android:parentActivityName=".activities.TaskListActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".activities.TeacherCreationActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activities.TeacherListActivity">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".activities.TeacherListActivity"
             android:theme="@style/AppTheme.NoActionBar">

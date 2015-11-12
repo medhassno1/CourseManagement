@@ -5,4 +5,9 @@
         android:id="@+id/action_export_file"
         android:title="导出表格"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_commit_task"
+        android:title="提交报课"
+        app:showAsAction="always"
+        android:visible="false"/>
 </menu>

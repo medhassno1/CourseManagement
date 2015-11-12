@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity
                     //打印获得的网页
                     Log.w("first post=", html);
                     if (logResult == -1) {
-                        //跳转,同时将选择登录的身份数据传送至下一个界面，方便下一个界面根据不同身份做相应修改
+                        //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
                         ownInformationSaveEditor.putString("identity", identity);

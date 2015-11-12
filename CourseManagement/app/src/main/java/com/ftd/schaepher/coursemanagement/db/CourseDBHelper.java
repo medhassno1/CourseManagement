@@ -15,7 +15,7 @@ import java.util.List;
 
 
 public class CourseDBHelper {
-    FinalDb db;
+    public FinalDb db;
 //创建数据库
     public void creatDataBase(Context context) {
         db = FinalDb.create(context, "teacherclass.db");

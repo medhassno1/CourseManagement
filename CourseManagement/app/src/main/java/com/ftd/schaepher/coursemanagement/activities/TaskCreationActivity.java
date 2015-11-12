@@ -52,7 +52,13 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -85,7 +91,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        edtTxDepartmentDeadline.setText(String.format("%d-%d-%d", year, monthOfYear, dayOfMonth));
+                        edtTxDepartmentDeadline.setText(String.format("%d-%d-%d", year, monthOfYear+1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
@@ -94,7 +100,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        edtTxTeacherDeadline.setText(String.format("%d-%d-%d", year, monthOfYear, dayOfMonth));
+                        edtTxTeacherDeadline.setText(String.format("%d-%d-%d", year, monthOfYear+1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
