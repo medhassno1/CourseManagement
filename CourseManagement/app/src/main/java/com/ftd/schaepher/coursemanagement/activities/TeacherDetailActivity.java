@@ -75,7 +75,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     }
 
     /**
-     * 获得界面的数据
+     * 获得界面数据
      */
     private TableTeacher getTeacherData(){
         TableTeacher teacher = new TableTeacher();
