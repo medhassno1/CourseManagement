@@ -35,7 +35,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         edtTxNumber = (EditText)findViewById(R.id.edtTx_teacher_creation_username);
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_creation_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
-        edtTxNumber.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);//工号输入框格式
+        edtTxNumber.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);//工号输入框的格式
         edtTxDepartment.setInputType(InputType.TYPE_NULL);
         edtTxMajor.setInputType(InputType.TYPE_NULL);
         edtTxDepartment.setOnClickListener(this);
