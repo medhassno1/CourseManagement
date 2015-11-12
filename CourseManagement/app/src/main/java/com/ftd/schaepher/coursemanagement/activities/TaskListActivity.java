@@ -250,6 +250,7 @@ public class TaskListActivity extends AppCompatActivity
 
     //任务状态映射
     public String taskStateMap(String string){
+        if (string == null) return null;
         switch (string){
             case "0":
                 return "进行中";
