@@ -16,14 +16,11 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
-import com.ftd.schaepher.coursemanagement.tools.ParseJson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 
 import java.nio.charset.Charset;
 
@@ -69,7 +66,6 @@ public class LoginActivity extends AppCompatActivity
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
         autoSetUserName();
-     //   loginTest();
     }
 
     /**
@@ -215,31 +211,5 @@ public class LoginActivity extends AppCompatActivity
         if (!edtTxPassWord.getText().toString().equals("")) {
             layoutPassWord.setError(null);
         }
-    }
-
-
-    // 用来测试login的类
-    public void loginTest() {
-        ownInformationSaveEditor.putString("userName", userName);
-        ownInformationSaveEditor.commit();
-        NetworkManager.post(NetworkManager.URL_JSON, null, new BaseJsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int i, Header[] headers, String s, Object o) {
-                Log.w(TAG, s);
-                ParseJson parseJson = new ParseJson();
-                parseJson.toTeacher(s);
-            }
-
-            @Override
-            public void onFailure(int i, Header[] headers, Throwable throwable, String s, Object o) {
-
-            }
-
-            @Override
-            protected Object parseResponse(String s, boolean b) throws Throwable {
-                JSONArray array = new JSONArray(s);
-                return array;
-            }
-        });
     }
 }

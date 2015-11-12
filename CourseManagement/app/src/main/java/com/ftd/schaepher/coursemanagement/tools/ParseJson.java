@@ -2,7 +2,9 @@ package com.ftd.schaepher.coursemanagement.tools;
 
 import android.util.Log;
 
+import com.ftd.schaepher.coursemanagement.pojo.TableSystemLeader;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.Teacher;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -19,13 +21,17 @@ public class ParseJson {
         gson = new Gson();
     }
 
-    public void toTeacher(String jsonArray) {
+    public void getTeacherList(String jsonArray) {
         List<TableTeacher> teacherList = gson.fromJson(jsonArray, new TypeToken<List<TableTeacher>>() {
         }.getType());
         for (TableTeacher teacher:teacherList)
         {
             Log.w("teacher",teacher.toString());
         }
+    }
+
+    public String getTeacherJson(List teacherList){
+        return gson.toJson(teacherList);
     }
 
 }
