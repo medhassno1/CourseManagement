@@ -184,16 +184,15 @@ public class Initialize {
         tableClass.setGrade("2012");
         tableClass.setMajor("计算机科学与技术");
         tableClass.setNum("87");
-        tableClass.setType("实践选修");
-        tableClass.setTime("24");
+        tableClass.setClassTime("24");
         tableClass.setClassCredit("1");
         dbHelper.insert(tableClass);
         tableClass.setClassName("计算机仿真技术");
         tableClass.setGrade("2012");
         tableClass.setMajor("计算机科学与技术");
         tableClass.setNum("87");
-        tableClass.setType("实践选修");
-        tableClass.setTime("24");
+        tableClass.setClassType("实践选修");
+        tableClass.setClassTime("24");
         tableClass.setClassCredit("1");
         tableClass.setOpTime("12");
         dbHelper.insert(tableClass);
@@ -201,8 +200,8 @@ public class Initialize {
         tableClass.setGrade("2012");
         tableClass.setMajor("计算机科学与技术");
         tableClass.setNum("87");
-        tableClass.setType("专业方向");
-        tableClass.setTime("32");
+        tableClass.setClassType("专业方向");
+        tableClass.setClassTime("32");
         tableClass.setClassCredit("2");
         tableClass.setPrTime("12");
         dbHelper.insert(tableClass);
@@ -210,8 +209,8 @@ public class Initialize {
         tableClass.setGrade("2014");
         tableClass.setMajor("计算机类");
         tableClass.setNum("191");
-        tableClass.setType("实践选修");
-        tableClass.setTime("48");
+        tableClass.setClassType("实践选修");
+        tableClass.setClassTime("48");
         tableClass.setClassCredit("2");
         tableClass.setPrTime("18");
         dbHelper.insert(tableClass);
@@ -228,9 +227,5 @@ public class Initialize {
         tableTeachingDepartment.setName("张秦");
         tableTeachingDepartment.setTelephone("10000000001");
         dbHelper.insert(tableTeachingDepartment);
-
-
     }
-
-
 }
