@@ -52,7 +52,6 @@ public class LoginActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         edtTxUserName = (EditText) findViewById(R.id.edtTx_login_username);
         edtTxPassWord = (EditText) findViewById(R.id.edtTx_login_password);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_check_identity);
@@ -81,7 +80,7 @@ public class LoginActivity extends AppCompatActivity
     /**
      * 第一次登陆的操作，即初始化数据库
      */
-    private void isFirstInit(){
+    private void isFirstInit() {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -92,13 +91,10 @@ public class LoginActivity extends AppCompatActivity
 
             Initialize initialize = new Initialize();//初始化数据库
             initialize.init(this);
-        }else{
+        } else {
             Log.d("debug", "不是第一次运行");
         }
     }
-
-
-
 
     @Override
     public void onClick(View v) {
@@ -123,8 +119,8 @@ public class LoginActivity extends AppCompatActivity
                     login();
 //                    loginTest();
                 }
-
                 break;
+
             default:
                 break;
         }
@@ -177,8 +173,6 @@ public class LoginActivity extends AppCompatActivity
 
                         LoginActivity.this.finish();
                         startActivity(intent);
-
-
                     } else {
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "账号或密码错误",
