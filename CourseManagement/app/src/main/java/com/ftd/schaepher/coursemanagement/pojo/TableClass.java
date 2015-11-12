@@ -1,8 +1,12 @@
 package com.ftd.schaepher.coursemanagement.pojo;
 import net.tsz.afinal.annotation.sqlite.Id;
+import net.tsz.afinal.annotation.sqlite.Table;
+
 /**
  * Created by lenovo on 2015/11/2.
+ * 开课表
  */
+@Table(name = "TableClass")
 public class TableClass {
     @Id
     private String className;
