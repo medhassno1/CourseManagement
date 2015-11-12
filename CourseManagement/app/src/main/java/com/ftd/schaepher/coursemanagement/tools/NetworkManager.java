@@ -3,7 +3,6 @@ package com.ftd.schaepher.coursemanagement.tools;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 /**
@@ -14,10 +13,13 @@ public class NetworkManager {
     // 实例化对象
     private static AsyncHttpClient client = new AsyncHttpClient();
     // 基础地址
-    public static final String URL_BASE = "http://schaepher.imwork.net:22817/";
+    //public static final String URL_BASE = "http://schaepher.imwork.net:22817/";
+    public static final String URL_BASE = "http://jeek-zsy.imwork.net:12051/";
     // 登陆地址
+   /* public static final String URL_LOGIN =
+            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";*/
     public static final String URL_LOGIN =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
+            "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";
     // 测试json数据地址
     public static final String URL_JSON_GET =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/json-test.php";

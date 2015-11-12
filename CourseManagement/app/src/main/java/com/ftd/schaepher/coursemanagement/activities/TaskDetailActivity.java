@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.ftd.schaepher.coursemanagement.R;
  */
 public class TaskDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private CardView cardvTaskDetail;
+    private String identity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +38,32 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_detail_activity_actions, menu);
+        if (identity.equals("teacher")) {
+            menu.removeItem(R.id.action_export_file);
+            menu.findItem(R.id.action_commit_task).setVisible(true);
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_export_file:
+                Log.d("TAG","export file");
+                //点击导出文件逻辑
+                return true;
+            case R.id.action_commit_task:
+                Log.d("TAG","commit task");
+                //点击提交报课逻辑
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     //点击查看文件跳转逻辑

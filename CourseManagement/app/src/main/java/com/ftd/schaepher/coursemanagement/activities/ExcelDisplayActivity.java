@@ -8,15 +8,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.ftd.schaepher.coursemanagement.pojo.Course;
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.Course;
+import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +32,10 @@ import java.util.List;
 public class ExcelDisplayActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private List<Course> excelData;
+    private List<TableClass> excelListData;
+    private CourseDBHelper dbHelper;
+    private ListView excelListView;
+    private ExcelAdapter mExcelAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,36 +51,72 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         initExcelListView();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initExcelData();
+        initExcelListView();
+    }
+
     private void initExcelData() {
         excelData = new ArrayList<Course>();
-        Course courseCur = new Course("年级", "专业", "专业人数", "课程名称", "选修类型", "学分", "学时",
+        Course excelHeader = new Course("年级", "专业", "专业人数", "课程名称", "选修类型", "学分", "学时",
                 "实验学时", "上机学时", "起讫周序", "任课教师", "备注");
-        excelData.add(courseCur);
+        excelData.add(excelHeader);
+        dbHelper = new CourseDBHelper();
+        dbHelper.creatDataBase(this);
+        //查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
+        excelListData = dbHelper.findall(TableClass.class);
+        for (int i = 0; i < excelListData.size(); i++) {
+            TableClass listCur = excelListData.get(i);
+            Course courseCur = new Course(listCur.getGrade(), listCur.getMajor(), listCur.getNum(),
+                    listCur.getClassName(), listCur.getClassType(), listCur.getClassCredit(),
+                    listCur.getClassTime(), listCur.getOpTime(), listCur.getPrTime(),
+                    listCur.getTimePeriod(), listCur.getTeacherName(), listCur.getRemark());
+            excelData.add(courseCur);
+        }
     }
 
     private void initExcelListView() {
-        ExcelAdapter mExcelAdapter = new
+        mExcelAdapter = new
                 ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelData);
-        ListView excelListView = (ListView) findViewById(R.id.lv_excel_display);
+        excelListView = (ListView) findViewById(R.id.lv_excel_display);
         excelListView.setAdapter(mExcelAdapter);
         excelListView.setOnItemClickListener(this);
+
     }
 
     //点击弹出修改弹窗
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        AlertDialog mAlertDialog = initAlertDialog();
-        mAlertDialog.show();
+        if (position != 0) {
+            AlertDialog mAlertDialog = initAlertDialog(position);
+            mAlertDialog.show();
+        }
     }
 
-    public AlertDialog initAlertDialog() {
+    public AlertDialog initAlertDialog(final int position) {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
-        mBuilder.setView(mInflater.inflate(R.layout.dialog_excel_modify, null))
+        final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
+        initAlertDialogData(position, alertDialogView);
+        mBuilder.setView(alertDialogView)
                 .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //点击确认修改逻辑
+                        EditText edtTxDialogFromToEnd =
+                                (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
+                        EditText edtTxDialogNote =
+                                (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
+
+                        TableClass courseModify = new TableClass();
+                        courseModify.setClassName(excelData.get(position).getCourseName());
+                        courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
+                        courseModify.setRemark(edtTxDialogNote.getText().toString());
+                        courseModify.setTeacherName("张三");
+                        dbHelper.update(courseModify);
+                        onResume();
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -82,6 +126,45 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     }
                 });
         return mBuilder.create();
+    }
+
+    //设置弹窗的数据
+    private void initAlertDialogData(int position, View v) {
+        position = position - 1;
+        TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
+        TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
+        TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
+        TextView tvDialogCourseName = (TextView) v.findViewById(R.id.tv_dialog_course_name);
+        TextView tvDialogType = (TextView) v.findViewById(R.id.tv_dialog_type);
+        TextView tvDialogCredit = (TextView) v.findViewById(R.id.tv_dialog_credit);
+        TextView tvDialogClassHour = (TextView) v.findViewById(R.id.tv_dialog_class_hour);
+        TextView tvDialogExperimentHour = (TextView) v.findViewById(R.id.tv_dialog_experiment_hour);
+        TextView tvDialogComputerHour = (TextView) v.findViewById(R.id.tv_dialog_computer_hour);
+        EditText edtTxDialogFromtoEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
+        EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
+
+        tvDialogGrade.setText(excelListData.get(position).getGrade());
+        tvDialogMajor.setText(excelListData.get(position).getMajor());
+        tvDialogNum.setText(excelListData.get(position).getNum());
+        tvDialogCourseName.setText(excelListData.get(position).getClassName());
+        tvDialogType.setText(excelListData.get(position).getClassType());
+        tvDialogCredit.setText(excelListData.get(position).getClassCredit());
+        tvDialogClassHour.setText(excelListData.get(position).getClassTime());
+        tvDialogExperimentHour.setText(excelListData.get(position).getOpTime());
+        tvDialogComputerHour.setText(excelListData.get(position).getPrTime());
+        edtTxDialogFromtoEnd.setText(excelListData.get(position).getTimePeriod());
+        edtTxDialogNote.setText(excelListData.get(position).getRemark());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -126,6 +209,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             mViewHolder.tvCourseName.setText(courseCur.getCourseName());
             mViewHolder.tvCredit.setText(courseCur.getCredit());
             mViewHolder.tvClassHour.setText(courseCur.getClassHour());
+            mViewHolder.tvType.setText(courseCur.getType());
             mViewHolder.tvExperimentHour.setText(courseCur.getExperimentHour());
             mViewHolder.tvComputerHour.setText(courseCur.getComputerHour());
             mViewHolder.tvFromToEnd.setText(courseCur.getFromToEnd());

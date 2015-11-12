@@ -14,6 +14,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.ParseJson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -68,15 +69,40 @@ public class LoginActivity extends AppCompatActivity
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
         autoSetUserName();
-        loginTest();
+     //   loginTest();
     }
 
+    /**
+     * 自动保存用户名
+     */
     private void autoSetUserName() {
         userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
         if (!userName.equals("")) {
             edtTxUserName.setText(userName);
         }
     }
+
+    /**
+     * 第一次登陆的操作，即初始化数据库
+     */
+    private void isFirstInit(){
+        SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
+        boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (isFirstRun) {
+            Log.d("debug", "第一次运行");
+            editor.putBoolean("isFirstRun", false);
+            editor.commit();
+
+            Initialize initialize = new Initialize();//初始化数据库
+            initialize.init(this);
+        }else{
+            Log.d("debug", "不是第一次运行");
+        }
+    }
+
+
+
 
     @Override
     public void onClick(View v) {
@@ -144,14 +170,19 @@ public class LoginActivity extends AppCompatActivity
                     //打印获得的网页
                     Log.w("first post=", html);
                     if (logResult == -1) {
-                        //跳转,同时将选择登录的身份数据传送至下一个界面，方便下一个界面根据不同身份做相应修改
+                        //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
-                        ownInformationSaveEditor.putString("identity", identity);
+                        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
                         ownInformationSaveEditor.putString("userName", userName);
                         ownInformationSaveEditor.commit();
+
+                        isFirstInit();//判断是否是第一次操作，并执行相关操作
+
                         LoginActivity.this.finish();
                         startActivity(intent);
+
+
                     } else {
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "账号或密码错误",

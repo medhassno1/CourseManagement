@@ -1,8 +1,6 @@
 package com.ftd.schaepher.coursemanagement.db;
 
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
-
 
 import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
@@ -10,8 +8,6 @@ import com.ftd.schaepher.coursemanagement.pojo.TableSystem;
 import com.ftd.schaepher.coursemanagement.pojo.TableSystemLeader;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
-
-import net.tsz.afinal.FinalDb;
 
 /**
  * Created by lenovo on 2015/11/6.
@@ -83,7 +79,7 @@ public class Initialize {
         TableTeacher tableTeacher =new TableTeacher();
         tableTeacher.setWorkNumber("02501");
         tableTeacher.setPwd("02501");
-        tableTeacher.setName("陈楠楠");
+        tableTeacher.setName("陈楠楠1111");
         tableTeacher.setTelephone("00000000005");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02502");
@@ -188,16 +184,15 @@ public class Initialize {
         tableClass.setGrade("2012");
         tableClass.setMajor("计算机科学与技术");
         tableClass.setNum("87");
-        tableClass.setType("实践选修");
-        tableClass.setTime("24");
+        tableClass.setClassTime("24");
         tableClass.setClassCredit("1");
         dbHelper.insert(tableClass);
         tableClass.setClassName("计算机仿真技术");
         tableClass.setGrade("2012");
         tableClass.setMajor("计算机科学与技术");
         tableClass.setNum("87");
-        tableClass.setType("实践选修");
-        tableClass.setTime("24");
+        tableClass.setClassType("实践选修");
+        tableClass.setClassTime("24");
         tableClass.setClassCredit("1");
         tableClass.setOpTime("12");
         dbHelper.insert(tableClass);
@@ -205,8 +200,8 @@ public class Initialize {
         tableClass.setGrade("2012");
         tableClass.setMajor("计算机科学与技术");
         tableClass.setNum("87");
-        tableClass.setType("专业方向");
-        tableClass.setTime("32");
+        tableClass.setClassType("专业方向");
+        tableClass.setClassTime("32");
         tableClass.setClassCredit("2");
         tableClass.setPrTime("12");
         dbHelper.insert(tableClass);
@@ -214,8 +209,8 @@ public class Initialize {
         tableClass.setGrade("2014");
         tableClass.setMajor("计算机类");
         tableClass.setNum("191");
-        tableClass.setType("实践选修");
-        tableClass.setTime("48");
+        tableClass.setClassType("实践选修");
+        tableClass.setClassTime("48");
         tableClass.setClassCredit("2");
         tableClass.setPrTime("18");
         dbHelper.insert(tableClass);
@@ -232,9 +227,5 @@ public class Initialize {
         tableTeachingDepartment.setName("张秦");
         tableTeachingDepartment.setTelephone("10000000001");
         dbHelper.insert(tableTeachingDepartment);
-
-
     }
-
-
 }

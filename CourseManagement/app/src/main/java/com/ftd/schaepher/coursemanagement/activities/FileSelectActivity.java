@@ -20,11 +20,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sxq on 2015/10/30.
@@ -204,7 +208,9 @@ public class FileSelectActivity extends AppCompatActivity
     }
 
     private void importFile(File file) {
-        String path = file.getAbsolutePath();
+        final String path = file.getAbsolutePath();
+
+        Log.i("path",path);
 
         if(!path.endsWith(".xls")){   //直接调用excelTools.isTrueFileName()会出错，暂时无解
             new AlertDialog.Builder(this).setTitle("提示").setMessage("只能导入.xls文件").setPositiveButton
@@ -216,13 +222,31 @@ public class FileSelectActivity extends AppCompatActivity
             }).show();
 
         }else{
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("可以导入，后期实现").setPositiveButton
+            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否导入教师表").setPositiveButton
                     (android.R.string.ok, new DialogInterface.OnClickListener() {
-
                         @Override
-                        public void onClick (DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialog, int which) {
+                            ExcelTools excelTools = new ExcelTools();
+                            excelTools.setPath(path);
+                            List<TableTeacher> teachersList = excelTools.readTeacherExcel();
+                            //导入教师表
+                            for(int i=0;i<teachersList.size();i++){
+                                CourseDBHelper dbHelper = new CourseDBHelper();
+                                dbHelper.creatDataBase(FileSelectActivity.this);
+                                TableTeacher teacher = teachersList.get(i);
+                                dbHelper.insert(teacher);
+                            }
+
+                            finish();
+                        }
+                    }).setNegativeButton
+                    (android.R.string.cancel, new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
                         }
                     }).show();
+
 
         }
 
