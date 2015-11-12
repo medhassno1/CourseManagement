@@ -20,6 +20,7 @@ import com.rey.material.app.SimpleDialog;
 public class TeacherCreationActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
+    private EditText edtTxNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +32,10 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("添加用户");
 
+        edtTxNumber = (EditText)findViewById(R.id.edtTx_teacher_creation_username);
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_creation_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
+        edtTxNumber.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);//工号输入框格式
         edtTxDepartment.setInputType(InputType.TYPE_NULL);
         edtTxMajor.setInputType(InputType.TYPE_NULL);
         edtTxDepartment.setOnClickListener(this);

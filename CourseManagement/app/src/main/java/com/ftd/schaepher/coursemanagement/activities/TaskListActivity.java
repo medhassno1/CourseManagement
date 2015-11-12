@@ -53,6 +53,9 @@ public class TaskListActivity extends AppCompatActivity
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
+     /*   Initialize initialize = new Initialize();
+        initialize.init(this);*/
+
         initTaskListData();
         initTaskListView();
     }
