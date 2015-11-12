@@ -19,8 +19,11 @@ public class NetworkManager {
     public static final String URL_LOGIN =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
     // 测试json数据地址
-    public static final String URL_JSON =
+    public static final String URL_JSON_GET =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/json-test.php";
+    // 测试json数据地址
+    public static final String URL_JSON_POST =
+            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/json-post-test.php";
 
     // 静态初始化
     static
