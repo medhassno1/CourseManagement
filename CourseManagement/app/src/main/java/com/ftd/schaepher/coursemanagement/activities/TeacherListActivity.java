@@ -81,24 +81,13 @@ public class TeacherListActivity extends AppCompatActivity
         updateTeacherDataList();
     }
 
+    //更新数据，从数据库中获取当前页面所需的数据
     public void updateTeacherDataList(){
         initTeacherListData();
         initTeacherListView();
     }
 
-    private void setNavViewConfig() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
-        navigationView.setNavigationItemSelectedListener(this);
-    }
-
+    //初始化数据，从数据库中获取当前页面所需的数据
     private void initTeacherListData() {
         teacherListData = new ArrayList<>();
         CourseDBHelper dbHelper = new CourseDBHelper();
@@ -114,6 +103,7 @@ public class TeacherListActivity extends AppCompatActivity
 
     }
 
+    //显示数据，控件与数据绑定
     private void initTeacherListView() {
         TeacherAdapter mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
         ListView mListView = (ListView) findViewById(R.id.lv_teacher_list);
@@ -121,16 +111,32 @@ public class TeacherListActivity extends AppCompatActivity
         mListView.setOnItemClickListener(this);
     }
 
+    //左侧菜单的初始设置
+    private void setNavViewConfig() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
     //左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        Intent intend;
         switch (item.getItemId()) {
             case R.id.nav_teacher_list:
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
                 drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_task_list:
-                startActivity(new Intent(TeacherListActivity.this, TaskListActivity.class));
+                intend = new Intent();
+                intend.setClass(TeacherListActivity.this, TaskListActivity.class);
+                intend.putExtra("teacherID", workNumber);
+                startActivity(intend);
                 finish();
                 break;
             case R.id.nav_logout:
@@ -138,7 +144,7 @@ public class TeacherListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                Intent intend = new Intent();
+                intend = new Intent();
                 intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
                 intend.putExtra("teacherID",workNumber);
                 startActivity(intend);
@@ -150,6 +156,7 @@ public class TeacherListActivity extends AppCompatActivity
         return false;
     }
 
+    //系统返回键事件
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
@@ -181,18 +188,7 @@ public class TeacherListActivity extends AppCompatActivity
         return true;
     }
 
-    //点击查看教师信息跳转逻辑
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intend = new Intent();
-        intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
-        intend.putExtra("teacherID", list.get(position).getWorkNumber());
-        startActivity(intend);
-
-        Log.i("str", position + "    " + id);
-        Log.i("str",list.get(position).getWorkNumber()+list.get(position).getName());
-    }
-
+    //标题栏按钮点击事件，即添加教师
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()){
@@ -206,6 +202,18 @@ public class TeacherListActivity extends AppCompatActivity
                 break;
         }
         return true;
+    }
+
+    //点击查看教师信息跳转逻辑
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intend = new Intent();
+        intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
+        intend.putExtra("teacherID", list.get(position).getWorkNumber());
+        startActivity(intend);
+
+        Log.i("str", position + "    " + id);
+        Log.i("str",list.get(position).getWorkNumber()+list.get(position).getName());
     }
 
     /**

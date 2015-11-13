@@ -52,7 +52,7 @@ public class TaskListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_list);
-        tvName = (TextView)findViewById(R.id.nav_own_name);
+      // tvName = (TextView)findViewById(R.layout.nav_header_base);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_task_jxb);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -117,13 +117,17 @@ public class TaskListActivity extends AppCompatActivity
     //左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        Intent intend;
         switch (item.getItemId()) {
             case R.id.nav_task_list:
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
                 drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_teacher_list:
-                startActivity(new Intent(TaskListActivity.this, TeacherListActivity.class));
+                intend = new Intent();
+                intend.putExtra("teacherID", workNumber);
+                intend.setClass(TaskListActivity.this, TeacherListActivity.class);
+                startActivity(intend);
                 finish();
                 break;
             case R.id.nav_logout:
@@ -131,7 +135,7 @@ public class TaskListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                Intent intend = new Intent();
+                intend = new Intent();
                 intend.setClass(TaskListActivity.this, TeacherDetailActivity.class);
                 intend.putExtra("teacherID", workNumber);
                 startActivity(intend);
