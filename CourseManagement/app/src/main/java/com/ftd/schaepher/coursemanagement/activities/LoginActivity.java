@@ -68,8 +68,6 @@ public class LoginActivity extends AppCompatActivity
         autoSetUserName();
 
         isFirstInit();
-
-
     }
 
     @Override
@@ -183,13 +181,16 @@ public class LoginActivity extends AppCompatActivity
                     if (logResult == -1) {
                         //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
-                        Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
+
                         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
                         ownInformationSaveEditor.putString("userName", userName);
-                        ownInformationSaveEditor.commit();
+                        ownInformationSaveEditor.apply();
 
+                        Intent intend = new Intent();
+                        intend.setClass(LoginActivity.this, TaskListActivity.class);
+                        intend.putExtra("teacherID", userName);
                         LoginActivity.this.finish();
-                        startActivity(intent);
+                        startActivity(intend);
                     } else {
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "账号或密码错误",
@@ -197,7 +198,6 @@ public class LoginActivity extends AppCompatActivity
                     }
                 }
 
-                //修改网络出错的提示信息
                 @Override
                 public void onFailure(int statusCode, Header[] headers,
                                       byte[] response, Throwable throwable) {

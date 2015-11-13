@@ -55,6 +55,7 @@ public class TeacherListActivity extends AppCompatActivity
     private String userName;
     private String identity;
     private static final String TAG = "TeacherListActivity";
+    private String workNumber;
 
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeacher> list;
@@ -67,11 +68,15 @@ public class TeacherListActivity extends AppCompatActivity
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
 
+
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
         updateTeacherDataList();
         initUserInformation();
+
+        Intent intent = getIntent();
+        workNumber = intent.getStringExtra("teacherID");
 
         setSearchTextChanged();//设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick();//设置叉叉的监听器
@@ -170,7 +175,10 @@ public class TeacherListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                startActivity(new Intent(TeacherListActivity.this, TeacherDetailActivity.class));
+                Intent intend = new Intent();
+                intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
+                intend.putExtra("teacherID",workNumber);
+                startActivity(intend);
                 onBackPressed();
                 break;
             default:

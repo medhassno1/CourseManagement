@@ -50,6 +50,7 @@ public class TaskListActivity extends AppCompatActivity
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private static final String TAG = "TaskListActivity";
+    private String workNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +64,12 @@ public class TaskListActivity extends AppCompatActivity
         setSupportDoubleBackExit(true);
 
         initUserInformation();
+        Intent intent = getIntent();
+        workNumber = intent.getStringExtra("teacherID");
+
         initTaskListData();
         initTaskListView();
     }
-
 
     @Override
     protected void onResume() {
@@ -133,6 +136,7 @@ public class TaskListActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
+
         if (identity.equals("teacher")) {
             navigationView.getMenu().removeItem(R.id.nav_teacher_list);
         }
@@ -160,7 +164,11 @@ public class TaskListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                startActivity(new Intent(TaskListActivity.this, TeacherDetailActivity.class));
+                Intent intend = new Intent();
+                intend.setClass(TaskListActivity.this, TeacherDetailActivity.class);
+                intend.putExtra("teacherID", workNumber);
+                startActivity(intend);
+
                 onBackPressed();
                 break;
             default:
