@@ -184,7 +184,6 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         teacher.setName(edtTxTeacherName.getText().toString().trim());
         teacher.setDepartment(edtTxDepartment.getText().toString().trim());
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
-        teacher.setMajor(edtTxMajor.getText().toString().trim());
 
         return teacher;
     }
