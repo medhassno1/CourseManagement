@@ -11,7 +11,6 @@ import net.tsz.afinal.annotation.sqlite.Table;
 public class TableCourseCombine {
     @Id
     private String insertTime;
-    private String workNumber;
     private String grade;
     private String major;
     private String people;
@@ -28,12 +27,7 @@ public class TableCourseCombine {
     public TableCourseCombine() {
     }
 
-    public TableCourseCombine(String workNumber, String grade, String major,
-                              String people, String courseName, String courseType,
-                              String courseCredit, String courseHours, String practiceHour,
-                              String onMachineHour, String timePeriod, String teacherName,
-                              String remark) {
-        this.workNumber = workNumber;
+    public TableCourseCombine( String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHours, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
         this.grade = grade;
         this.major = major;
         this.people = people;
@@ -54,14 +48,6 @@ public class TableCourseCombine {
 
     public void setInsertTime(String insertTime) {
         this.insertTime = insertTime;
-    }
-
-    public String getWorkNumber() {
-        return workNumber;
-    }
-
-    public void setWorkNumber(String workNumber) {
-        this.workNumber = workNumber;
     }
 
     public String getGrade() {
@@ -164,7 +150,6 @@ public class TableCourseCombine {
     public String toString() {
         return "TableCourseCombine{" +
                 "insertTime='" + insertTime + '\'' +
-                ", workNumber='" + workNumber + '\'' +
                 ", grade='" + grade + '\'' +
                 ", major='" + major + '\'' +
                 ", people='" + people + '\'' +

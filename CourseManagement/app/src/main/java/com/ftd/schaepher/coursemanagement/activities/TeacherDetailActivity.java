@@ -14,7 +14,9 @@ import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
 /**
  * Created by sxq on 2015/11/2.
@@ -30,6 +32,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private EditText edtTxMajor;
 
     private String workNumber;
+    private String identity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,20 +59,55 @@ public class TeacherDetailActivity extends AppCompatActivity {
      */
     private void initTeacherData() {
         Intent intent = getIntent();
-        workNumber = intent.getStringExtra("teacherID");
+        CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
+        if (intent.getBooleanExtra("isQueryOwnInfomation", true)) {
+            workNumber = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
+            identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
+            switch (identity) {
+                case "teacher":
+                    TableUserTeacher teacher = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
+                    if (teacher != null) {
+                        edtTxTeacherNumber.setText(teacher.getWorkNumber());
+                        edtTxPassword.setText(teacher.getPassword());
+                        edtTxTeacherName.setText(teacher.getName());
+                        edtTxPhoneNumber.setText(teacher.getTelephone());
+                        edtTxDepartment.setText(teacher.getDepartment());
+                    }
+                    break;
+                case "teachingOffice":
+                    TableUserTeachingOffice office = (TableUserTeachingOffice) dbHelper.findById(workNumber, TableUserTeachingOffice.class);
+                    if (office != null) {
+                        edtTxTeacherNumber.setText(office.getWorkNumber());
+                        edtTxPassword.setText(office.getPassword());
+                        edtTxTeacherName.setText(office.getName());
+                        edtTxPhoneNumber.setText(office.getTelephone());
+                    }
+                    break;
+                case "departmentHead":
+                    TableUserDepartmentHead departmentHead = (TableUserDepartmentHead) dbHelper.findById(workNumber, TableUserDepartmentHead.class);
+                    if (departmentHead != null) {
+                        edtTxTeacherNumber.setText(departmentHead.getWorkNumber());
+                        edtTxPassword.setText(departmentHead.getPassword());
+                        edtTxTeacherName.setText(departmentHead.getName());
+                        edtTxPhoneNumber.setText(departmentHead.getTelephone());
+                        edtTxDepartment.setText(departmentHead.getDepartment());
+                    }
+                    break;
+                default:
+                    break;
+            }
 
-        Log.i("str2", "工号" + workNumber);
+        } else {
+            workNumber = intent.getStringExtra("teacherID");
+            Log.i("str2", "工号" + workNumber);
 
-        CourseDBHelper dbHelper = new CourseDBHelper();
-        dbHelper.createDataBase(this);
-        TableUserTeacher teacher = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
-
-        edtTxTeacherNumber.setText(teacher.getWorkNumber());
-        edtTxPassword.setText(teacher.getPassword());
-        edtTxTeacherName.setText(teacher.getName());
-        edtTxPhoneNumber.setText(teacher.getTelephone());
-        edtTxDepartment.setText(teacher.getDepartment());
-
+            TableUserTeacher ownInfomation = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
+            edtTxTeacherNumber.setText(ownInfomation.getWorkNumber());
+            edtTxPassword.setText(ownInfomation.getPassword());
+            edtTxTeacherName.setText(ownInfomation.getName());
+            edtTxPhoneNumber.setText(ownInfomation.getTelephone());
+            edtTxDepartment.setText(ownInfomation.getDepartment());
+        }
     }
 
     /**
