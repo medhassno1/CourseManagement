@@ -23,16 +23,13 @@ import com.rey.material.widget.ProgressView;
 
 import org.apache.http.Header;
 
-import java.nio.charset.Charset;
-
-//import com.rey.material.widget.ProgressView;
-
 /**
  * Created by sxq on 2015/10/28.
  * 登录界面
  */
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, View.OnFocusChangeListener {
+
     private static final String TAG = "LoginActivity";
     private Button btnLogin;
     private EditText edtTxUserName;
@@ -67,7 +64,7 @@ public class LoginActivity extends AppCompatActivity
         btnLogin.setOnClickListener(this);
         autoSetUserName();
 
-        isFirstInit();
+        initDatabaseData();
     }
 
     @Override
@@ -90,7 +87,7 @@ public class LoginActivity extends AppCompatActivity
     /**
      * 第一次登陆的操作，即初始化数据库
      */
-    private void isFirstInit() {
+    private void initDatabaseData() {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -101,7 +98,7 @@ public class LoginActivity extends AppCompatActivity
 
             Initialize initialize = new Initialize();//初始化数据库
             initialize.init(this);
-        }else{
+        } else {
             Log.v("debug", "不是第一次运行");
         }
     }
@@ -116,11 +113,12 @@ public class LoginActivity extends AppCompatActivity
                     RadioButton rdoBtnId = (RadioButton) rdoGroup.getChildAt(i);
                     if (rdoBtnId.isChecked()) {
                         identity = rdoBtnId.getText().toString().trim();
-                        // 由于服务端暂时只有教师和负责人两种身份,这里暂时也只有这两种身份，后期再修改
                         if (identity.equals("教师")) {
                             identity = "teacher";
-                        } else {
-                            identity = "manager";
+                        } else if (identity.equals("教学办")) {
+                            identity = "teachingOffice";
+                        } else if (identity.equals("系负责人")) {
+                            identity = "departmentHead";
                         }
                     }
                 }
@@ -135,7 +133,9 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    /*检查账号密码*/
+    /**
+     * 检查账号密码
+     */
     private boolean isTrueForm() {
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")) {
@@ -152,7 +152,7 @@ public class LoginActivity extends AppCompatActivity
         return false;
     }
 
-    //处理登录逻辑
+    // 处理登录逻辑
     public void login() {
         RequestParams params = new RequestParams();
         params.add("login-user", userName);
@@ -160,18 +160,13 @@ public class LoginActivity extends AppCompatActivity
         params.add("ident", identity);
         try {
             NetworkManager.post(NetworkManager.URL_LOGIN, params, new AsyncHttpResponseHandler() {
-
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                    Log.i("str", "网络连接成功");
-                    Log.i("statusCode:", statusCode + "");
-                    Charset charset = Charset.forName("UTF-8");
-                    String html = new String(response, charset);
-                    int logResult = html.indexOf("alert");
-                    //打印获得的网页
-                    Log.w("first post=", html);
-                    if (logResult == -1) {
-                        //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
+                    String html = new String(response);
+                    Log.w("first post=", html); // 服务器返回的文本
+
+                    if (html.equals("true")) {
+                        // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
 
                         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
@@ -203,10 +198,9 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    //处理输入错误提示
+    // 处理输入错误提示
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-
         if (!edtTxUserName.getText().toString().equals("")) {
             layoutUserName.setError(null);
         }

@@ -1,11 +1,13 @@
 package com.ftd.schaepher.coursemanagement.pojo;
+
 import net.tsz.afinal.annotation.sqlite.Id;
 import net.tsz.afinal.annotation.sqlite.Table;
+
 /**
  * Created by lenovo on 2015/11/2.
  * 系负责人用户表
  */
-@Table(name="TableUserDepartmentHead")
+@Table(name = "TableUserDepartmentHead")
 public class TableUserDepartmentHead {
     @Id
     private String workNumber;
@@ -17,6 +19,23 @@ public class TableUserDepartmentHead {
     private String email;
     private String department;
     private String managedMajor;
+
+    public TableUserDepartmentHead() {
+    }
+
+    public TableUserDepartmentHead(String workNumber, String password, String name, String sex,
+                                   String birthday, String telephone, String email,
+                                   String department, String managedMajor) {
+        this.workNumber = workNumber;
+        this.password = password;
+        this.name = name;
+        this.sex = sex;
+        this.birthday = birthday;
+        this.telephone = telephone;
+        this.email = email;
+        this.department = department;
+        this.managedMajor = managedMajor;
+    }
 
     public String getWorkNumber() {
         return workNumber;

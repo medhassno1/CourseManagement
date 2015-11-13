@@ -28,7 +28,9 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,17 +44,27 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class TeacherListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemClickListener, MenuItem.OnMenuItemClickListener {
+
+    private static final String TAG = "TeacherListActivity";
+
     private Toolbar mToolbar;
+    private EditText eSearch;
+    Runnable eChanged = new Runnable() {
+        @Override
+        public void run() {
+            String data = eSearch.getText().toString();
+
+        }
+    };
+    private ImageView ivDeleteText;
+    private TextView tvOwnName;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
-    private EditText eSearch;
-    private ImageView ivDeleteText;
-
-    private Handler myhandler = new Handler();
-    private static final String TAG = "TeacherListActivity";
+    private Handler myHandler = new Handler();
+    private String userName;
+    private String identity;
     private String workNumber;
-
-    private List<TableUserTeacher> teacherListData;//
+    private List<TableUserTeacher> teacherListData;
     private List<TableUserTeacher> list;
 
     @Override
@@ -63,55 +75,18 @@ public class TeacherListActivity extends AppCompatActivity
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
 
+        // 侧滑菜单
         setNavViewConfig();
         setSupportDoubleBackExit(true);
-
-        updateTeacherDataList();
 
         Intent intent = getIntent();
         workNumber = intent.getStringExtra("teacherID");
 
-        setSearchTextChanged();//设置eSearch搜索框的文本改变时监听器
-        setIvDeleteTextOnClick();//设置叉叉的监听器
+        setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
+        setIvDeleteTextOnClick(); // 设置叉叉的监听器
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateTeacherDataList();
-    }
-
-    //更新数据，从数据库中获取当前页面所需的数据
-    public void updateTeacherDataList(){
-        initTeacherListData();
-        initTeacherListView();
-    }
-
-    //初始化数据，从数据库中获取当前页面所需的数据
-    private void initTeacherListData() {
-        teacherListData = new ArrayList<>();
-        CourseDBHelper dbHelper = new CourseDBHelper();
-        dbHelper.creatDataBase(this);
-
-        list = dbHelper.findall(TableUserTeacher.class);
-        Log.i("string", list.size() + "");
-
-        for(int i=0;i<list.size();i++){
-            teacherListData.add(list.get(i));
-            Log.i("string",list.get(i).getName());
-        }
-
-    }
-
-    //显示数据，控件与数据绑定
-    private void initTeacherListView() {
-        TeacherAdapter mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
-        ListView mListView = (ListView) findViewById(R.id.lv_teacher_list);
-        mListView.setAdapter(mTeacherAdapter);
-        mListView.setOnItemClickListener(this);
-    }
-
-    //左侧菜单的初始设置
+    // 左滑菜单初始配置
     private void setNavViewConfig() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -120,33 +95,109 @@ public class TeacherListActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
+        tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
+                .findViewById(R.id.nav_own_name);
+        navigationView.getMenu().findItem(R.id.nav_teacher_list).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    //左菜单点击事件
+    public void setSupportDoubleBackExit(boolean isDoubleBackExit) {
+        this.isSupportDoubleBackExit = isDoubleBackExit;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateTeacherDataList();
+        initUserInformation();
+
+    }
+
+    public void updateTeacherDataList() {
+        initTeacherListData();
+        initTeacherListView();
+    }
+
+    // 初始化教师列表数据
+    private void initTeacherListData() {
+        teacherListData = new ArrayList<>();
+        CourseDBHelper dbHelper = new CourseDBHelper();
+        dbHelper.createDataBase(this);
+
+        list = dbHelper.findall(TableUserTeacher.class);
+        Log.i("string", list.size() + "");
+
+        for (int i = 0; i < list.size(); i++) {
+            teacherListData.add(list.get(i));
+            Log.i("string", list.get(i).getName());
+        }
+
+    }
+
+    // 初始化教师列表界面的控件
+    private void initTeacherListView() {
+        TeacherAdapter mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
+        ListView mListView = (ListView) findViewById(R.id.lv_teacher_list);
+        mListView.setAdapter(mTeacherAdapter);
+        mListView.setOnItemClickListener(this);
+    }
+
+    private void initUserInformation() {
+        CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
+        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
+        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
+        switch (identity) {
+            case "teacher":
+                TableUserTeacher teacher =
+                        (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
+                tvOwnName.setText(teacher.getName());
+                break;
+            case "teachingOffice":
+                TableUserTeachingOffice office =
+                        (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
+                tvOwnName.setText(office.getName());
+                break;
+            case "departmentHead":
+                TableUserDepartmentHead departmentHead =
+                        (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
+                tvOwnName.setText(departmentHead.getName());
+                break;
+            default:
+                break;
+        }
+    }
+
+    //添加标题栏上的按钮图标
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
+        MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
+        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
+        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
+        return true;
+    }
+
+    // 左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Intent intend;
+        item.setChecked(true);
         switch (item.getItemId()) {
             case R.id.nav_teacher_list:
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
                 drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_task_list:
-                intend = new Intent();
-                intend.setClass(TeacherListActivity.this, TaskListActivity.class);
-                intend.putExtra("teacherID", workNumber);
-                startActivity(intend);
+                startActivity(new Intent(TeacherListActivity.this, TaskListActivity.class));
                 finish();
                 break;
             case R.id.nav_logout:
-                startActivity(new Intent(TeacherListActivity.this,LoginActivity.class));
+                startActivity(new Intent(TeacherListActivity.this, LoginActivity.class));
                 finish();
                 break;
             case R.id.nav_own_information:
-                intend = new Intent();
+                Intent intend = new Intent();
                 intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
-                intend.putExtra("teacherID",workNumber);
+                intend.putExtra("teacherID", workNumber);
                 startActivity(intend);
                 onBackPressed();
                 break;
@@ -156,7 +207,85 @@ public class TeacherListActivity extends AppCompatActivity
         return false;
     }
 
-    //系统返回键事件
+    // 点击查看教师信息跳转逻辑
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intend = new Intent();
+        intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
+        intend.putExtra("teacherID", list.get(position).getWorkNumber());
+        startActivity(intend);
+
+        Log.i("str", position + "    " + id);
+        Log.i("str", list.get(position).getWorkNumber() + list.get(position).getName());
+    }
+
+    // 点击标题栏的子菜单事件
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_teacher_from_input:
+                startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
+                break;
+            case R.id.add_teacher_from_file:
+                startActivity(new Intent(TeacherListActivity.this, FileSelectActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    /**
+     * 设置搜索框的文本更改时的监听器
+     */
+    private void setSearchTextChanged() {
+        eSearch = (EditText) findViewById(R.id.etSearch);
+
+        eSearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+                //这个应该是在改变的时候会做的动作吧，具体还没用到过。
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                          int arg3) {
+                //这是文本框改变之前会执行的动作
+            }
+
+            /**这是文本框改变之后 会执行的动作
+             * 因为我们要做的就是，在文本框改变的同时，我们的listview的数据也进行相应的变动，
+             * 并且如一的显示在界面上。所以这里我们就需要加上数据的修改的动作了。
+             */
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    ivDeleteText.setVisibility(View.GONE); // 当文本框为空时，则叉叉消失
+                } else {
+                    ivDeleteText.setVisibility(View.VISIBLE); // 当文本框不为空时，出现叉叉
+                }
+
+                myHandler.post(eChanged);
+            }
+        });
+
+    }
+
+    /**
+     * 设置叉叉的点击事件，即清空功能
+     */
+    private void setIvDeleteTextOnClick() {
+        ivDeleteText = (ImageView) findViewById(R.id.ivDeleteText);
+        ivDeleteText.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                eSearch.setText("");
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
@@ -174,48 +303,6 @@ public class TeacherListActivity extends AppCompatActivity
         }
     }
 
-    public void setSupportDoubleBackExit(boolean isDoubleBackExit) {
-        this.isSupportDoubleBackExit = isDoubleBackExit;
-    }
-
-    //添加标题栏上的按钮图标
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
-        MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
-        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
-        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
-        return true;
-    }
-
-    //标题栏按钮点击事件，即添加教师
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.add_teacher_from_input:
-                startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
-                break;
-            case R.id.add_teacher_from_file:
-                startActivity(new Intent(TeacherListActivity.this, FileSelectActivity.class));
-                break;
-            default:
-                break;
-        }
-        return true;
-    }
-
-    //点击查看教师信息跳转逻辑
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intend = new Intent();
-        intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
-        intend.putExtra("teacherID", list.get(position).getWorkNumber());
-        startActivity(intend);
-
-        Log.i("str", position + "    " + id);
-        Log.i("str",list.get(position).getWorkNumber()+list.get(position).getName());
-    }
-
     /**
      * 任务列表的适配器
      */
@@ -229,7 +316,6 @@ public class TeacherListActivity extends AppCompatActivity
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-           // Teacher teacher = getItem(position);
             TableUserTeacher teacher = getItem(position);
             View view;
             viewHolder viewHolder;
@@ -255,62 +341,4 @@ public class TeacherListActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * 设置搜索框的文本更改时的监听器
-     */
-    private void setSearchTextChanged() {
-        eSearch = (EditText) findViewById(R.id.etSearch);
-
-        eSearch.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-                //这个应该是在改变的时候会做的动作吧，具体还没用到过。
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-                //这是文本框改变之前会执行的动作
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                /**这是文本框改变之后 会执行的动作
-                 * 因为我们要做的就是，在文本框改变的同时，我们的listview的数据也进行相应的变动，并且如一的显示在界面上。
-                 * 所以这里我们就需要加上数据的修改的动作了。
-                 */
-                if (s.length() == 0) {
-                    ivDeleteText.setVisibility(View.GONE);//当文本框为空时，则叉叉消失
-                } else {
-                    ivDeleteText.setVisibility(View.VISIBLE);//当文本框不为空时，出现叉叉
-                }
-
-                myhandler.post(eChanged);
-            }
-        });
-
-    }
-
-    Runnable eChanged = new Runnable() {
-        @Override
-        public void run() {
-            String data = eSearch.getText().toString();
-
-        }
-    };
-
-    /**
-     * 设置叉叉的点击事件，即清空功能
-     */
-    private void setIvDeleteTextOnClick() {
-        ivDeleteText = (ImageView) findViewById(R.id.ivDeleteText);
-        ivDeleteText.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                eSearch.setText("");
-            }
-        });
-    }
 }
