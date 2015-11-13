@@ -140,10 +140,10 @@ public class ExcelTools {
 
                     teacher.setWorkNumber(getCellValue(i, 1));//导入教师信息
                     teacher.setPassword(getCellValue(i, 2));
-                    teacher.setName(getCellValue(i,3));
-                    teacher.setTelephone(getCellValue(i,4));
+                    teacher.setName(getCellValue(i, 3));
+                    teacher.setTelephone(getCellValue(i, 4));
                     teacher.setDepartment(getCellValue(i,5));
-                    teacher.setMajor(getCellValue(i,6));
+
 
                     Log.i("Data", getCellValue(i,5));
                     list.add(teacher);

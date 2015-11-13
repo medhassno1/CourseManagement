@@ -70,7 +70,6 @@ public class TeacherDetailActivity extends AppCompatActivity {
         edtTxTeacherName.setText(teacher.getName());
         edtTxPhoneNumber.setText(teacher.getTelephone());
         edtTxDepartment.setText(teacher.getDepartment());
-        edtTxMajor.setText(teacher.getMajor());
 
     }
 
@@ -84,7 +83,6 @@ public class TeacherDetailActivity extends AppCompatActivity {
         teacher.setName(edtTxTeacherName.getText().toString().trim());
         teacher.setDepartment(edtTxDepartment.getText().toString().trim());
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
-        teacher.setMajor(edtTxMajor.getText().toString().trim());
 
         return teacher;
     }
