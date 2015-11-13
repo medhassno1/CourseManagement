@@ -144,13 +144,6 @@ public class LoginActivity extends AppCompatActivity
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));
-                Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
-                ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-                ownInformationSaveEditor.putString("userName", userName);
-                ownInformationSaveEditor.commit();
-
-                LoginActivity.this.finish();
-                startActivity(intent);
             }
         } else {
             layoutUserName.setError(null);
