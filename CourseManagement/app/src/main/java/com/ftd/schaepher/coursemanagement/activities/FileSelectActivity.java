@@ -53,7 +53,6 @@ public class FileSelectActivity extends AppCompatActivity
         mActionBar.setTitle("选择文件");
 
         initView();
-
     }
 
     private void initView() {
