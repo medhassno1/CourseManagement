@@ -66,8 +66,6 @@ public class LoginActivity extends AppCompatActivity
         autoSetUserName();
 
         isFirstInit();
-
-
     }
 
     @Override
@@ -116,11 +114,12 @@ public class LoginActivity extends AppCompatActivity
                     RadioButton rdoBtnId = (RadioButton) rdoGroup.getChildAt(i);
                     if (rdoBtnId.isChecked()) {
                         identity = rdoBtnId.getText().toString().trim();
-                        // 由于服务端暂时只有教师和负责人两种身份,这里暂时也只有这两种身份，后期再修改
                         if (identity.equals("教师")) {
                             identity = "teacher";
-                        } else {
-                            identity = "manager";
+                        } else if (identity.equals("教学办")){
+                            identity = "teachingOffice";
+                        } else if (identity.equals("系负责人")){
+                            identity = "departmentHead";
                         }
                     }
                 }
@@ -169,13 +168,16 @@ public class LoginActivity extends AppCompatActivity
                     if (html.equals("true")) {
                         //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
-                        Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
+
                         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
                         ownInformationSaveEditor.putString("userName", userName);
-                        ownInformationSaveEditor.commit();
+                        ownInformationSaveEditor.apply();
 
+                        Intent intend = new Intent();
+                        intend.setClass(LoginActivity.this, TaskListActivity.class);
+                        intend.putExtra("teacherID", userName);
                         LoginActivity.this.finish();
-                        startActivity(intent);
+                        startActivity(intend);
                     } else {
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "账号或密码错误",
@@ -183,7 +185,6 @@ public class LoginActivity extends AppCompatActivity
                     }
                 }
 
-                //修改网络出错的提示信息
                 @Override
                 public void onFailure(int statusCode, Header[] headers,
                                       byte[] response, Throwable throwable) {
