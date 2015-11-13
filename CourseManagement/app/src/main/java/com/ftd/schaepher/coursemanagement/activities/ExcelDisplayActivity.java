@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.Course;
-import com.ftd.schaepher.coursemanagement.pojo.TableClass;
+import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.List;
 public class ExcelDisplayActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private List<Course> excelData;
-    private List<TableClass> excelListData;
+    private List<TableCourseMultiline> excelListData;
     private CourseDBHelper dbHelper;
     private ListView excelListView;
     private ExcelAdapter mExcelAdapter;
@@ -66,12 +66,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         dbHelper = new CourseDBHelper();
         dbHelper.creatDataBase(this);
         //查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
-        excelListData = dbHelper.findall(TableClass.class);
+        excelListData = dbHelper.findall(TableCourseMultiline.class);
         for (int i = 0; i < excelListData.size(); i++) {
-            TableClass listCur = excelListData.get(i);
-            Course courseCur = new Course(listCur.getGrade(), listCur.getMajor(), listCur.getNum(),
-                    listCur.getClassName(), listCur.getClassType(), listCur.getClassCredit(),
-                    listCur.getClassTime(), listCur.getOpTime(), listCur.getPrTime(),
+            TableCourseMultiline listCur = excelListData.get(i);
+            Course courseCur = new Course(listCur.getGrade(), listCur.getMajor(), listCur.getPeople(),
+                    listCur.getCourseName(), listCur.getCourseType(), listCur.getCourseCredit(),
+                    listCur.getCourseHours(), listCur.getPracticeHour(), listCur.getOnMachineHour(),
                     listCur.getTimePeriod(), listCur.getTeacherName(), listCur.getRemark());
             excelData.add(courseCur);
         }
@@ -110,8 +110,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         EditText edtTxDialogNote =
                                 (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
 
-                        TableClass courseModify = new TableClass();
-                        courseModify.setClassName(excelData.get(position).getCourseName());
+                        TableCourseMultiline courseModify = new TableCourseMultiline();
+                        courseModify.setCourseName(excelData.get(position).getCourseName());
                         courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
                         courseModify.setRemark(edtTxDialogNote.getText().toString());
                         courseModify.setTeacherName("张三");
@@ -145,13 +145,13 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
         tvDialogGrade.setText(excelListData.get(position).getGrade());
         tvDialogMajor.setText(excelListData.get(position).getMajor());
-        tvDialogNum.setText(excelListData.get(position).getNum());
-        tvDialogCourseName.setText(excelListData.get(position).getClassName());
-        tvDialogType.setText(excelListData.get(position).getClassType());
-        tvDialogCredit.setText(excelListData.get(position).getClassCredit());
-        tvDialogClassHour.setText(excelListData.get(position).getClassTime());
-        tvDialogExperimentHour.setText(excelListData.get(position).getOpTime());
-        tvDialogComputerHour.setText(excelListData.get(position).getPrTime());
+        tvDialogNum.setText(excelListData.get(position).getPeople());
+        tvDialogCourseName.setText(excelListData.get(position).getCourseName());
+        tvDialogType.setText(excelListData.get(position).getCourseType());
+        tvDialogCredit.setText(excelListData.get(position).getCourseCredit());
+        tvDialogClassHour.setText(excelListData.get(position).getCourseHours());
+        tvDialogExperimentHour.setText(excelListData.get(position).getPracticeHour());
+        tvDialogComputerHour.setText(excelListData.get(position).getOnMachineHour());
         edtTxDialogFromtoEnd.setText(excelListData.get(position).getTimePeriod());
         edtTxDialogNote.setText(excelListData.get(position).getRemark());
     }

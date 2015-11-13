@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -22,24 +22,24 @@ public class ServerTools {
 
     Context context;
 
-    public ServerTools(Context context)
-    {
-        this.context=context;
+    public ServerTools(Context context) {
+        this.context = context;
     }
 
-    public void postTeacherTable()
-    {
-        CourseDBHelper dbHelper =new CourseDBHelper();
+    public void postTeacherTable() {
+        CourseDBHelper dbHelper = new CourseDBHelper();
         dbHelper.creatDataBase(context);
-        List list = dbHelper.findall(TableTeacher.class);
+        List list = dbHelper.findall(TableUserTeacher.class);
 
         ParseJson parseJson = new ParseJson();
-        String jsonData =  parseJson.getTeacherJson(list);
+        String jsonData = parseJson.getTeacherJson((List<TableUserTeacher>)list);
+
+        Log.w("json数据", jsonData);
 
         RequestParams params = new RequestParams();
-        params.add("jsonData",jsonData);
+        params.add("jsonData", jsonData);
 
-        NetworkManager.post(NetworkManager.URL_JSON_POST, null, new AsyncHttpResponseHandler() {
+        NetworkManager.post(NetworkManager.URL_JSON_POST, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 Charset charset = Charset.forName("UTF-8");
@@ -55,7 +55,7 @@ public class ServerTools {
     }
 
 
-    public void getTeacherTable(){
+    public void getTeacherTable() {
         NetworkManager.post(NetworkManager.URL_JSON_GET, null, new BaseJsonHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, String s, Object o) {

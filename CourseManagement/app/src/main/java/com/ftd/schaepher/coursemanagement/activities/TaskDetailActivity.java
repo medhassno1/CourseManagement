@@ -10,12 +10,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTask;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -32,7 +31,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
     private String identity;
     private String taskId;
-    private TableTask task;
+    private TableTaskInfo task;
     private CourseDBHelper dbHelper;
 
     @Override
@@ -63,7 +62,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cardvTaskDetail.setOnClickListener(this);
 
         Log.d("TASKID",taskId);
-        task = (TableTask) dbHelper.findById(taskId,TableTask.class);
+        task = (TableTaskInfo) dbHelper.findById(taskId,TableTaskInfo.class);
         Log.d("TAG", task.toString());
         String taskTerm = task.getYear()+task.getSemester();
         tvTaskTerm.setText(taskTerm);

@@ -16,7 +16,7 @@ import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTask;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
 
@@ -111,8 +111,8 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
     }
 
     //获取即将发布的任务的信息
-    private TableTask getNewTaskInfomation() {
-        TableTask newTask = new TableTask();
+    private TableTaskInfo getNewTaskInfomation() {
+        TableTaskInfo newTask = new TableTaskInfo();
         newTask.setYear("2015");
         newTask.setSemester("02");
         newTask.setTaskState("0");

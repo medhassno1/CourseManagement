@@ -9,8 +9,9 @@ import java.nio.channels.Pipe;
  * Created by sxq on 2015/10/31.
  * 任务详情表
  */
-@Table(name = "TableTask")
-public class TableTask {
+@Table(name = "TableTaskInfo")
+public class TableTaskInfo {
+    @Id
     private int id;
     private String relativeTable;
     private String year;
@@ -28,10 +29,10 @@ public class TableTask {
         this.id = id;
     }
 
-    public TableTask() {
+    public TableTaskInfo() {
     }
 
-    public TableTask(String taskState, String relativeTable) {
+    public TableTaskInfo(String taskState, String relativeTable) {
         this.taskState = taskState;
         this.relativeTable = relativeTable;
     }
@@ -90,5 +91,19 @@ public class TableTask {
 
     public void setTaskState(String taskState) {
         this.taskState = taskState;
+    }
+
+    @Override
+    public String toString() {
+        return "TableTaskInfo{" +
+                "id=" + id +
+                ", relativeTable='" + relativeTable + '\'' +
+                ", year='" + year + '\'' +
+                ", semester='" + semester + '\'' +
+                ", departmentDeadline='" + departmentDeadline + '\'' +
+                ", teacherDeadline='" + teacherDeadline + '\'' +
+                ", remark='" + remark + '\'' +
+                ", taskState='" + taskState + '\'' +
+                '}';
     }
 }

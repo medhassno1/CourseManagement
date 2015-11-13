@@ -5,7 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.pojo.Course;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,10 +112,10 @@ public class ExcelTools {
 
 
     //读取course表格的所有数据
-    public List<TableTeacher> readTeacherExcel() {
+    public List<TableUserTeacher> readTeacherExcel() {
         int rows;
         int beginRows=4;
-        ArrayList<TableTeacher> list = new ArrayList<>();
+        ArrayList<TableUserTeacher> list = new ArrayList<>();
         Log.i("Data", "目录是否可读");
 
         if(isTrueFileName()) {
@@ -136,10 +136,10 @@ public class ExcelTools {
                 }
 
                 for (int i = beginRows; i <= rows; i++) {
-                   TableTeacher teacher = new TableTeacher();
+                   TableUserTeacher teacher = new TableUserTeacher();
 
                     teacher.setWorkNumber(getCellValue(i, 1));//导入教师信息
-                    teacher.setPwd(getCellValue(i, 2));
+                    teacher.setPassword(getCellValue(i, 2));
                     teacher.setName(getCellValue(i,3));
                     teacher.setTelephone(getCellValue(i,4));
                     teacher.setDepartment(getCellValue(i,5));

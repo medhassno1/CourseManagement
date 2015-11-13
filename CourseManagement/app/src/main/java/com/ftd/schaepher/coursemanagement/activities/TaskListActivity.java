@@ -24,9 +24,8 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTask;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +38,7 @@ public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private Toolbar mToolbar;
 
-    private List<TableTask> taskListData;
+    private List<TableTaskInfo> taskListData;
     private String identity;
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
@@ -71,7 +70,7 @@ public class TaskListActivity extends AppCompatActivity
     //初始化数据，从数据库中获取当前页面所需的数据
     private void initTaskListData() {
         dbHelper = new CourseDBHelper(this);
-        taskListData = dbHelper.findall(TableTask.class);
+        taskListData = dbHelper.findall(TableTaskInfo.class);
     }
 
     //显示数据，控件与数据绑定
@@ -185,17 +184,17 @@ public class TaskListActivity extends AppCompatActivity
     /**
      * 任务列表的适配器
      */
-    class TaskAdapter extends ArrayAdapter<TableTask> {
+    class TaskAdapter extends ArrayAdapter<TableTaskInfo> {
         private int resourceId;
 
-        public TaskAdapter(Context context, int resource, List<TableTask> objects) {
+        public TaskAdapter(Context context, int resource, List<TableTaskInfo> objects) {
             super(context, resource, objects);
             this.resourceId = resource;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            TableTask task = getItem(position);
+            TableTaskInfo task = getItem(position);
             View view;
             viewHolder viewHolder;
             if (convertView == null) {
