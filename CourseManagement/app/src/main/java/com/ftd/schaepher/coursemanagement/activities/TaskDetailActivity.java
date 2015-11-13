@@ -50,7 +50,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         initWidgetValue();
     }
 
-    //初始化控件数据
+    // 初始化控件数据
     private void initWidgetValue() {
         tvTaskTerm = (TextView) findViewById(R.id.tv_task_detail_term);
         tvTeacherDeadline = (TextView) findViewById(R.id.tv_task_detail_teacher_deadline);
@@ -84,7 +84,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         return true;
     }
 
-    //标题栏图标点击事件
+    // 标题栏图标点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -104,7 +104,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    //点击查看文件跳转逻辑
+    // 点击查看文件跳转逻辑
     @Override
     public void onClick(View v) {
         startActivity(new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class));

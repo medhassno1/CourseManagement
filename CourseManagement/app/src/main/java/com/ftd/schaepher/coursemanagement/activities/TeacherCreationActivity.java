@@ -75,7 +75,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 CourseDBHelper dbHelper = new CourseDBHelper();
-                                dbHelper.creatDataBase(TeacherCreationActivity.this);
+                                dbHelper.createDataBase(TeacherCreationActivity.this);
                                 TableUserTeacher teacher = getTeacherData();
                                 dbHelper.insert(teacher);
 
@@ -93,7 +93,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         }
     }
 
-    //设置弹出系和专业可供选择
+    // 设置弹出系和专业可供选择
     @Override
     public void onClick(View v) {
         final SimpleDialog simpleDialog = new SimpleDialog(TeacherCreationActivity.this);

@@ -14,6 +14,7 @@ import android.widget.Toast;
 public class ConnectionChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+
         //获取网络连接管理者
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -21,7 +22,6 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
         // NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         NetworkInfo mobNetInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         NetworkInfo wifiNetInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
 
         if (!mobNetInfo.isConnected() && !wifiNetInfo.isConnected()) {
             Toast.makeText(context, "网络不可用",

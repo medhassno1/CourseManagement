@@ -25,8 +25,9 @@ public class ExcelTools {
 
     public Context context;
     public Sheet sheet;
-    // public String path = "/storage/emulated/0/tencent/QQfile_recv/course.xls";//模拟器sd卡中excel表格的路径
-    //这是个静态路径，默认为qq接收文件夹
+    // 模拟器sd卡中excel表格的路径
+    // public String path = "/storage/emulated/0/tencent/QQfile_recv/course.xls";
+    // 这是个静态路径，默认为qq接收文件夹
     public String path = "mnt/sdcard/course.xls";
 
     public ExcelTools() {
@@ -35,7 +36,6 @@ public class ExcelTools {
     public ExcelTools(Context con) {
         context = con;
     }
-
 
     public void setPath(String filePath) {
         path = filePath;
@@ -57,7 +57,7 @@ public class ExcelTools {
         return false;
     }
 
-    //读取course表格的所有数据
+    // 读取course表格的所有数据
     public List<TableCourseMultiline> readCourseExcel() {
         int rows;
         int beginRows = 4;
@@ -78,12 +78,10 @@ public class ExcelTools {
                         beginRows = i;
                         break;
                     }
-
                 }
 
                 for (int i = beginRows; i <= rows; i++) {
                     TableCourseMultiline course = new TableCourseMultiline();
-
                     course.setGrade(getCellValue(i, 1));//导入课程信息
                     course.setMajor(getCellValue(i, 2));
                     course.setPeople(getCellValue(i, 3));
@@ -113,7 +111,7 @@ public class ExcelTools {
     }
 
 
-    //读取course表格的所有数据
+    // 读取course表格的所有数据
     public List<TableUserTeacher> readTeacherExcel() {
         int rows;
         int beginRows = 4;
@@ -136,7 +134,6 @@ public class ExcelTools {
                         beginRows = i;
                         break;
                     }
-
                 }
 
                 for (int i = beginRows; i <= rows; i++) {
@@ -147,7 +144,6 @@ public class ExcelTools {
                     teacher.setName(getCellValue(i, 3));
                     teacher.setTelephone(getCellValue(i, 4));
                     teacher.setDepartment(getCellValue(i, 5));
-
 
                     Log.i("Data", getCellValue(i, 5));
                     list.add(teacher);
@@ -160,7 +156,6 @@ public class ExcelTools {
                 e.printStackTrace();
             }
         }
-
         return list;
     }
 
@@ -169,7 +164,7 @@ public class ExcelTools {
      */
     public String getCellValue(int row, int col) {
         Cell c = sheet.getCell(col - 1, row - 1);
-        return c.getContents().trim();//返回去空格的值
+        return c.getContents().trim(); // 返回去掉空格后的值
     }
 
 }

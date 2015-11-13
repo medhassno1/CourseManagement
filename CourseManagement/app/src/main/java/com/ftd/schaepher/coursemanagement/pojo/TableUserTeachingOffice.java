@@ -18,6 +18,20 @@ public class TableUserTeachingOffice {
     private String telephone;
     private String email;
 
+    public TableUserTeachingOffice() {
+    }
+
+    public TableUserTeachingOffice(String workNumber, String password, String name, String sex,
+                                   String birthday, String telephone, String email) {
+        this.workNumber = workNumber;
+        this.password = password;
+        this.name = name;
+        this.sex = sex;
+        this.birthday = birthday;
+        this.telephone = telephone;
+        this.email = email;
+    }
+
     public String getWorkNumber() {
         return workNumber;
     }

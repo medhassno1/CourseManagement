@@ -26,7 +26,6 @@ public class TableCourseCombine {
     private String remark;
 
     public TableCourseCombine() {
-
     }
 
     public TableCourseCombine(String workNumber, String grade, String major,

@@ -16,9 +16,9 @@ public class Initialize {
 
 
     public void init(Context context) {
-        dbHelper.creatDataBase(context);
+        dbHelper.createDataBase(context);
 
-        dbHelper.creatTableSystemLeader();
+        dbHelper.createTableSystemLeader();
         TableUserDepartmentHead tableUserDepartmentHead = new TableUserDepartmentHead();
         tableUserDepartmentHead.setWorkNumber("00000");
         tableUserDepartmentHead.setPassword("00000");
@@ -46,7 +46,7 @@ public class Initialize {
         tableUserDepartmentHead.setTelephone("00000000004");
         dbHelper.insert(tableUserDepartmentHead);
 
-        dbHelper.creatTableTeacher();
+        dbHelper.createTableTeacher();
         TableUserTeacher tableUserTeacher = new TableUserTeacher();
         tableUserTeacher.setWorkNumber("02501");
         tableUserTeacher.setPassword("02501");
@@ -189,7 +189,7 @@ public class Initialize {
 
         dbHelper.insert(tableUserTeacher);
 
-        dbHelper.creatTableClass();
+        dbHelper.createTableClass();
         TableCourseMultiline tableCourseMultiline = new TableCourseMultiline();
         tableCourseMultiline.setCourseName("Internet技术与协议分析实验");
         tableCourseMultiline.setGrade("2012");
@@ -226,7 +226,7 @@ public class Initialize {
         tableCourseMultiline.setOnMachineHour("18");
         dbHelper.insert(tableCourseMultiline);
 
-        dbHelper.creatTableTeachingDepartment();
+        dbHelper.createTableTeachingDepartment();
         TableUserTeachingOffice tableUserTeachingOffice = new TableUserTeachingOffice();
         tableUserTeachingOffice.setWorkNumber("10000");
         tableUserTeachingOffice.setPassword("10000");

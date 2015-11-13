@@ -23,33 +23,27 @@ public class CourseDBHelper {
     public CourseDBHelper() {
     }
 
-    //创建数据库
-    public void creatDataBase(Context context) {
+    // 创建数据库
+    public void createDataBase(Context context) {
         db = FinalDb.create(context, "teacherclass.db");
     }
 
-    public void creatTableTeacher() {
+    public void createTableTeacher() {
         TableUserTeacher teacher = new TableUserTeacher();
         db.save(teacher);
     }
 
-    /**
-     * 功能：
-     *
-     * @param
-     * @return
-     */
-    public void creatTableTeachingDepartment() {
+    public void createTableTeachingDepartment() {
         TableUserTeachingOffice tableTeachingDepartmentr = new TableUserTeachingOffice();
         db.save(tableTeachingDepartmentr);
     }
 
-    public void creatTableSystemLeader() {
+    public void createTableSystemLeader() {
         TableUserDepartmentHead tableUserDepartmentHead = new TableUserDepartmentHead();
         db.save(tableUserDepartmentHead);
     }
 
-    public void creatTableClass() {
+    public void createTableClass() {
         TableCourseMultiline tableCourseMultiline = new TableCourseMultiline();
         db.save(tableCourseMultiline);
     }
@@ -59,23 +53,22 @@ public class CourseDBHelper {
         db.save(tableTaskInfo);
     }
 
-    //插入数据
+    // 插入数据
     public void insert(Object entity) {
         db.save(entity);
-
     }
 
-    //,删除数据，class为id为表的主键
+    // 删除数据，class为id为表的主键
     public void delete(Class<?> clazz, String id) {
         db.deleteById(clazz, id);
     }
 
-    //改
+    // 改
     public void update(Object entity) {
         db.update(entity);
     }
-    //查
 
+    // 查
     public Object findById(String id, Class<?> clazz) {
         return db.findById(id, clazz);
     }

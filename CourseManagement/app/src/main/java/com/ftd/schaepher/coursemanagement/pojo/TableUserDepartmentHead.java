@@ -20,6 +20,23 @@ public class TableUserDepartmentHead {
     private String department;
     private String managedMajor;
 
+    public TableUserDepartmentHead() {
+    }
+
+    public TableUserDepartmentHead(String workNumber, String password, String name, String sex,
+                                   String birthday, String telephone, String email,
+                                   String department, String managedMajor) {
+        this.workNumber = workNumber;
+        this.password = password;
+        this.name = name;
+        this.sex = sex;
+        this.birthday = birthday;
+        this.telephone = telephone;
+        this.email = email;
+        this.department = department;
+        this.managedMajor = managedMajor;
+    }
+
     public String getWorkNumber() {
         return workNumber;
     }

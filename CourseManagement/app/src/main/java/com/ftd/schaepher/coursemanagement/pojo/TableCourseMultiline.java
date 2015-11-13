@@ -25,7 +25,6 @@ public class TableCourseMultiline {
     private String remark;
 
     public TableCourseMultiline() {
-
     }
 
     public TableCourseMultiline(String grade, String major, String people, String courseName,

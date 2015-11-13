@@ -29,8 +29,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
 
-    private String workNumber;//教师工号
-
+    private String workNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +61,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         Log.i("str2", "工号" + workNumber);
 
         CourseDBHelper dbHelper = new CourseDBHelper();
-        dbHelper.creatDataBase(this);
+        dbHelper.createDataBase(this);
         TableUserTeacher teacher = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
 
         edtTxTeacherNumber.setText(teacher.getWorkNumber());
@@ -105,7 +104,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 CourseDBHelper dbHelper = new CourseDBHelper();
-                                dbHelper.creatDataBase(TeacherDetailActivity.this);
+                                dbHelper.createDataBase(TeacherDetailActivity.this);
                                 TableUserTeacher teacher = getTeacherData();
                                 dbHelper.update(teacher);
 
@@ -124,6 +123,5 @@ public class TeacherDetailActivity extends AppCompatActivity {
         }
 
     }
-
 
 }

@@ -59,8 +59,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         excelListData.add(excelHeader);
 
         dbHelper = new CourseDBHelper();
-        dbHelper.creatDataBase(this);
-        //查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
+        dbHelper.createDataBase(this);
+
+        // 查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
         excelListData.addAll(dbHelper.findall(TableCourseMultiline.class));
     }
 
@@ -74,7 +75,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         excelListView.setOnItemClickListener(this);
     }
 
-    //点击弹出修改弹窗
+    // 点击弹出修改弹窗
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position != 0) {
@@ -92,7 +93,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //点击确认修改逻辑
                         EditText edtTxDialogFromToEnd =
                                 (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
                         EditText edtTxDialogNote =
@@ -110,13 +110,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //点击取消修改逻辑
                     }
                 });
         return mBuilder.create();
     }
 
-    //设置弹窗的数据
+    // 设置弹窗的数据
     private void initAlertDialogData(int position, View v) {
         position = position - 1;
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);

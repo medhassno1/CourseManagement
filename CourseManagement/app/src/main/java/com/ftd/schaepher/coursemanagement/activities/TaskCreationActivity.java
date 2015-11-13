@@ -26,14 +26,15 @@ import java.util.Calendar;
  * Created by sxq on 2015/10/31.
  * 发布任务界面
  */
-public class TaskCreationActivity extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
+public class TaskCreationActivity extends AppCompatActivity
+        implements View.OnFocusChangeListener, View.OnClickListener {
+
     private EditText edtTxDepartmentDeadline;
     private EditText edtTxTeacherDeadline;
     private EditText edtTxTaskName;
     private EditText edtTxTaskTeam;
     private EditText edtTxTaskRemark;
     private Button btnImportFile;
-
     private CourseDBHelper dbHelper;
 
     @Override
@@ -49,7 +50,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         initWidgetAndListener();
     }
 
-    //初始化控件及绑定监听事件
+    // 初始化控件及绑定监听事件
     private void initWidgetAndListener() {
         edtTxDepartmentDeadline = (EditText) findViewById(R.id.edtTx_add_task_department_deadline);
         edtTxTeacherDeadline = (EditText) findViewById(R.id.edtTx_add_task_teacher_deadline);
@@ -77,7 +78,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         return true;
     }
 
-    //标题栏图标的点击事件
+    // 标题栏图标的点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -94,7 +95,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
                     @Override
                     public void onClick(View v) {
                         dbHelper = new CourseDBHelper(TaskCreationActivity.this);
-                        dbHelper.insert(getNewTaskInfomation());
+                        dbHelper.insert(getNewTaskInformation());
                         finish();
                     }
                 });
@@ -110,8 +111,8 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         }
     }
 
-    //获取即将发布的任务的信息
-    private TableTaskInfo getNewTaskInfomation() {
+    // 获取即将发布的任务的信息
+    private TableTaskInfo getNewTaskInformation() {
         TableTaskInfo newTask = new TableTaskInfo();
         newTask.setYear("2015");
         newTask.setSemester("02");
@@ -119,11 +120,11 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
         newTask.setRemark(edtTxTaskRemark.getText().toString());
-        newTask.setRelativeTable(taskNameChineseMapEnglisg(edtTxTaskName.getText().toString()) + "201502");
+        newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + "201502");
         return newTask;
     }
 
-    //控件的焦点监听事件
+    // 控件的焦点监听事件
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         switch (v.getId()) {
@@ -147,7 +148,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         }
     }
 
-    //控件的点击事件
+    // 控件的点击事件
     @Override
     public void onClick(View v) {
         final Calendar calendar = Calendar.getInstance();
@@ -205,8 +206,8 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         }
     }
 
-    //任务名映射
-    public String taskNameChineseMapEnglisg(String string) {
+    // 任务名映射
+    public String transferTaskNameToEnglish(String string) {
         Log.d("TAG", string);
         switch (string) {
             case "计算机（卓越班）":

@@ -23,14 +23,13 @@ import com.rey.material.widget.ProgressView;
 
 import org.apache.http.Header;
 
-import java.nio.charset.Charset;
-
 /**
  * Created by sxq on 2015/10/28.
  * 登录界面
  */
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, View.OnFocusChangeListener {
+
     private static final String TAG = "LoginActivity";
     private Button btnLogin;
     private EditText edtTxUserName;
@@ -65,7 +64,7 @@ public class LoginActivity extends AppCompatActivity
         btnLogin.setOnClickListener(this);
         autoSetUserName();
 
-        isFirstInit();
+        initDatabaseData();
     }
 
     @Override
@@ -88,7 +87,7 @@ public class LoginActivity extends AppCompatActivity
     /**
      * 第一次登陆的操作，即初始化数据库
      */
-    private void isFirstInit() {
+    private void initDatabaseData() {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -116,9 +115,9 @@ public class LoginActivity extends AppCompatActivity
                         identity = rdoBtnId.getText().toString().trim();
                         if (identity.equals("教师")) {
                             identity = "teacher";
-                        } else if (identity.equals("教学办")){
+                        } else if (identity.equals("教学办")) {
                             identity = "teachingOffice";
-                        } else if (identity.equals("系负责人")){
+                        } else if (identity.equals("系负责人")) {
                             identity = "departmentHead";
                         }
                     }
@@ -134,7 +133,9 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    /*检查账号密码*/
+    /**
+     * 检查账号密码
+     */
     private boolean isTrueForm() {
         if (userName.equals("") || password.equals("")) {
             if (userName.equals("")) {
@@ -151,7 +152,7 @@ public class LoginActivity extends AppCompatActivity
         return false;
     }
 
-    //处理登录逻辑
+    // 处理登录逻辑
     public void login() {
         RequestParams params = new RequestParams();
         params.add("login-user", userName);
@@ -159,14 +160,13 @@ public class LoginActivity extends AppCompatActivity
         params.add("ident", identity);
         try {
             NetworkManager.post(NetworkManager.URL_LOGIN, params, new AsyncHttpResponseHandler() {
-
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                     String html = new String(response);
-                    Log.w("first post=", html); //服务器返回的文本
+                    Log.w("first post=", html); // 服务器返回的文本
 
                     if (html.equals("true")) {
-                        //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
+                        // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
 
                         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
@@ -198,10 +198,9 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    //处理输入错误提示
+    // 处理输入错误提示
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-
         if (!edtTxUserName.getText().toString().equals("")) {
             layoutUserName.setError(null);
         }
