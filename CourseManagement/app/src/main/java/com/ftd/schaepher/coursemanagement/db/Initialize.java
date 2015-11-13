@@ -13,14 +13,14 @@ import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
  * Created by lenovo on 2015/11/6.
  */
 public class Initialize {
-    CourseDBHelper dbHelper =new CourseDBHelper();
+    CourseDBHelper dbHelper = new CourseDBHelper();
 
 
-    public void init(Context context){
+    public void init(Context context) {
         dbHelper.creatDataBase(context);
 
         dbHelper.creatTableMajor();
-        TableMajor major =new TableMajor();
+        TableMajor major = new TableMajor();
         major.setMajor("计算机");
         dbHelper.insert(major);
         major.setMajor("数学");
@@ -37,7 +37,7 @@ public class Initialize {
         dbHelper.insert(major);
 
         dbHelper.creatTableSystem();
-        TableSystem tableSystem =new TableSystem();
+        TableSystem tableSystem = new TableSystem();
         tableSystem.setSysytemName("计算机系");
         dbHelper.insert(tableSystem);
         tableSystem.setSysytemName("软件工程系");
@@ -48,7 +48,7 @@ public class Initialize {
         dbHelper.insert(tableSystem);
 
         dbHelper.creatTableSystemLeader();
-        TableSystemLeader tableSystemLeader =new TableSystemLeader();
+        TableSystemLeader tableSystemLeader = new TableSystemLeader();
         tableSystemLeader.setWorkNumber("00000");
         tableSystemLeader.setPsw("00000");
         tableSystemLeader.setName("张栋");
@@ -76,7 +76,7 @@ public class Initialize {
         dbHelper.insert(tableSystemLeader);
 
         dbHelper.creatTableTeacher();
-        TableTeacher tableTeacher =new TableTeacher();
+        TableTeacher tableTeacher = new TableTeacher();
         tableTeacher.setWorkNumber("02501");
         tableTeacher.setPwd("02501");
         tableTeacher.setName("陈楠楠1111");
@@ -86,96 +86,134 @@ public class Initialize {
         tableTeacher.setPwd("02502");
         tableTeacher.setName("陈世发");
         tableTeacher.setTelephone("00000000006");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02503");
         tableTeacher.setPwd("02503");
         tableTeacher.setName("黄星");
         tableTeacher.setTelephone("00000000006");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02504");
         tableTeacher.setPwd("02504");
         tableTeacher.setName("洪耀坤");
         tableTeacher.setTelephone("00000000007");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02505");
         tableTeacher.setPwd("02505");
         tableTeacher.setName("黄晓雄");
         tableTeacher.setTelephone("00000000008");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02506");
         tableTeacher.setPwd("02506");
         tableTeacher.setName("黄晓辉");
         tableTeacher.setTelephone("00000000009");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02507");
         tableTeacher.setPwd("02507");
         tableTeacher.setName("林培新");
         tableTeacher.setTelephone("00000000010");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02508");
         tableTeacher.setPwd("02508");
         tableTeacher.setName("黄云龙");
         tableTeacher.setTelephone("00000000011");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02509");
         tableTeacher.setPwd("02509");
         tableTeacher.setName("李洪");
         tableTeacher.setTelephone("000000000012");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02510");
         tableTeacher.setPwd("02510");
         tableTeacher.setName("李小龙");
         tableTeacher.setTelephone("000000000013");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02511");
         tableTeacher.setPwd("02511");
         tableTeacher.setName("苏钦辉");
         tableTeacher.setTelephone("00000000014");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02512");
         tableTeacher.setPwd("02512");
         tableTeacher.setName("吴伟坤");
         tableTeacher.setTelephone("00000000015");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02513");
         tableTeacher.setPwd("02513");
         tableTeacher.setName("钱仁法");
         tableTeacher.setTelephone("00000000016");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02514");
         tableTeacher.setPwd("02514");
         tableTeacher.setName("宋一博");
         tableTeacher.setTelephone("00000000017");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02515");
         tableTeacher.setPwd("02515");
         tableTeacher.setName("苏世杰");
         tableTeacher.setTelephone("00000000018");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02516");
         tableTeacher.setPwd("02516");
         tableTeacher.setName("苏晓强");
         tableTeacher.setTelephone("00000000019");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02517");
         tableTeacher.setPwd("02517");
         tableTeacher.setName("孙治书");
         tableTeacher.setTelephone("00000000020");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02518");
         tableTeacher.setPwd("02518");
         tableTeacher.setName("周斌");
         tableTeacher.setTelephone("00000000021");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02519");
         tableTeacher.setPwd("02519");
         tableTeacher.setName("颜海林");
         tableTeacher.setTelephone("00000000022");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
         tableTeacher.setWorkNumber("02520");
         tableTeacher.setPwd("02520");
         tableTeacher.setName("张海山");
         tableTeacher.setTelephone("00000000022");
+        tableTeacher.setDepartment("计算机类");
+        tableTeacher.setMajor("计算机类");
         dbHelper.insert(tableTeacher);
 
         dbHelper.creatTableClass();
@@ -216,7 +254,7 @@ public class Initialize {
         dbHelper.insert(tableClass);
 
         dbHelper.creatTableTeachingDepartment();
-        TableTeachingDepartment tableTeachingDepartment =new TableTeachingDepartment();
+        TableTeachingDepartment tableTeachingDepartment = new TableTeachingDepartment();
         tableTeachingDepartment.setNumber("10000");
         tableTeachingDepartment.setPwd("10000");
         tableTeachingDepartment.setName("张琴");

@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.ServerTools;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
@@ -66,6 +67,17 @@ public class LoginActivity extends AppCompatActivity
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
         autoSetUserName();
+
+        isFirstInit();
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ServerTools serverTools = new ServerTools(this);
+        serverTools.postTeacherTable();
     }
 
     /**
@@ -86,14 +98,14 @@ public class LoginActivity extends AppCompatActivity
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (isFirstRun) {
-            Log.d("debug", "第一次运行");
+            Log.v("debug", "第一次运行");
             editor.putBoolean("isFirstRun", false);
-            editor.commit();
+            editor.apply();
 
             Initialize initialize = new Initialize();//初始化数据库
             initialize.init(this);
         }else{
-            Log.d("debug", "不是第一次运行");
+            Log.v("debug", "不是第一次运行");
         }
     }
 
@@ -121,7 +133,6 @@ public class LoginActivity extends AppCompatActivity
                 if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
                     login();
-//                    loginTest();
                 }
 
                 break;
@@ -172,8 +183,6 @@ public class LoginActivity extends AppCompatActivity
                         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
                         ownInformationSaveEditor.putString("userName", userName);
                         ownInformationSaveEditor.commit();
-
-                        isFirstInit();//判断是否是第一次操作，并执行相关操作
 
                         LoginActivity.this.finish();
                         startActivity(intent);

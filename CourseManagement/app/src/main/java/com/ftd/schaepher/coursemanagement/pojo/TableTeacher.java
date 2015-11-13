@@ -16,8 +16,12 @@ public class TableTeacher {
     private String department;
     private String major;
 
-    public String getDepartment() {
-        return department;
+    public String getWorkNumber() {
+        return workNumber;
+    }
+
+    public void setWorkNumber(String workNumber) {
+        this.workNumber = workNumber;
     }
 
     public String getMajor() {
@@ -28,16 +32,12 @@ public class TableTeacher {
         this.major = major;
     }
 
+    public String getDepartment() {
+        return department;
+    }
+
     public void setDepartment(String department) {
         this.department = department;
-    }
-
-    public String getWorkNumber() {
-        return workNumber;
-    }
-
-    public void setWorkNumber(String workNumber) {
-        this.workNumber = workNumber;
     }
 
     public String getTelephone() {
@@ -64,6 +64,7 @@ public class TableTeacher {
         this.pwd = pwd;
     }
 
+
     @Override
     public String toString() {
         return "TableTeacher{" +
@@ -71,6 +72,8 @@ public class TableTeacher {
                 ", pwd='" + pwd + '\'' +
                 ", name='" + name + '\'' +
                 ", telephone='" + telephone + '\'' +
+                ", department='" + department + '\'' +
+                ", major='" + major + '\'' +
                 '}';
     }
 }

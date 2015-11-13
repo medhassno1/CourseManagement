@@ -30,7 +30,8 @@ public class ParseJson {
         }
     }
 
-    public String getTeacherJson(List teacherList){
+    public String getTeacherJson(List<TableTeacher> teacherList){
+        // 如果一行中某一列为空，则在这里会被舍弃。需要解决这个问题
         return gson.toJson(teacherList);
     }
 
