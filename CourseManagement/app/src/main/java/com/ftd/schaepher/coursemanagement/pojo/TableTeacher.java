@@ -5,6 +5,7 @@ import net.tsz.afinal.annotation.sqlite.Table;
 
 /**
  * Created by lenovo on 2015/11/6.
+ * 教师用户表
  */
 @Table(name="TableTeacher") //表名
 public class TableTeacher {

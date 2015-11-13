@@ -25,22 +25,16 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="15dp">
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/edtTx_add_task_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="任务名"
-                android:inputType="text"
-                android:text="计算机专业" />
-        </android.support.design.widget.TextInputLayout>
+        android:layout_margin="15dp"
+        android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -54,17 +48,6 @@
                 android:inputType="text" />
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/edtTx_add_task_teacher"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="参与教师"
-                android:inputType="text" />
-        </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -102,18 +85,32 @@
                 android:inputType="text" />
         </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/edtTx_add_task_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="任务名/专业"
+                android:inputType="text" />
+        </android.support.design.widget.TextInputLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
 
-            <TextView
+            <com.rey.material.widget.Button
+                android:id="@+id/btn_add_task_import_file"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
                 android:gravity="center"
-                android:text="开课表附件"
-                android:textSize="18sp" />
+                android:text="导入文件"
+                android:textColor="#0056d3"
+                android:background="@null"
+                app:rd_enable="true"/>
 
             <ImageView
                 android:layout_width="1dp"
@@ -128,14 +125,14 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/excel_xls" />
+                android:src="@drawable/excel_xls"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/tv_add_task_file_name"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="计算机专业.xls" />
+                android:gravity="center" />
         </LinearLayout>
 
         <ImageView

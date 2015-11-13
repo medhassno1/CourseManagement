@@ -6,6 +6,7 @@ import com.ftd.schaepher.coursemanagement.pojo.TableClass;
 import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableSystem;
 import com.ftd.schaepher.coursemanagement.pojo.TableSystemLeader;
+import com.ftd.schaepher.coursemanagement.pojo.TableTask;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
 
@@ -16,7 +17,15 @@ import java.util.List;
 
 public class CourseDBHelper {
     public FinalDb db;
-//创建数据库
+
+    public CourseDBHelper(Context context) {
+        db = FinalDb.create(context, "teacherclass.db");
+    }
+
+    public CourseDBHelper() {
+    }
+
+    //创建数据库
     public void creatDataBase(Context context) {
         db = FinalDb.create(context, "teacherclass.db");
     }
@@ -55,6 +64,12 @@ public class CourseDBHelper {
         TableClass tableClass =new TableClass();
         db.save(tableClass);
     }
+
+    public void createTableTask(){
+        TableTask tableTask = new TableTask();
+        db.save(tableTask);
+    }
+
     //插入数据
     public void insert(Object entity) {
         db.save(entity);

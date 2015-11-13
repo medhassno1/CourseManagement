@@ -1,0 +1,94 @@
+package com.ftd.schaepher.coursemanagement.pojo;
+
+import net.tsz.afinal.annotation.sqlite.Table;
+import net.tsz.afinal.annotation.sqlite.Id;
+
+import java.nio.channels.Pipe;
+
+/**
+ * Created by sxq on 2015/10/31.
+ * 任务详情表
+ */
+@Table(name = "TableTask")
+public class TableTask {
+    private int id;
+    private String relativeTable;
+    private String year;
+    private String semester;
+    private String departmentDeadline;
+    private String teacherDeadline;
+    private String remark;
+    private String taskState;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public TableTask() {
+    }
+
+    public TableTask(String taskState, String relativeTable) {
+        this.taskState = taskState;
+        this.relativeTable = relativeTable;
+    }
+
+    public String getRelativeTable() {
+        return relativeTable;
+    }
+
+    public void setRelativeTable(String relativeTable) {
+        this.relativeTable = relativeTable;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
+    public String getDepartmentDeadline() {
+        return departmentDeadline;
+    }
+
+    public void setDepartmentDeadline(String departmentDeadline) {
+        this.departmentDeadline = departmentDeadline;
+    }
+
+    public String getTeacherDeadline() {
+        return teacherDeadline;
+    }
+
+    public void setTeacherDeadline(String teacherDeadline) {
+        this.teacherDeadline = teacherDeadline;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getTaskState() {
+        return taskState;
+    }
+
+    public void setTaskState(String taskState) {
+        this.taskState = taskState;
+    }
+}
