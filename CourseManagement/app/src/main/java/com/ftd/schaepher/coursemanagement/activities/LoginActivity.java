@@ -92,7 +92,7 @@ public class LoginActivity extends AppCompatActivity
         if (isFirstRun) {
             Log.d("debug", "第一次运行");
             editor.putBoolean("isFirstRun", false);
-            editor.commit();
+            editor.apply();
 
             Initialize initialize = new Initialize();//初始化数据库
             initialize.init(this);
@@ -100,9 +100,6 @@ public class LoginActivity extends AppCompatActivity
             Log.d("debug", "不是第一次运行");
         }
     }
-
-
-
 
     @Override
     public void onClick(View v) {
@@ -127,7 +124,6 @@ public class LoginActivity extends AppCompatActivity
                     login();
 //                    loginTest();
                 }
-
                 break;
             default:
                 break;
@@ -172,16 +168,18 @@ public class LoginActivity extends AppCompatActivity
                     if (logResult == -1) {
                         //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
-                        Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
+
                         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
                         ownInformationSaveEditor.putString("userName", userName);
-                        ownInformationSaveEditor.commit();
+                        ownInformationSaveEditor.apply();
 
                         isFirstInit();//判断是否是第一次操作，并执行相关操作
 
+                        Intent intend = new Intent();
+                        intend.setClass(LoginActivity.this, TaskListActivity.class);
+                        intend.putExtra("teacherID", userName);
                         LoginActivity.this.finish();
-                        startActivity(intent);
-
+                        startActivity(intend);
 
                     } else {
                         proBarLogin.setVisibility(View.INVISIBLE);
@@ -190,7 +188,6 @@ public class LoginActivity extends AppCompatActivity
                     }
                 }
 
-                //修改网络出错的提示信息
                 @Override
                 public void onFailure(int statusCode, Header[] headers,
                                       byte[] response, Throwable throwable) {

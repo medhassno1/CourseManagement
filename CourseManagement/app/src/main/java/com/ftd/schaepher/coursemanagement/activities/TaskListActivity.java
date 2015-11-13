@@ -36,22 +36,29 @@ public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private List<Task> taskListData;
     private Toolbar mToolbar;
+    private TextView tvName;
 
     private String identity;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private static final String TAG = "TaskListActivity";
+    private String workNumber;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_list);
+        tvName = (TextView)findViewById(R.id.nav_own_name);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_task_jxb);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("报课任务列表");
         setNavViewConfig();
         setSupportDoubleBackExit(true);
+
+        Intent intent = getIntent();
+        workNumber = intent.getStringExtra("teacherID");
 
         initTaskListData();
         initTaskListView();
@@ -66,7 +73,7 @@ public class TaskListActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
-
+       // tvName.setText("李四");
         if (identity.equals("teacher")) {
             navigationView.getMenu().removeItem(R.id.nav_teacher_list);
         }
@@ -111,7 +118,11 @@ public class TaskListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                startActivity(new Intent(TaskListActivity.this, TeacherDetailActivity.class));
+                Intent intend = new Intent();
+                intend.setClass(TaskListActivity.this, TeacherDetailActivity.class);
+                intend.putExtra("teacherID", workNumber);
+                startActivity(intend);
+
                 onBackPressed();
                 break;
             default:

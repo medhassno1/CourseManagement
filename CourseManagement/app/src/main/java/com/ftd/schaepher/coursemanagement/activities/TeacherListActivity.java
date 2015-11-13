@@ -50,6 +50,7 @@ public class TeacherListActivity extends AppCompatActivity
 
     private Handler myhandler = new Handler();
     private static final String TAG = "TeacherListActivity";
+    private String workNumber;
 
     private List<TableTeacher> teacherListData;//
     private List<TableTeacher> list;
@@ -62,15 +63,13 @@ public class TeacherListActivity extends AppCompatActivity
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
 
-
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
-        /*Initialize initialize = new Initialize();
-        initialize.init(this);*/
-
         updateTeacherDataList();
 
+        Intent intent = getIntent();
+        workNumber = intent.getStringExtra("teacherID");
 
         setSearchTextChanged();//设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick();//设置叉叉的监听器
@@ -93,6 +92,8 @@ public class TeacherListActivity extends AppCompatActivity
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
         navigationView.setNavigationItemSelectedListener(this);
@@ -137,7 +138,10 @@ public class TeacherListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                startActivity(new Intent(TeacherListActivity.this, TeacherDetailActivity.class));
+                Intent intend = new Intent();
+                intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
+                intend.putExtra("teacherID",workNumber);
+                startActivity(intend);
                 onBackPressed();
                 break;
             default:

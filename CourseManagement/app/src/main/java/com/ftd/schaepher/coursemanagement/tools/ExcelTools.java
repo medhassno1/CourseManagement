@@ -126,9 +126,11 @@ public class ExcelTools {
 
                 Log.i("Data", "行数" + rows);
 
-                for (int i = 1; i <= rows; i++) {       //判断从第几行导入数据
+                //判断从第几行导入数据
+                for (int i = 1; i <= rows; i++) {
                     Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
-                    if (getCellValue(i, 1).matches("^[0-9]+$")) {    //匹配数字
+                    //匹配数字
+                    if (getCellValue(i, 1).matches("^[0-9]+$")) {
                         beginRows = i;
                         break;
                     }
