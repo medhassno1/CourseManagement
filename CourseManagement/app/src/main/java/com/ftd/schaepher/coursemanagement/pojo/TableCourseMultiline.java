@@ -11,6 +11,7 @@ import net.tsz.afinal.annotation.sqlite.Table;
 public class TableCourseMultiline {
     @Id
     private String insertTime;
+    private String workNumber;
     private String grade;
     private String major;
     private String people;
@@ -27,10 +28,7 @@ public class TableCourseMultiline {
     public TableCourseMultiline() {
     }
 
-    public TableCourseMultiline(String grade, String major, String people, String courseName,
-                                String courseType, String courseCredit, String courseHours,
-                                String practiceHour, String onMachineHour, String timePeriod,
-                                String teacherName, String remark) {
+    public TableCourseMultiline(  String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHours, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
         this.grade = grade;
         this.major = major;
         this.people = people;
@@ -51,6 +49,14 @@ public class TableCourseMultiline {
 
     public void setInsertTime(String insertTime) {
         this.insertTime = insertTime;
+    }
+
+    public String getWorkNumber() {
+        return workNumber;
+    }
+
+    public void setWorkNumber(String workNumber) {
+        this.workNumber = workNumber;
     }
 
     public String getGrade() {
@@ -149,5 +155,23 @@ public class TableCourseMultiline {
         this.remark = remark;
     }
 
-
+    @Override
+    public String toString() {
+        return "TableCourseMultiline{" +
+                "insertTime='" + insertTime + '\'' +
+                ", workNumber='" + workNumber + '\'' +
+                ", grade='" + grade + '\'' +
+                ", major='" + major + '\'' +
+                ", people='" + people + '\'' +
+                ", courseName='" + courseName + '\'' +
+                ", courseType='" + courseType + '\'' +
+                ", courseCredit='" + courseCredit + '\'' +
+                ", courseHours='" + courseHours + '\'' +
+                ", practiceHour='" + practiceHour + '\'' +
+                ", onMachineHour='" + onMachineHour + '\'' +
+                ", timePeriod='" + timePeriod + '\'' +
+                ", teacherName='" + teacherName + '\'' +
+                ", remark='" + remark + '\'' +
+                '}';
+    }
 }
