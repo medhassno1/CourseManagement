@@ -175,7 +175,6 @@ public class LoginActivity extends AppCompatActivity
 
                         Intent intend = new Intent();
                         intend.setClass(LoginActivity.this, TaskListActivity.class);
-                        intend.putExtra("teacherID", userName);
                         LoginActivity.this.finish();
                         startActivity(intend);
                     } else {
