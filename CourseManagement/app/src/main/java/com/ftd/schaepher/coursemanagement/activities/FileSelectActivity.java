@@ -212,7 +212,7 @@ public class FileSelectActivity extends AppCompatActivity
         Log.i("path",path);
 
         if(!path.endsWith(".xls")){   //直接调用excelTools.isTrueFileName()会出错，暂时无解
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("只能导入.xls文件").setPositiveButton
+            new AlertDialog.Builder(this).setTitle("提示").setMessage("文件类型错误，请选择excel文件").setPositiveButton
                     (android.R.string.ok, new DialogInterface.OnClickListener() {
 
                 @Override
@@ -245,10 +245,6 @@ public class FileSelectActivity extends AppCompatActivity
 
                         }
                     }).show();
-
-
         }
-
     }
-
 }
