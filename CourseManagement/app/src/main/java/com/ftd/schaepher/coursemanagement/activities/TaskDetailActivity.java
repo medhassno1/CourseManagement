@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -19,7 +22,17 @@ import com.ftd.schaepher.coursemanagement.R;
  */
 public class TaskDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private CardView cardvTaskDetail;
+    private TextView tvDepartmentDeadline;
+    private TextView tvTeacherDeadline;
+    private TextView tvTaskRemark;
+    private TextView tvTaskState;
+    private TextView tvTaskName;
+    private TextView tvTaskTerm;
+
     private String identity;
+    private String taskId;
+    private TableTaskInfo task;
+    private CourseDBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +44,33 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         mActionBar.setTitle("报课任务详情");
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
+        taskId = getIntent().getStringExtra("taskId");
 
+        dbHelper = new CourseDBHelper(this);
+        initWidgetValue();
+    }
+
+    //初始化控件数据
+    private void initWidgetValue() {
+        tvTaskTerm = (TextView) findViewById(R.id.tv_task_detail_term);
+        tvTeacherDeadline = (TextView) findViewById(R.id.tv_task_detail_teacher_deadline);
+        tvDepartmentDeadline = (TextView) findViewById(R.id.tv_task_detail_department_deadline);
+        tvTaskRemark = (TextView) findViewById(R.id.tv_task_detail_remark);
+        tvTaskState = (TextView) findViewById(R.id.tv_task_detail_state);
+        tvTaskName = (TextView) findViewById(R.id.tv_task_detail_name);
         cardvTaskDetail = (CardView) findViewById(R.id.cardv_task_detail);
         cardvTaskDetail.setOnClickListener(this);
+
+        Log.d("TASKID",taskId);
+        task = (TableTaskInfo) dbHelper.findById(taskId,TableTaskInfo.class);
+        Log.d("TAG", task.toString());
+        String taskTerm = task.getYear()+task.getSemester();
+        tvTaskTerm.setText(taskTerm);
+        tvDepartmentDeadline.setText(task.getDepartmentDeadline());
+        tvTeacherDeadline.setText(task.getTeacherDeadline());
+        tvTaskRemark.setText(task.getRemark());
+        tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
+        tvTaskName.setText(TaskListActivity.taskNameChineseMapEnglisg(task.getRelativeTable()));
     }
 
     @Override
@@ -47,6 +84,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         return true;
     }
 
+    //标题栏图标点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

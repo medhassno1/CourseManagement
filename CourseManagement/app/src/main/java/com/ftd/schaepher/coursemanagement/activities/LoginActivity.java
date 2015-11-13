@@ -16,14 +16,12 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
-import com.ftd.schaepher.coursemanagement.tools.ParseJson;
+import com.ftd.schaepher.coursemanagement.tools.ServerTools;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 
 import java.nio.charset.Charset;
 
@@ -55,7 +53,6 @@ public class LoginActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         edtTxUserName = (EditText) findViewById(R.id.edtTx_login_username);
         edtTxPassWord = (EditText) findViewById(R.id.edtTx_login_password);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_check_identity);
@@ -69,7 +66,15 @@ public class LoginActivity extends AppCompatActivity
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
         autoSetUserName();
-     //   loginTest();
+
+        isFirstInit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ServerTools serverTools = new ServerTools(this);
+        serverTools.postTeacherTable();
     }
 
     /**
@@ -85,19 +90,19 @@ public class LoginActivity extends AppCompatActivity
     /**
      * 第一次登陆的操作，即初始化数据库
      */
-    private void isFirstInit(){
+    private void isFirstInit() {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (isFirstRun) {
-            Log.d("debug", "第一次运行");
+            Log.v("debug", "第一次运行");
             editor.putBoolean("isFirstRun", false);
             editor.apply();
 
             Initialize initialize = new Initialize();//初始化数据库
             initialize.init(this);
         }else{
-            Log.d("debug", "不是第一次运行");
+            Log.v("debug", "不是第一次运行");
         }
     }
 
@@ -122,9 +127,9 @@ public class LoginActivity extends AppCompatActivity
                 if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
                     login();
-//                    loginTest();
                 }
                 break;
+
             default:
                 break;
         }
@@ -173,14 +178,11 @@ public class LoginActivity extends AppCompatActivity
                         ownInformationSaveEditor.putString("userName", userName);
                         ownInformationSaveEditor.apply();
 
-                        isFirstInit();//判断是否是第一次操作，并执行相关操作
-
                         Intent intend = new Intent();
                         intend.setClass(LoginActivity.this, TaskListActivity.class);
                         intend.putExtra("teacherID", userName);
                         LoginActivity.this.finish();
                         startActivity(intend);
-
                     } else {
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "账号或密码错误",
@@ -212,31 +214,5 @@ public class LoginActivity extends AppCompatActivity
         if (!edtTxPassWord.getText().toString().equals("")) {
             layoutPassWord.setError(null);
         }
-    }
-
-
-    // 用来测试login的类
-    public void loginTest() {
-        ownInformationSaveEditor.putString("userName", userName);
-        ownInformationSaveEditor.commit();
-        NetworkManager.post(NetworkManager.URL_JSON, null, new BaseJsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int i, Header[] headers, String s, Object o) {
-                Log.w(TAG, s);
-                ParseJson parseJson = new ParseJson();
-                parseJson.toTeacher(s);
-            }
-
-            @Override
-            public void onFailure(int i, Header[] headers, Throwable throwable, String s, Object o) {
-
-            }
-
-            @Override
-            protected Object parseResponse(String s, boolean b) throws Throwable {
-                JSONArray array = new JSONArray(s);
-                return array;
-            }
-        });
     }
 }

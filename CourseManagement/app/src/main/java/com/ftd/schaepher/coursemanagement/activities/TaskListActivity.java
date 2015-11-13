@@ -23,10 +23,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
-import com.ftd.schaepher.coursemanagement.pojo.Task;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -34,11 +36,12 @@ import java.util.List;
  */
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
-    private List<Task> taskListData;
     private Toolbar mToolbar;
     private TextView tvName;
 
+    private List<TableTaskInfo> taskListData;
     private String identity;
+    private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private static final String TAG = "TaskListActivity";
@@ -64,27 +67,17 @@ public class TaskListActivity extends AppCompatActivity
         initTaskListView();
     }
 
-    private void setNavViewConfig() {
-        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
-       // tvName.setText("李四");
-        if (identity.equals("teacher")) {
-            navigationView.getMenu().removeItem(R.id.nav_teacher_list);
-        }
-        navigationView.setNavigationItemSelectedListener(this);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initTaskListData();
+        initTaskListView();
     }
 
     //初始化数据，从数据库中获取当前页面所需的数据
     private void initTaskListData() {
-        taskListData = new ArrayList<Task>();
-        Task task = new Task("进行中", "计算机专业");
-        taskListData.add(task);
+        dbHelper = new CourseDBHelper(this);
+        taskListData = dbHelper.findall(TableTaskInfo.class);
     }
 
     //显示数据，控件与数据绑定
@@ -98,7 +91,27 @@ public class TaskListActivity extends AppCompatActivity
     //点击任务列表项跳转操作
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        startActivity(new Intent(TaskListActivity.this, TaskDetailActivity.class));
+        Log.d(TAG, String.valueOf(taskListData.get(position).getId()));
+        Intent intent = new Intent(TaskListActivity.this, TaskDetailActivity.class);
+        intent.putExtra("taskId", String.valueOf(taskListData.get(position).getId()));
+        startActivity(intent);
+    }
+
+    //左侧菜单的初始设置
+    private void setNavViewConfig() {
+        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
+
+        if (identity.equals("teacher")) {
+            navigationView.getMenu().removeItem(R.id.nav_teacher_list);
+        }
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     //左菜单点击事件
@@ -131,6 +144,7 @@ public class TaskListActivity extends AppCompatActivity
         return false;
     }
 
+    //系统返回键事件
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
@@ -181,17 +195,17 @@ public class TaskListActivity extends AppCompatActivity
     /**
      * 任务列表的适配器
      */
-    class TaskAdapter extends ArrayAdapter<Task> {
+    class TaskAdapter extends ArrayAdapter<TableTaskInfo> {
         private int resourceId;
 
-        public TaskAdapter(Context context, int resource, List<Task> objects) {
+        public TaskAdapter(Context context, int resource, List<TableTaskInfo> objects) {
             super(context, resource, objects);
             this.resourceId = resource;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Task task = getItem(position);
+            TableTaskInfo task = getItem(position);
             View view;
             viewHolder viewHolder;
             if (convertView == null) {
@@ -205,14 +219,60 @@ public class TaskListActivity extends AppCompatActivity
                 viewHolder = (TaskAdapter.viewHolder) view.getTag();
             }
 
-            viewHolder.taskState.setText(task.getTaskState());
-            viewHolder.taskName.setText(task.getTaskName());
+            viewHolder.taskState.setText(taskStateMap(task.getTaskState()));
+            viewHolder.taskName.setText(taskNameChineseMapEnglisg(task.getRelativeTable()));
             return view;
         }
 
         class viewHolder {
             TextView taskState;
             TextView taskName;
+        }
+    }
+
+    //任务名映射
+    public static String taskNameChineseMapEnglisg(String string){
+        StringBuffer strTaskName = new StringBuffer();
+        Pattern pattern = Pattern.compile("[a-zA-Z_]*");
+        Matcher matcher = pattern.matcher(string);
+        if (matcher.find()){
+            strTaskName.append(matcher.group());
+        }
+        Log.d("TAG",strTaskName.toString());
+        switch (strTaskName.toString()){
+            case "tc_com_exc":
+                return "计算机（卓越班）";
+            case "tc_com_nor":
+                return "计算机专业";
+            case "tc_com_ope":
+                return "计算机（实验班）";
+            case "tc_inf_sec":
+                return "信息安全专业";
+            case "tc_math_nor":
+                return "数学类";
+            case "tc_math_ope":
+                return "数学类（实验班）";
+            case "tc_net_pro":
+                return "网络工程专业";
+            case "tc_soft_pro":
+                return "软件工程专业";
+            default:
+                return null;
+        }
+    }
+
+    //任务状态映射
+    public static String taskStateMap(String string){
+        if (string == null) return null;
+        switch (string){
+            case "0":
+                return "进行中";
+            case "1":
+                return "审核中";
+            case "2":
+                return "已结束";
+            default:
+                return null;
         }
     }
 

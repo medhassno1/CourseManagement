@@ -14,7 +14,7 @@ import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 
 /**
  * Created by sxq on 2015/11/2.
@@ -63,28 +63,26 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
         CourseDBHelper dbHelper = new CourseDBHelper();
         dbHelper.creatDataBase(this);
-        TableTeacher teacher=(TableTeacher)dbHelper.findById(workNumber,TableTeacher.class);
+        TableUserTeacher teacher=(TableUserTeacher)dbHelper.findById(workNumber,TableUserTeacher.class);
 
         edtTxTeacherNumber.setText(teacher.getWorkNumber());
-        edtTxPassword.setText(teacher.getPwd());
+        edtTxPassword.setText(teacher.getPassword());
         edtTxTeacherName.setText(teacher.getName());
         edtTxPhoneNumber.setText(teacher.getTelephone());
         edtTxDepartment.setText(teacher.getDepartment());
-        edtTxMajor.setText(teacher.getMajor());
 
     }
 
     /**
      * 获得界面数据
      */
-    private TableTeacher getTeacherData(){
-        TableTeacher teacher = new TableTeacher();
+    private TableUserTeacher getTeacherData(){
+        TableUserTeacher teacher = new TableUserTeacher();
         teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        teacher.setPwd(edtTxPassword.getText().toString().trim());
+        teacher.setPassword(edtTxPassword.getText().toString().trim());
         teacher.setName(edtTxTeacherName.getText().toString().trim());
         teacher.setDepartment(edtTxDepartment.getText().toString().trim());
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
-        teacher.setMajor(edtTxMajor.getText().toString().trim());
 
         return teacher;
     }
@@ -108,7 +106,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 CourseDBHelper dbHelper = new CourseDBHelper();
                                 dbHelper.creatDataBase(TeacherDetailActivity.this);
-                                TableTeacher teacher = getTeacherData();
+                                TableUserTeacher teacher = getTeacherData();
                                 dbHelper.update(teacher);
 
                                 finish();

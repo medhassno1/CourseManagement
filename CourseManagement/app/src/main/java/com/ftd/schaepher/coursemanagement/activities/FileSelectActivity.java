@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 
 import java.io.File;
@@ -227,12 +227,12 @@ public class FileSelectActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int which) {
                             ExcelTools excelTools = new ExcelTools();
                             excelTools.setPath(path);
-                            List<TableTeacher> teachersList = excelTools.readTeacherExcel();
+                            List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
                             //导入教师表
                             for(int i=0;i<teachersList.size();i++){
                                 CourseDBHelper dbHelper = new CourseDBHelper();
                                 dbHelper.creatDataBase(FileSelectActivity.this);
-                                TableTeacher teacher = teachersList.get(i);
+                                TableUserTeacher teacher = teachersList.get(i);
                                 dbHelper.insert(teacher);
                             }
 
