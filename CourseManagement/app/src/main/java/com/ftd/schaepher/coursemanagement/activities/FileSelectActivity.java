@@ -43,7 +43,7 @@ public class FileSelectActivity extends AppCompatActivity
     private TextView tvItemCount;
 
     @Override
-    protected void onCreate (Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_select);
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_file_select);
@@ -56,7 +56,7 @@ public class FileSelectActivity extends AppCompatActivity
     }
 
     private void initView() {
-        lvFileList= (ListView) findViewById(R.id.lv_file_list);
+        lvFileList = (ListView) findViewById(R.id.lv_file_list);
         tvPath = (TextView) findViewById(R.id.path);
         tvItemCount = (TextView) findViewById(R.id.item_count);
         lvFileList.setOnItemClickListener(this);
@@ -88,7 +88,7 @@ public class FileSelectActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
@@ -96,6 +96,66 @@ public class FileSelectActivity extends AppCompatActivity
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        File file = (File) mFileAdpter.getItem(position);
+        if (!file.canRead()) {
+            new AlertDialog.Builder(this).setTitle("提示").setMessage("权限不足").setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            }).show();
+        } else if (file.isDirectory()) {
+            initData(file);
+        } else {
+            importFile(file);
+        }
+    }
+
+    private void importFile(File file) {
+        final String path = file.getAbsolutePath();
+
+        Log.i("path", path);
+
+        if (!path.endsWith(".xls")) {   //直接调用excelTools.isTrueFileName()会出错，暂时无解
+            new AlertDialog.Builder(this).setTitle("提示").setMessage("文件类型错误，请选择excel文件").setPositiveButton
+                    (android.R.string.ok, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    }).show();
+
+        } else {
+            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否导入教师表").setPositiveButton
+                    (android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ExcelTools excelTools = new ExcelTools();
+                            excelTools.setPath(path);
+                            List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
+                            //导入教师表
+                            for (int i = 0; i < teachersList.size(); i++) {
+                                CourseDBHelper dbHelper = new CourseDBHelper();
+                                dbHelper.createDataBase(FileSelectActivity.this);
+                                TableUserTeacher teacher = teachersList.get(i);
+                                dbHelper.insert(teacher);
+                            }
+
+                            finish();
+                        }
+                    }).setNegativeButton
+                    (android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
+        }
     }
 
     /**
@@ -108,7 +168,7 @@ public class FileSelectActivity extends AppCompatActivity
         private boolean isRoot;
         private LayoutInflater mInflater;
 
-        public FileListAdapter (Context context, ArrayList<File> files, boolean isRoot) {
+        public FileListAdapter(Context context, ArrayList<File> files, boolean isRoot) {
             this.context = context;
             this.files = files;
             this.isRoot = isRoot;
@@ -116,24 +176,24 @@ public class FileSelectActivity extends AppCompatActivity
         }
 
         @Override
-        public int getCount () {
+        public int getCount() {
             return files.size();
         }
 
         @Override
-        public Object getItem (int position) {
+        public Object getItem(int position) {
             return files.get(position);
         }
 
         @Override
-        public long getItemId (int position) {
+        public long getItemId(int position) {
             return position;
         }
 
         @Override
-        public View getView (int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
-            if(convertView == null) {
+            if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = mInflater.inflate(R.layout.list_item_file, null);
                 convertView.setTag(viewHolder);
@@ -146,7 +206,7 @@ public class FileSelectActivity extends AppCompatActivity
             }
 
             File file = (File) getItem(position);
-            if(position == 0 && !isRoot) {
+            if (position == 0 && !isRoot) {
                 viewHolder.title.setText("返回上一级");
                 viewHolder.data.setVisibility(View.GONE);
                 viewHolder.size.setVisibility(View.GONE);
@@ -154,24 +214,24 @@ public class FileSelectActivity extends AppCompatActivity
             } else {
                 String fileName = file.getName();
                 viewHolder.title.setText(fileName);
-                if(file.isDirectory()) {
+                if (file.isDirectory()) {
                     viewHolder.size.setText("文件夹");
                     viewHolder.size.setTextColor(Color.RED);
                     viewHolder.type.setVisibility(View.GONE);
                     viewHolder.data.setVisibility(View.GONE);
                 } else {
                     long fileSize = file.length();
-                    if(fileSize > 1024*1024) {
-                        float size = fileSize /(1024f*1024f);
+                    if (fileSize > 1024 * 1024) {
+                        float size = fileSize / (1024f * 1024f);
                         viewHolder.size.setText(new DecimalFormat("#.00").format(size) + "MB");
-                    } else if(fileSize >= 1024) {
-                        float size = fileSize/1024;
+                    } else if (fileSize >= 1024) {
+                        float size = fileSize / 1024;
                         viewHolder.size.setText(new DecimalFormat("#.00").format(size) + "KB");
                     } else {
                         viewHolder.size.setText(fileSize + "B");
                     }
                     int dot = fileName.indexOf('.');
-                    if(dot > -1 && dot < (fileName.length() -1)) {
+                    if (dot > -1 && dot < (fileName.length() - 1)) {
                         viewHolder.type.setText(fileName.substring(dot + 1) + "文件");
                     }
                     viewHolder.data.setText(new SimpleDateFormat("yyyy/MM/dd HH:mm").format(file.lastModified()));
@@ -188,63 +248,4 @@ public class FileSelectActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
-        File file = (File) mFileAdpter.getItem(position);
-        if(!file.canRead()) {
-                new AlertDialog.Builder(this).setTitle("提示").setMessage("权限不足").setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick (DialogInterface dialog, int which) {
-
-                    }
-                }).show();
-        } else if(file.isDirectory()) {
-            initData(file);
-        } else {
-            importFile(file);
-        }
-    }
-
-    private void importFile(File file) {
-        final String path = file.getAbsolutePath();
-
-        Log.i("path",path);
-
-        if(!path.endsWith(".xls")){   //直接调用excelTools.isTrueFileName()会出错，暂时无解
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("文件类型错误，请选择excel文件").setPositiveButton
-                    (android.R.string.ok, new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick (DialogInterface dialog, int which) {
-                }
-            }).show();
-
-        }else{
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否导入教师表").setPositiveButton
-                    (android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ExcelTools excelTools = new ExcelTools();
-                            excelTools.setPath(path);
-                            List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
-                            //导入教师表
-                            for(int i=0;i<teachersList.size();i++){
-                                CourseDBHelper dbHelper = new CourseDBHelper();
-                                dbHelper.creatDataBase(FileSelectActivity.this);
-                                TableUserTeacher teacher = teachersList.get(i);
-                                dbHelper.insert(teacher);
-                            }
-
-                            finish();
-                        }
-                    }).setNegativeButton
-                    (android.R.string.cancel, new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    }).show();
-        }
-    }
 }

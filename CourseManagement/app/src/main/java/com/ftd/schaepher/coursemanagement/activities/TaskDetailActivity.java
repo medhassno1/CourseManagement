@@ -50,7 +50,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         initWidgetValue();
     }
 
-    //初始化控件数据
+    // 初始化控件数据
     private void initWidgetValue() {
         tvTaskTerm = (TextView) findViewById(R.id.tv_task_detail_term);
         tvTeacherDeadline = (TextView) findViewById(R.id.tv_task_detail_teacher_deadline);
@@ -61,10 +61,10 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cardvTaskDetail = (CardView) findViewById(R.id.cardv_task_detail);
         cardvTaskDetail.setOnClickListener(this);
 
-        Log.d("TASKID",taskId);
-        task = (TableTaskInfo) dbHelper.findById(taskId,TableTaskInfo.class);
+        Log.d("TASKID", taskId);
+        task = (TableTaskInfo) dbHelper.findById(taskId, TableTaskInfo.class);
         Log.d("TAG", task.toString());
-        String taskTerm = task.getYear()+task.getSemester();
+        String taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
         tvTeacherDeadline.setText(task.getTeacherDeadline());
@@ -84,7 +84,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         return true;
     }
 
-    //标题栏图标点击事件
+    // 标题栏图标点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -92,11 +92,11 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 finish();
                 return true;
             case R.id.action_export_file:
-                Log.d("TAG","export file");
+                Log.d("TAG", "export file");
                 //点击导出文件逻辑
                 return true;
             case R.id.action_commit_task:
-                Log.d("TAG","commit task");
+                Log.d("TAG", "commit task");
                 //点击提交报课逻辑
                 return true;
             default:
@@ -104,9 +104,9 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    //点击查看文件跳转逻辑
+    // 点击查看文件跳转逻辑
     @Override
     public void onClick(View v) {
-        startActivity(new Intent(TaskDetailActivity.this,ExcelDisplayActivity.class));
+        startActivity(new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class));
     }
 }

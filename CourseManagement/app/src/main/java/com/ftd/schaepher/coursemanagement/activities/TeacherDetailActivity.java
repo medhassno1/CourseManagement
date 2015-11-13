@@ -29,8 +29,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
 
-    private String workNumber;//教师工号
-
+    private String workNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +41,12 @@ public class TeacherDetailActivity extends AppCompatActivity {
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("用户信息");
 
-        edtTxTeacherNumber = (EditText)findViewById(R.id.edtTx_teacher_detail_username);
-        edtTxPassword = (EditText)findViewById(R.id.edtTx_teacher_detail_password);
-        edtTxTeacherName = (EditText)findViewById(R.id.edtTx_teacher_detail_name);
-        edtTxPhoneNumber = (EditText)findViewById(R.id.edtTx_teacher_detail_phone_number);
-        edtTxDepartment = (EditText)findViewById(R.id.edtTx_teacher_detail_department);
-        edtTxMajor = (EditText)findViewById(R.id.edtTx_teacher_detail_major);
+        edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_username);
+        edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_detail_password);
+        edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_detail_name);
+        edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_phone_number);
+        edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_detail_department);
+        edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_detail_major);
 
         initTeacherData();
     }
@@ -55,15 +54,15 @@ public class TeacherDetailActivity extends AppCompatActivity {
     /**
      * 初始化界面数据
      */
-    private void initTeacherData(){
+    private void initTeacherData() {
         Intent intent = getIntent();
         workNumber = intent.getStringExtra("teacherID");
 
         Log.i("str2", "工号" + workNumber);
 
         CourseDBHelper dbHelper = new CourseDBHelper();
-        dbHelper.creatDataBase(this);
-        TableUserTeacher teacher=(TableUserTeacher)dbHelper.findById(workNumber,TableUserTeacher.class);
+        dbHelper.createDataBase(this);
+        TableUserTeacher teacher = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
 
         edtTxTeacherNumber.setText(teacher.getWorkNumber());
         edtTxPassword.setText(teacher.getPassword());
@@ -76,7 +75,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     /**
      * 获得界面数据
      */
-    private TableUserTeacher getTeacherData(){
+    private TableUserTeacher getTeacherData() {
         TableUserTeacher teacher = new TableUserTeacher();
         teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
         teacher.setPassword(edtTxPassword.getText().toString().trim());
@@ -95,7 +94,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
@@ -105,14 +104,14 @@ public class TeacherDetailActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 CourseDBHelper dbHelper = new CourseDBHelper();
-                                dbHelper.creatDataBase(TeacherDetailActivity.this);
+                                dbHelper.createDataBase(TeacherDetailActivity.this);
                                 TableUserTeacher teacher = getTeacherData();
                                 dbHelper.update(teacher);
 
                                 finish();
                             }
                         }).setNegativeButton
-                        (android.R.string.cancel, new DialogInterface.OnClickListener(){
+                        (android.R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -124,6 +123,5 @@ public class TeacherDetailActivity extends AppCompatActivity {
         }
 
     }
-
 
 }

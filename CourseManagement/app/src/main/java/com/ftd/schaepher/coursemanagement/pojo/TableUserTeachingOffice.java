@@ -7,7 +7,7 @@ import net.tsz.afinal.annotation.sqlite.Table;
  * Created by lenovo on 2015/10/31.
  * 教学办用户表
  */
-@Table(name="TableUserTeachingOffice")
+@Table(name = "TableUserTeachingOffice")
 public class TableUserTeachingOffice {
     @Id
     private String workNumber;
@@ -17,6 +17,20 @@ public class TableUserTeachingOffice {
     private String birthday;
     private String telephone;
     private String email;
+
+    public TableUserTeachingOffice() {
+    }
+
+    public TableUserTeachingOffice(String workNumber, String password, String name, String sex,
+                                   String birthday, String telephone, String email) {
+        this.workNumber = workNumber;
+        this.password = password;
+        this.name = name;
+        this.sex = sex;
+        this.birthday = birthday;
+        this.telephone = telephone;
+        this.email = email;
+    }
 
     public String getWorkNumber() {
         return workNumber;

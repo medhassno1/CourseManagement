@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.Course;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 
 import java.util.ArrayList;
@@ -31,11 +30,8 @@ import java.util.List;
  */
 public class ExcelDisplayActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private List<Course> excelData;
     private List<TableCourseMultiline> excelListData;
     private CourseDBHelper dbHelper;
-    private ListView excelListView;
-    private ExcelAdapter mExcelAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +42,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("计算机专业.xls");
-
-        initExcelData();
-        initExcelListView();
     }
 
     @Override
@@ -59,34 +52,30 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     private void initExcelData() {
-        excelData = new ArrayList<Course>();
-        Course excelHeader = new Course("年级", "专业", "专业人数", "课程名称", "选修类型", "学分", "学时",
-                "实验学时", "上机学时", "起讫周序", "任课教师", "备注");
-        excelData.add(excelHeader);
+        excelListData = new ArrayList<>();
+        TableCourseMultiline excelHeader = new TableCourseMultiline("年级", "专业", "专业人数",
+                "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
+                "任课教师", "备注");
+        excelListData.add(excelHeader);
+
         dbHelper = new CourseDBHelper();
-        dbHelper.creatDataBase(this);
-        //查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
-        excelListData = dbHelper.findall(TableCourseMultiline.class);
-        for (int i = 0; i < excelListData.size(); i++) {
-            TableCourseMultiline listCur = excelListData.get(i);
-            Course courseCur = new Course(listCur.getGrade(), listCur.getMajor(), listCur.getPeople(),
-                    listCur.getCourseName(), listCur.getCourseType(), listCur.getCourseCredit(),
-                    listCur.getCourseHours(), listCur.getPracticeHour(), listCur.getOnMachineHour(),
-                    listCur.getTimePeriod(), listCur.getTeacherName(), listCur.getRemark());
-            excelData.add(courseCur);
-        }
+        dbHelper.createDataBase(this);
+
+        // 查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
+        excelListData.addAll(dbHelper.findall(TableCourseMultiline.class));
     }
 
     private void initExcelListView() {
-        mExcelAdapter = new
-                ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelData);
+        ExcelAdapter mExcelAdapter = new
+                ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
+
+        ListView excelListView;
         excelListView = (ListView) findViewById(R.id.lv_excel_display);
         excelListView.setAdapter(mExcelAdapter);
         excelListView.setOnItemClickListener(this);
-
     }
 
-    //点击弹出修改弹窗
+    // 点击弹出修改弹窗
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position != 0) {
@@ -104,14 +93,13 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //点击确认修改逻辑
                         EditText edtTxDialogFromToEnd =
                                 (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
                         EditText edtTxDialogNote =
                                 (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
 
                         TableCourseMultiline courseModify = new TableCourseMultiline();
-                        courseModify.setCourseName(excelData.get(position).getCourseName());
+                        courseModify.setCourseName(excelListData.get(position).getCourseName());
                         courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
                         courseModify.setRemark(edtTxDialogNote.getText().toString());
                         courseModify.setTeacherName("张三");
@@ -122,13 +110,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //点击取消修改逻辑
                     }
                 });
         return mBuilder.create();
     }
 
-    //设置弹窗的数据
+    // 设置弹窗的数据
     private void initAlertDialogData(int position, View v) {
         position = position - 1;
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
@@ -170,17 +157,17 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     /**
      * 文件查看界面listView布局的适配器，引用的布局文件为list_item_excel_display.xml
      */
-    public class ExcelAdapter extends ArrayAdapter<Course> {
+    public class ExcelAdapter extends ArrayAdapter<TableCourseMultiline> {
         private int resourceId;
 
-        public ExcelAdapter(Context context, int resource, List<Course> objects) {
+        public ExcelAdapter(Context context, int resource, List<TableCourseMultiline> objects) {
             super(context, resource, objects);
             this.resourceId = resource;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Course courseCur = getItem(position);
+            TableCourseMultiline courseCur = getItem(position);
             View view;
             viewHolder mViewHolder;
             if (convertView == null) {
@@ -205,16 +192,16 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             }
             mViewHolder.tvGrade.setText(courseCur.getGrade());
             mViewHolder.tvMajor.setText(courseCur.getMajor());
-            mViewHolder.tvSum.setText(courseCur.getSum());
+            mViewHolder.tvSum.setText(courseCur.getPeople());
             mViewHolder.tvCourseName.setText(courseCur.getCourseName());
-            mViewHolder.tvCredit.setText(courseCur.getCredit());
-            mViewHolder.tvClassHour.setText(courseCur.getClassHour());
-            mViewHolder.tvType.setText(courseCur.getType());
-            mViewHolder.tvExperimentHour.setText(courseCur.getExperimentHour());
-            mViewHolder.tvComputerHour.setText(courseCur.getComputerHour());
-            mViewHolder.tvFromToEnd.setText(courseCur.getFromToEnd());
-            mViewHolder.tvTeacher.setText(courseCur.getTeacher());
-            mViewHolder.tvNote.setText(courseCur.getNote());
+            mViewHolder.tvCredit.setText(courseCur.getCourseCredit());
+            mViewHolder.tvClassHour.setText(courseCur.getCourseHours());
+            mViewHolder.tvType.setText(courseCur.getCourseType());
+            mViewHolder.tvExperimentHour.setText(courseCur.getPracticeHour());
+            mViewHolder.tvComputerHour.setText(courseCur.getOnMachineHour());
+            mViewHolder.tvFromToEnd.setText(courseCur.getTimePeriod());
+            mViewHolder.tvTeacher.setText(courseCur.getTeacherName());
+            mViewHolder.tvNote.setText(courseCur.getRemark());
             return view;
         }
 

@@ -1,9 +1,7 @@
 package com.ftd.schaepher.coursemanagement.pojo;
 
-import net.tsz.afinal.annotation.sqlite.Table;
 import net.tsz.afinal.annotation.sqlite.Id;
-
-import java.nio.channels.Pipe;
+import net.tsz.afinal.annotation.sqlite.Table;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -21,20 +19,20 @@ public class TableTaskInfo {
     private String remark;
     private String taskState;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public TableTaskInfo() {
     }
 
     public TableTaskInfo(String taskState, String relativeTable) {
         this.taskState = taskState;
         this.relativeTable = relativeTable;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getRelativeTable() {

@@ -19,7 +19,6 @@ import java.util.List;
  * Created by Schaepher on 2015/11/12.
  */
 public class ServerTools {
-
     Context context;
 
     public ServerTools(Context context) {
@@ -28,13 +27,12 @@ public class ServerTools {
 
     public void postTeacherTable() {
         CourseDBHelper dbHelper = new CourseDBHelper();
-        dbHelper.creatDataBase(context);
-        List list = dbHelper.findall(TableUserTeacher.class);
+        dbHelper.createDataBase(context);
+        List<TableUserTeacher> list = dbHelper.findall(TableUserTeacher.class);
 
         ParseJson parseJson = new ParseJson();
-        String jsonData = parseJson.getTeacherJson((List<TableUserTeacher>)list);
-
-        Log.w("json数据", jsonData);
+        String jsonData = parseJson.getTeacherJson(list);
+        jsonData = jsonData.replace("null", "\"\"");
 
         RequestParams params = new RequestParams();
         params.add("jsonData", jsonData);
@@ -44,16 +42,14 @@ public class ServerTools {
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 Charset charset = Charset.forName("UTF-8");
                 String html = new String(bytes, charset);
-                Log.w("html", html);
+                Log.w("发送数据给PHP", html);
             }
 
             @Override
             public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
-
             }
         });
     }
-
 
     public void getTeacherTable() {
         NetworkManager.post(NetworkManager.URL_JSON_GET, null, new BaseJsonHttpResponseHandler() {
