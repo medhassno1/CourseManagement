@@ -28,7 +28,9 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,15 +45,18 @@ public class TeacherListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemClickListener, MenuItem.OnMenuItemClickListener {
     private Toolbar mToolbar;
-    private boolean isSupportDoubleBackExit;
-    private long betweenDoubleBackTime;
     private EditText eSearch;
     private ImageView ivDeleteText;
+    private TextView tvOwnName;
 
+    private boolean isSupportDoubleBackExit;
+    private long betweenDoubleBackTime;
     private Handler myhandler = new Handler();
+    private String userName;
+    private String identity;
     private static final String TAG = "TeacherListActivity";
 
-    private List<TableUserTeacher> teacherListData;//
+    private List<TableUserTeacher> teacherListData;
     private List<TableUserTeacher> list;
 
     @Override
@@ -62,15 +67,11 @@ public class TeacherListActivity extends AppCompatActivity
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
 
-
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
-        /*Initialize initialize = new Initialize();
-        initialize.init(this);*/
-
         updateTeacherDataList();
-
+        initUserInformation();
 
         setSearchTextChanged();//设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick();//设置叉叉的监听器
@@ -82,11 +83,37 @@ public class TeacherListActivity extends AppCompatActivity
         updateTeacherDataList();
     }
 
+    private void initUserInformation() {
+        CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
+        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
+        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
+        switch (identity){
+            case "teacher":
+                TableUserTeacher teacher =
+                        (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
+                tvOwnName.setText(teacher.getName());
+                break;
+            case "teachingOffice":
+                TableUserTeachingOffice office =
+                        (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
+                tvOwnName.setText(office.getName());
+                break;
+            case "departmentHead":
+                TableUserDepartmentHead departmentHead =
+                        (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
+                tvOwnName.setText(departmentHead.getName());
+                break;
+            default:
+                break;
+        }
+    }
+
     public void updateTeacherDataList(){
         initTeacherListData();
         initTeacherListView();
     }
 
+    //左滑菜单初始配置
     private void setNavViewConfig() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -95,9 +122,13 @@ public class TeacherListActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
+        tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
+                .findViewById(R.id.nav_own_name);
+        navigationView.getMenu().findItem(R.id.nav_teacher_list).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    //初始化教师列表数据
     private void initTeacherListData() {
         teacherListData = new ArrayList<>();
         CourseDBHelper dbHelper = new CourseDBHelper();
@@ -113,6 +144,7 @@ public class TeacherListActivity extends AppCompatActivity
 
     }
 
+    //初始化教师列表界面的控件
     private void initTeacherListView() {
         TeacherAdapter mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
         ListView mListView = (ListView) findViewById(R.id.lv_teacher_list);
@@ -123,6 +155,7 @@ public class TeacherListActivity extends AppCompatActivity
     //左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        item.setChecked(true);
         switch (item.getItemId()) {
             case R.id.nav_teacher_list:
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
@@ -189,6 +222,7 @@ public class TeacherListActivity extends AppCompatActivity
         Log.i("str",list.get(position).getWorkNumber()+list.get(position).getName());
     }
 
+    //点击标题栏的子菜单事件
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()){

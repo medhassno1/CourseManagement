@@ -118,11 +118,12 @@ public class LoginActivity extends AppCompatActivity
                     RadioButton rdoBtnId = (RadioButton) rdoGroup.getChildAt(i);
                     if (rdoBtnId.isChecked()) {
                         identity = rdoBtnId.getText().toString().trim();
-                        // 由于服务端暂时只有教师和负责人两种身份,这里暂时也只有这两种身份，后期再修改
                         if (identity.equals("教师")) {
                             identity = "teacher";
-                        } else {
-                            identity = "manager";
+                        } else if (identity.equals("教学办")){
+                            identity = "teachingOffice";
+                        } else if (identity.equals("系负责人")){
+                            identity = "departmentHead";
                         }
                     }
                 }
@@ -145,6 +146,13 @@ public class LoginActivity extends AppCompatActivity
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));
+                Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);
+                ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
+                ownInformationSaveEditor.putString("userName", userName);
+                ownInformationSaveEditor.commit();
+
+                LoginActivity.this.finish();
+                startActivity(intent);
             }
         } else {
             layoutUserName.setError(null);

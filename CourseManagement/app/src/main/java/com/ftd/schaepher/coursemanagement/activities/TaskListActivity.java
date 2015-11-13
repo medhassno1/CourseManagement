@@ -25,6 +25,9 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -37,8 +40,11 @@ import java.util.regex.Pattern;
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private Toolbar mToolbar;
+    private TextView tvOwnName;
 
     private List<TableTaskInfo> taskListData;
+
+    private String userName;
     private String identity;
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
@@ -56,15 +62,42 @@ public class TaskListActivity extends AppCompatActivity
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
+        initUserInformation();
         initTaskListData();
         initTaskListView();
     }
+
 
     @Override
     protected void onResume() {
         super.onResume();
         initTaskListData();
         initTaskListView();
+    }
+
+    private void initUserInformation() {
+        CourseDBHelper dbHelper = new CourseDBHelper(TaskListActivity.this);
+        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
+        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
+        switch (identity){
+            case "teacher":
+                TableUserTeacher teacher =
+                        (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
+                tvOwnName.setText(teacher.getName());
+                break;
+            case "teachingOffice":
+                TableUserTeachingOffice office =
+                        (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
+                tvOwnName.setText(office.getName());
+                break;
+            case "departmentHead":
+                TableUserDepartmentHead departmentHead =
+                        (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
+                tvOwnName.setText(departmentHead.getName());
+                break;
+            default:
+                break;
+        }
     }
 
     //初始化数据，从数据库中获取当前页面所需的数据
@@ -100,16 +133,19 @@ public class TaskListActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
-
         if (identity.equals("teacher")) {
             navigationView.getMenu().removeItem(R.id.nav_teacher_list);
         }
+        tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
+                .findViewById(R.id.nav_own_name);
+        navigationView.getMenu().findItem(R.id.nav_task_list).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
     //左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        item.setChecked(true);
         switch (item.getItemId()) {
             case R.id.nav_task_list:
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
