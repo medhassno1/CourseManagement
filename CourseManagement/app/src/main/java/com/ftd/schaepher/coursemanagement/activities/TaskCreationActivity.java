@@ -1,7 +1,9 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,14 +15,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 import com.rey.material.app.SimpleDialog;
+import com.rey.material.drawable.CircularProgressDrawable;
 import com.rey.material.widget.Button;
+import com.rey.material.widget.ProgressView;
 
 import java.util.Calendar;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -34,8 +45,13 @@ public class TaskCreationActivity extends AppCompatActivity
     private EditText edtTxTaskName;
     private EditText edtTxTaskTeam;
     private EditText edtTxTaskRemark;
+    private ImageView imgvFileImg;
+    private TextView tvFileName;
     private Button btnImportFile;
     private CourseDBHelper dbHelper;
+    private String filePath;
+    private String fileName;
+    private String tableCourseName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +74,8 @@ public class TaskCreationActivity extends AppCompatActivity
         edtTxTaskTeam = (EditText) findViewById(R.id.edtTx_add_task_team);
         edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
         btnImportFile = (Button) findViewById(R.id.btn_add_task_import_file);
+        imgvFileImg = (ImageView) findViewById(R.id.imgv_add_task_file_img);
+        tvFileName = (TextView) findViewById(R.id.tv_add_task_file_name);
 
         edtTxTeacherDeadline.setOnFocusChangeListener(this);
         edtTxDepartmentDeadline.setOnFocusChangeListener(this);
@@ -95,8 +113,43 @@ public class TaskCreationActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
                         dbHelper = new CourseDBHelper(TaskCreationActivity.this);
-                        dbHelper.insert(getNewTaskInformation());
+                        TableTaskInfo task = getNewTaskInformation();
+                        dbHelper.insert(task);
                         finish();
+                        tableCourseName = "tc_com_nor";
+                        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+                        db.execSQL("DROP TABLE IF EXISTS " + tableCourseName);
+                        db.execSQL("CREATE TABLE " + tableCourseName +
+                                " ( insertTime text primary key ," +
+                                "  grade text  ," +
+                                "  major text ," +
+                                "  people text," +
+                                "  courseName text ," +
+                                "  courseType text ," +
+                                "  courseCredit text ," +
+                                "  courseHour text ," +
+                                "  practiceHour text ," +
+                                "  onMachineHour text," +
+                                "  timePeriod text ," +
+                                "  teacherName text ," +
+                                "  remark text )");
+
+                        ExcelTools excelTools = new ExcelTools();
+                        excelTools.setPath(filePath);
+                        List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
+
+                        for (int i = 0; i < courseList.size(); i++) {
+                            db.execSQL("INSERT INTO " + tableCourseName + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                    new Object[]{i+1,courseList.get(i).getGrade(),
+                                            courseList.get(i).getMajor(),
+                                            courseList.get(i).getPeople(),
+                                            courseList.get(i).getCourseName(),courseList.get(i).getCourseType(),
+                                            courseList.get(i).getCourseCredit(),courseList.get(i).getCourseHours(),
+                                            courseList.get(i).getPracticeHour(),courseList.get(i).getOnMachineHour(),
+                                            courseList.get(i).getTimePeriod(),courseList.get(i).getTeacherName(),
+                                            courseList.get(i).getRemark()});
+                        }
+                        db.close();
                     }
                 });
                 notificationDialog.negativeActionClickListener(new View.OnClickListener() {
@@ -198,7 +251,7 @@ public class TaskCreationActivity extends AppCompatActivity
                 break;
 
             case R.id.btn_add_task_import_file:
-                startActivity(new Intent(TaskCreationActivity.this, FileSelectActivity.class));
+                startActivityForResult(new Intent(TaskCreationActivity.this, FileSelectActivity.class), 1);
                 break;
 
             default:
@@ -206,10 +259,29 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            imgvFileImg.setVisibility(View.VISIBLE);
+            filePath = data.getStringExtra("fileName");
+            fileName = filePath.split("/")[filePath.split("/").length - 1];
+            tvFileName.setText(fileName);
+            Log.d("filePath", filePath);
+        }
+    }
+
     // 任务名映射
     public String transferTaskNameToEnglish(String string) {
-        Log.d("TAG", string);
-        switch (string) {
+        StringBuffer strTaskName = new StringBuffer();
+        Pattern pattern = Pattern.compile("^[.|x|l|s]*");
+        Matcher matcher = pattern.matcher(string);
+        if (matcher.find()) {
+            strTaskName.append(matcher.group());
+        }
+        Log.d("123456789", string);
+        Log.d("123456789", strTaskName.toString());
+        switch (strTaskName.toString()) {
             case "计算机（卓越班）":
                 return "tc_com_exc";
             case "计算机专业":
@@ -227,7 +299,22 @@ public class TaskCreationActivity extends AppCompatActivity
             case "软件工程专业":
                 return "tc_soft_pro";
             default:
-                return null;
+                return "";
         }
     }
 }
+/**
+ * fileName = path.split("/")[path.split("/").length-1];
+ * ExcelTools excelTools = new ExcelTools();
+ * excelTools.setPath(path);
+ * List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
+ * //导入开课表
+ * <p/>
+ * CourseDBHelper dbHelper = new CourseDBHelper();
+ * dbHelper.createDataBase(FileSelectActivity.this);
+ * TableCourseMultiline course = new TableCourseMultiline();
+ * for (int i = 0; i < courseList.size(); i++) {
+ * course = courseList.get(i);
+ * dbHelper.insert(course);
+ * }
+ */

@@ -2,6 +2,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -15,6 +16,12 @@ import android.widget.TextView;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+
+import java.io.File;
+import java.io.IOException;
+
+import jxl.write.WriteException;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -92,8 +99,16 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 finish();
                 return true;
             case R.id.action_export_file:
-                Log.d("TAG", "export file");
-                //点击导出文件逻辑
+                File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile().toString()
+                        + "/" + tvTaskName.getText().toString() + ".xls");
+                try {
+                    Log.d("path", file.toString());
+                    ExcelTools.createExcelFile(file);
+                } catch (WriteException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             case R.id.action_commit_task:
                 Log.d("TAG", "commit task");
@@ -104,9 +119,11 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+
     // 点击查看文件跳转逻辑
     @Override
     public void onClick(View v) {
-        startActivity(new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class));
+        Intent intent = new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class);
+        startActivity(intent);
     }
 }
