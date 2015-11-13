@@ -37,12 +37,13 @@ public class ServerTools {
         RequestParams params = new RequestParams();
         params.add("jsonData", jsonData);
 
+//        Log.w("JsonData",jsonData);
+
         NetworkManager.post(NetworkManager.URL_JSON_POST, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
-                Charset charset = Charset.forName("UTF-8");
-                String html = new String(bytes, charset);
-                Log.w("发送数据给PHP", html);
+                String html = new String(bytes);
+//                Log.w("发送数据给PHP", html);
             }
 
             @Override
