@@ -7,7 +7,7 @@ import net.tsz.afinal.annotation.sqlite.Table;
  * Created by lenovo on 2015/10/31.
  * 教学办用户表
  */
-@Table(name="TableUserTeachingOffice")
+@Table(name = "TableUserTeachingOffice")
 public class TableUserTeachingOffice {
     @Id
     private String workNumber;

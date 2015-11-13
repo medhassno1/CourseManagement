@@ -3,8 +3,8 @@ package com.ftd.schaepher.coursemanagement.db;
 import android.content.Context;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
@@ -52,6 +52,8 @@ public class Initialize {
         tableUserTeacher.setPassword("02501");
         tableUserTeacher.setName("陈楠楠1111");
         tableUserTeacher.setTelephone("00000000005");
+        tableUserTeacher.setDepartment("计算机类");
+
         dbHelper.insert(tableUserTeacher);
         tableUserTeacher.setWorkNumber("02502");
         tableUserTeacher.setPassword("02502");

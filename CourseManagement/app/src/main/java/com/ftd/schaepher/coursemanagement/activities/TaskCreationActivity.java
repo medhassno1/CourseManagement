@@ -119,7 +119,7 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
         newTask.setRemark(edtTxTaskRemark.getText().toString());
-        newTask.setRelativeTable(taskNameChineseMapEnglisg(edtTxTaskName.getText().toString())+"201502");
+        newTask.setRelativeTable(taskNameChineseMapEnglisg(edtTxTaskName.getText().toString()) + "201502");
         return newTask;
     }
 
@@ -206,9 +206,9 @@ public class TaskCreationActivity extends AppCompatActivity implements View.OnFo
     }
 
     //任务名映射
-    public String taskNameChineseMapEnglisg(String string){
+    public String taskNameChineseMapEnglisg(String string) {
         Log.d("TAG", string);
-        switch (string){
+        switch (string) {
             case "计算机（卓越班）":
                 return "tc_com_exc";
             case "计算机专业":

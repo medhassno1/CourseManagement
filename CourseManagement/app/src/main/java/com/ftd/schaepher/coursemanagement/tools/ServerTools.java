@@ -29,12 +29,17 @@ public class ServerTools {
     public void postTeacherTable() {
         CourseDBHelper dbHelper = new CourseDBHelper();
         dbHelper.creatDataBase(context);
-        List list = dbHelper.findall(TableUserTeacher.class);
+        List<TableUserTeacher> list = dbHelper.findall(TableUserTeacher.class);
+
+//        List<TableUserTeacher> list = dbHelper.getDb().findAll(TableUserTeacher.class);
 
         ParseJson parseJson = new ParseJson();
-        String jsonData = parseJson.getTeacherJson((List<TableUserTeacher>)list);
+        String jsonData = parseJson.getTeacherJson(list);
+        Log.w("json数据1", jsonData);
 
-        Log.w("json数据", jsonData);
+        jsonData = jsonData.replace("null", "\"\"");
+
+        Log.w("json数据2", jsonData);
 
         RequestParams params = new RequestParams();
         params.add("jsonData", jsonData);

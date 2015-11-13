@@ -36,14 +36,59 @@ import java.util.regex.Pattern;
  */
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "TaskListActivity";
     private Toolbar mToolbar;
-
     private List<TableTaskInfo> taskListData;
     private String identity;
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
-    private static final String TAG = "TaskListActivity";
+
+    //任务名映射
+    public static String taskNameChineseMapEnglisg(String string) {
+        StringBuffer strTaskName = new StringBuffer();
+        Pattern pattern = Pattern.compile("[a-zA-Z_]*");
+        Matcher matcher = pattern.matcher(string);
+        if (matcher.find()) {
+            strTaskName.append(matcher.group());
+        }
+        Log.d("TAG", strTaskName.toString());
+        switch (strTaskName.toString()) {
+            case "tc_com_exc":
+                return "计算机（卓越班）";
+            case "tc_com_nor":
+                return "计算机专业";
+            case "tc_com_ope":
+                return "计算机（实验班）";
+            case "tc_inf_sec":
+                return "信息安全专业";
+            case "tc_math_nor":
+                return "数学类";
+            case "tc_math_ope":
+                return "数学类（实验班）";
+            case "tc_net_pro":
+                return "网络工程专业";
+            case "tc_soft_pro":
+                return "软件工程专业";
+            default:
+                return null;
+        }
+    }
+
+    //任务状态映射
+    public static String taskStateMap(String string) {
+        if (string == null) { return null; }
+        switch (string) {
+            case "0":
+                return "进行中";
+            case "1":
+                return "审核中";
+            case "2":
+                return "已结束";
+            default:
+                return null;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,52 +261,6 @@ public class TaskListActivity extends AppCompatActivity
         class viewHolder {
             TextView taskState;
             TextView taskName;
-        }
-    }
-
-    //任务名映射
-    public static String taskNameChineseMapEnglisg(String string){
-        StringBuffer strTaskName = new StringBuffer();
-        Pattern pattern = Pattern.compile("[a-zA-Z_]*");
-        Matcher matcher = pattern.matcher(string);
-        if (matcher.find()){
-            strTaskName.append(matcher.group());
-        }
-        Log.d("TAG",strTaskName.toString());
-        switch (strTaskName.toString()){
-            case "tc_com_exc":
-                return "计算机（卓越班）";
-            case "tc_com_nor":
-                return "计算机专业";
-            case "tc_com_ope":
-                return "计算机（实验班）";
-            case "tc_inf_sec":
-                return "信息安全专业";
-            case "tc_math_nor":
-                return "数学类";
-            case "tc_math_ope":
-                return "数学类（实验班）";
-            case "tc_net_pro":
-                return "网络工程专业";
-            case "tc_soft_pro":
-                return "软件工程专业";
-            default:
-                return null;
-        }
-    }
-
-    //任务状态映射
-    public static String taskStateMap(String string){
-        if (string == null) return null;
-        switch (string){
-            case "0":
-                return "进行中";
-            case "1":
-                return "审核中";
-            case "2":
-                return "已结束";
-            default:
-                return null;
         }
     }
 

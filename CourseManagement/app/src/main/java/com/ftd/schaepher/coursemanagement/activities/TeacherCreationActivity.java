@@ -39,12 +39,12 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("添加用户");
 
-        edtTxTeacherNumber = (EditText)findViewById(R.id.edtTx_teacher_creation_username);
-        edtTxPassword = (EditText)findViewById(R.id.edtTx_teacher_creation_password);
-        edtTxTeacherName = (EditText)findViewById(R.id.edtTx_teacher_creation_name);
-        edtTxPhoneNumber = (EditText)findViewById(R.id.edtTx_teacher_creation_phone_number);
-        edtTxDepartment = (EditText)findViewById(R.id.edtTx_teacher_creation_department);
-        edtTxMajor = (EditText)findViewById(R.id.edtTx_teacher_creation_major);
+        edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_username);
+        edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_creation_password);
+        edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_creation_name);
+        edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_phone_number);
+        edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_creation_department);
+        edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
 
         edtTxTeacherNumber.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);//工号输入框的格式
         edtTxDepartment.setInputType(InputType.TYPE_NULL);
@@ -82,7 +82,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                                 finish();
                             }
                         }).setNegativeButton
-                        (android.R.string.cancel, new DialogInterface.OnClickListener(){
+                        (android.R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -177,7 +177,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     /**
      * 获得界面数据
      */
-    private TableUserTeacher getTeacherData(){
+    private TableUserTeacher getTeacherData() {
         TableUserTeacher teacher = new TableUserTeacher();
         teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
         teacher.setPassword(edtTxPassword.getText().toString().trim());

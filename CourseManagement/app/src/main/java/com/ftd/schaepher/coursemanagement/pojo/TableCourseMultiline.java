@@ -1,4 +1,5 @@
 package com.ftd.schaepher.coursemanagement.pojo;
+
 import net.tsz.afinal.annotation.sqlite.Id;
 import net.tsz.afinal.annotation.sqlite.Table;
 
@@ -22,6 +23,28 @@ public class TableCourseMultiline {
     private String timePeriod;
     private String teacherName;
     private String remark;
+
+    public TableCourseMultiline() {
+
+    }
+
+    public TableCourseMultiline(String grade, String major, String people, String courseName,
+                                String courseType, String courseCredit, String courseHours,
+                                String practiceHour, String onMachineHour, String timePeriod,
+                                String teacherName, String remark) {
+        this.grade = grade;
+        this.major = major;
+        this.people = people;
+        this.courseName = courseName;
+        this.courseType = courseType;
+        this.courseCredit = courseCredit;
+        this.courseHours = courseHours;
+        this.practiceHour = practiceHour;
+        this.onMachineHour = onMachineHour;
+        this.timePeriod = timePeriod;
+        this.teacherName = teacherName;
+        this.remark = remark;
+    }
 
     public String getInsertTime() {
         return insertTime;

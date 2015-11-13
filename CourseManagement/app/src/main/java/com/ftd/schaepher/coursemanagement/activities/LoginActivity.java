@@ -25,8 +25,6 @@ import org.apache.http.Header;
 
 import java.nio.charset.Charset;
 
-//import com.rey.material.widget.ProgressView;
-
 /**
  * Created by sxq on 2015/10/28.
  * 登录界面
@@ -103,7 +101,7 @@ public class LoginActivity extends AppCompatActivity
 
             Initialize initialize = new Initialize();//初始化数据库
             initialize.init(this);
-        }else{
+        } else {
             Log.v("debug", "不是第一次运行");
         }
     }
@@ -165,14 +163,10 @@ public class LoginActivity extends AppCompatActivity
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                    Log.i("str", "网络连接成功");
-                    Log.i("statusCode:", statusCode + "");
-                    Charset charset = Charset.forName("UTF-8");
-                    String html = new String(response, charset);
-                    int logResult = html.indexOf("alert");
-                    //打印获得的网页
-                    Log.w("first post=", html);
-                    if (logResult == -1) {
+                    String html = new String(response);
+                    Log.w("first post=", html); //服务器返回的文本
+
+                    if (html.equals("true")) {
                         //跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
                         Intent intent = new Intent(LoginActivity.this, TaskListActivity.class);

@@ -1,11 +1,13 @@
 package com.ftd.schaepher.coursemanagement.pojo;
+
 import net.tsz.afinal.annotation.sqlite.Id;
 import net.tsz.afinal.annotation.sqlite.Table;
+
 /**
  * Created by lenovo on 2015/11/2.
  * 系负责人用户表
  */
-@Table(name="TableUserDepartmentHead")
+@Table(name = "TableUserDepartmentHead")
 public class TableUserDepartmentHead {
     @Id
     private String workNumber;

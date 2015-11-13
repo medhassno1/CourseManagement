@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ftd.schaepher.coursemanagement.pojo.Course;
+import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 
 import java.io.File;
@@ -18,7 +18,6 @@ import jxl.Workbook;
 import jxl.read.biff.BiffException;
 
 
-
 /**
  * Created by Schaepher on 2015/10/27.
  */
@@ -30,39 +29,42 @@ public class ExcelTools {
     //这是个静态路径，默认为qq接收文件夹
     public String path = "mnt/sdcard/course.xls";
 
-    public ExcelTools(){}
-    public ExcelTools(Context con){
+    public ExcelTools() {
+    }
+
+    public ExcelTools(Context con) {
         context = con;
     }
 
 
     public void setPath(String filePath) {
-        path=filePath;
+        path = filePath;
     }
 
     /**
      * 判断文件名
+     *
      * @return
      */
-    public boolean isTrueFileName(){
-        if(!new File(path).exists()) {
+    public boolean isTrueFileName() {
+        if (!new File(path).exists()) {
             Toast.makeText(context, "该文件不存在！", Toast.LENGTH_LONG).show();
-        }else if(!path.endsWith(".xls")) {   //判断是否是excel文件
-            Toast.makeText(context,"该文件必须以[.xls]结尾！",Toast.LENGTH_LONG).show();
-        }else{
+        } else if (!path.endsWith(".xls")) {   //判断是否是excel文件
+            Toast.makeText(context, "该文件必须以[.xls]结尾！", Toast.LENGTH_LONG).show();
+        } else {
             return true;
         }
         return false;
     }
 
     //读取course表格的所有数据
-    public List<Course> readCourseExcel() {
+    public List<TableCourseMultiline> readCourseExcel() {
         int rows;
-        int beginRows=4;
-        ArrayList<Course> list = new ArrayList<>();
+        int beginRows = 4;
+        ArrayList<TableCourseMultiline> list = new ArrayList<>();
         Log.i("Data", "目录是否可读");
 
-        if(isTrueFileName()) {
+        if (isTrueFileName()) {
             try {
                 Workbook book = Workbook.getWorkbook(new File(path));//工作簿
                 sheet = book.getSheet(0);//工作表
@@ -80,20 +82,20 @@ public class ExcelTools {
                 }
 
                 for (int i = beginRows; i <= rows; i++) {
-                    Course course = new Course();
+                    TableCourseMultiline course = new TableCourseMultiline();
 
                     course.setGrade(getCellValue(i, 1));//导入课程信息
                     course.setMajor(getCellValue(i, 2));
-                    course.setSum(getCellValue(i, 3));
+                    course.setPeople(getCellValue(i, 3));
                     course.setCourseName(getCellValue(i, 4));
-                    course.setType(getCellValue(i, 5));
-                    course.setCredit(getCellValue(i, 6));
-                    course.setClassHour(getCellValue(i, 7));
-                    course.setExperimentHour(getCellValue(i, 8));
-                    course.setComputerHour(getCellValue(i, 9));
-                    course.setFromToEnd(getCellValue(i, 10));
-                    course.setTeacher(getCellValue(i, 11));
-                    course.setNote(getCellValue(i, 12));
+                    course.setCourseType(getCellValue(i, 5));
+                    course.setCourseCredit(getCellValue(i, 6));
+                    course.setCourseHours(getCellValue(i, 7));
+                    course.setPracticeHour(getCellValue(i, 8));
+                    course.setOnMachineHour(getCellValue(i, 9));
+                    course.setTimePeriod(getCellValue(i, 10));
+                    course.setTeacherName(getCellValue(i, 11));
+                    course.setRemark(getCellValue(i, 12));
 
                     Log.i("Data", getCellValue(i, 9));
                     list.add(course);
@@ -114,11 +116,11 @@ public class ExcelTools {
     //读取course表格的所有数据
     public List<TableUserTeacher> readTeacherExcel() {
         int rows;
-        int beginRows=4;
+        int beginRows = 4;
         ArrayList<TableUserTeacher> list = new ArrayList<>();
         Log.i("Data", "目录是否可读");
 
-        if(isTrueFileName()) {
+        if (isTrueFileName()) {
             try {
                 Workbook book = Workbook.getWorkbook(new File(path));//工作簿
                 sheet = book.getSheet(0);//工作表
@@ -136,16 +138,16 @@ public class ExcelTools {
                 }
 
                 for (int i = beginRows; i <= rows; i++) {
-                   TableUserTeacher teacher = new TableUserTeacher();
+                    TableUserTeacher teacher = new TableUserTeacher();
 
                     teacher.setWorkNumber(getCellValue(i, 1));//导入教师信息
                     teacher.setPassword(getCellValue(i, 2));
                     teacher.setName(getCellValue(i, 3));
                     teacher.setTelephone(getCellValue(i, 4));
-                    teacher.setDepartment(getCellValue(i,5));
+                    teacher.setDepartment(getCellValue(i, 5));
 
 
-                    Log.i("Data", getCellValue(i,5));
+                    Log.i("Data", getCellValue(i, 5));
                     list.add(teacher);
                 }
             } catch (BiffException e) {
@@ -162,9 +164,8 @@ public class ExcelTools {
 
     /**
      * 获取表格i行j列的单元格的值
-     *
      */
-    public String getCellValue(int row,int col){
+    public String getCellValue(int row, int col) {
         Cell c = sheet.getCell(col - 1, row - 1);
         return c.getContents().trim();//返回去空格的值
     }

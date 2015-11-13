@@ -42,15 +42,20 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class TeacherListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemClickListener, MenuItem.OnMenuItemClickListener {
+    private static final String TAG = "TeacherListActivity";
     private Toolbar mToolbar;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private EditText eSearch;
+    Runnable eChanged = new Runnable() {
+        @Override
+        public void run() {
+            String data = eSearch.getText().toString();
+
+        }
+    };
     private ImageView ivDeleteText;
-
     private Handler myhandler = new Handler();
-    private static final String TAG = "TeacherListActivity";
-
     private List<TableUserTeacher> teacherListData;//
     private List<TableUserTeacher> list;
 
@@ -82,7 +87,7 @@ public class TeacherListActivity extends AppCompatActivity
         updateTeacherDataList();
     }
 
-    public void updateTeacherDataList(){
+    public void updateTeacherDataList() {
         initTeacherListData();
         initTeacherListView();
     }
@@ -95,6 +100,7 @@ public class TeacherListActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
+
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -106,9 +112,9 @@ public class TeacherListActivity extends AppCompatActivity
         list = dbHelper.findall(TableUserTeacher.class);
         Log.i("string", list.size() + "");
 
-        for(int i=0;i<list.size();i++){
+        for (int i = 0; i < list.size(); i++) {
             teacherListData.add(list.get(i));
-            Log.i("string",list.get(i).getName());
+            Log.i("string", list.get(i).getName());
         }
 
     }
@@ -133,7 +139,7 @@ public class TeacherListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_logout:
-                startActivity(new Intent(TeacherListActivity.this,LoginActivity.class));
+                startActivity(new Intent(TeacherListActivity.this, LoginActivity.class));
                 finish();
                 break;
             case R.id.nav_own_information:
@@ -186,12 +192,12 @@ public class TeacherListActivity extends AppCompatActivity
         startActivity(intend);
 
         Log.i("str", position + "    " + id);
-        Log.i("str",list.get(position).getWorkNumber()+list.get(position).getName());
+        Log.i("str", list.get(position).getWorkNumber() + list.get(position).getName());
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.add_teacher_from_input:
                 startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
                 break;
@@ -202,45 +208,6 @@ public class TeacherListActivity extends AppCompatActivity
                 break;
         }
         return true;
-    }
-
-    /**
-     * 任务列表的适配器
-     */
-    class TeacherAdapter extends ArrayAdapter<TableUserTeacher> {
-        private int resourceId;
-
-        public TeacherAdapter(Context context, int resource, List<TableUserTeacher> objects) {
-            super(context, resource, objects);
-            this.resourceId = resource;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-           // Teacher teacher = getItem(position);
-            TableUserTeacher teacher = getItem(position);
-            View view;
-            viewHolder viewHolder;
-            if (convertView == null) {
-                view = LayoutInflater.from(getContext()).inflate(resourceId, null);
-                viewHolder = new viewHolder();
-                viewHolder.teacherImageId = (CircleImageView) view.findViewById(R.id.circle_img_teacher);
-                viewHolder.teacherName = (TextView) view.findViewById(R.id.tv_teacher_name);
-                view.setTag(viewHolder);
-            } else {
-                view = convertView;
-                viewHolder = (TeacherAdapter.viewHolder) view.getTag();
-            }
-
-            viewHolder.teacherImageId.setImageResource(R.drawable.ic_people);
-            viewHolder.teacherName.setText(teacher.getName());
-            return view;
-        }
-
-        class viewHolder {
-            CircleImageView teacherImageId;
-            TextView teacherName;
-        }
     }
 
     /**
@@ -280,14 +247,6 @@ public class TeacherListActivity extends AppCompatActivity
 
     }
 
-    Runnable eChanged = new Runnable() {
-        @Override
-        public void run() {
-            String data = eSearch.getText().toString();
-
-        }
-    };
-
     /**
      * 设置叉叉的点击事件，即清空功能
      */
@@ -300,5 +259,44 @@ public class TeacherListActivity extends AppCompatActivity
                 eSearch.setText("");
             }
         });
+    }
+
+    /**
+     * 任务列表的适配器
+     */
+    class TeacherAdapter extends ArrayAdapter<TableUserTeacher> {
+        private int resourceId;
+
+        public TeacherAdapter(Context context, int resource, List<TableUserTeacher> objects) {
+            super(context, resource, objects);
+            this.resourceId = resource;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // Teacher teacher = getItem(position);
+            TableUserTeacher teacher = getItem(position);
+            View view;
+            viewHolder viewHolder;
+            if (convertView == null) {
+                view = LayoutInflater.from(getContext()).inflate(resourceId, null);
+                viewHolder = new viewHolder();
+                viewHolder.teacherImageId = (CircleImageView) view.findViewById(R.id.circle_img_teacher);
+                viewHolder.teacherName = (TextView) view.findViewById(R.id.tv_teacher_name);
+                view.setTag(viewHolder);
+            } else {
+                view = convertView;
+                viewHolder = (TeacherAdapter.viewHolder) view.getTag();
+            }
+
+            viewHolder.teacherImageId.setImageResource(R.drawable.ic_people);
+            viewHolder.teacherName.setText(teacher.getName());
+            return view;
+        }
+
+        class viewHolder {
+            CircleImageView teacherImageId;
+            TextView teacherName;
+        }
     }
 }
