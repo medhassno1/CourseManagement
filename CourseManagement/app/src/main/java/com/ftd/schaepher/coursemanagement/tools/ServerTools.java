@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -29,10 +29,10 @@ public class ServerTools {
     public void postTeacherTable() {
         CourseDBHelper dbHelper = new CourseDBHelper();
         dbHelper.creatDataBase(context);
-        List list = dbHelper.findall(TableTeacher.class);
+        List list = dbHelper.findall(TableUserTeacher.class);
 
         ParseJson parseJson = new ParseJson();
-        String jsonData = parseJson.getTeacherJson((List<TableTeacher>)list);
+        String jsonData = parseJson.getTeacherJson((List<TableUserTeacher>)list);
 
         Log.w("json数据", jsonData);
 

@@ -14,7 +14,7 @@ import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.rey.material.app.SimpleDialog;
 
 /**
@@ -76,7 +76,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                             public void onClick(DialogInterface dialog, int which) {
                                 CourseDBHelper dbHelper = new CourseDBHelper();
                                 dbHelper.creatDataBase(TeacherCreationActivity.this);
-                                TableTeacher teacher = getTeacherData();
+                                TableUserTeacher teacher = getTeacherData();
                                 dbHelper.insert(teacher);
 
                                 finish();
@@ -177,10 +177,10 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     /**
      * 获得界面数据
      */
-    private TableTeacher getTeacherData(){
-        TableTeacher teacher = new TableTeacher();
+    private TableUserTeacher getTeacherData(){
+        TableUserTeacher teacher = new TableUserTeacher();
         teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        teacher.setPwd(edtTxPassword.getText().toString().trim());
+        teacher.setPassword(edtTxPassword.getText().toString().trim());
         teacher.setName(edtTxTeacherName.getText().toString().trim());
         teacher.setDepartment(edtTxDepartment.getText().toString().trim());
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());

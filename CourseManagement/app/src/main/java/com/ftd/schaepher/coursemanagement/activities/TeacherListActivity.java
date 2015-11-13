@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +51,8 @@ public class TeacherListActivity extends AppCompatActivity
     private Handler myhandler = new Handler();
     private static final String TAG = "TeacherListActivity";
 
-    private List<TableTeacher> teacherListData;//
-    private List<TableTeacher> list;
+    private List<TableUserTeacher> teacherListData;//
+    private List<TableUserTeacher> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class TeacherListActivity extends AppCompatActivity
         CourseDBHelper dbHelper = new CourseDBHelper();
         dbHelper.creatDataBase(this);
 
-        list = dbHelper.findall(TableTeacher.class);
+        list = dbHelper.findall(TableUserTeacher.class);
         Log.i("string", list.size() + "");
 
         for(int i=0;i<list.size();i++){
@@ -207,10 +207,10 @@ public class TeacherListActivity extends AppCompatActivity
     /**
      * 任务列表的适配器
      */
-    class TeacherAdapter extends ArrayAdapter<TableTeacher> {
+    class TeacherAdapter extends ArrayAdapter<TableUserTeacher> {
         private int resourceId;
 
-        public TeacherAdapter(Context context, int resource, List<TableTeacher> objects) {
+        public TeacherAdapter(Context context, int resource, List<TableUserTeacher> objects) {
             super(context, resource, objects);
             this.resourceId = resource;
         }
@@ -218,7 +218,7 @@ public class TeacherListActivity extends AppCompatActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
            // Teacher teacher = getItem(position);
-            TableTeacher teacher = getItem(position);
+            TableUserTeacher teacher = getItem(position);
             View view;
             viewHolder viewHolder;
             if (convertView == null) {

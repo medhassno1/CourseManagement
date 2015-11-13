@@ -2,13 +2,11 @@ package com.ftd.schaepher.coursemanagement.db;
 
 import android.content.Context;
 
-import com.ftd.schaepher.coursemanagement.pojo.TableClass;
-import com.ftd.schaepher.coursemanagement.pojo.TableMajor;
-import com.ftd.schaepher.coursemanagement.pojo.TableSystem;
-import com.ftd.schaepher.coursemanagement.pojo.TableSystemLeader;
-import com.ftd.schaepher.coursemanagement.pojo.TableTask;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeacher;
-import com.ftd.schaepher.coursemanagement.pojo.TableTeachingDepartment;
+import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
 import net.tsz.afinal.FinalDb;
 
@@ -31,7 +29,7 @@ public class CourseDBHelper {
     }
 
     public void creatTableTeacher() {
-        TableTeacher teacher = new TableTeacher();
+        TableUserTeacher teacher = new TableUserTeacher();
         db.save(teacher);
     }
 
@@ -41,33 +39,23 @@ public class CourseDBHelper {
      * @return
      */
     public void creatTableTeachingDepartment() {
-        TableTeachingDepartment tableTeachingDepartmentr = new TableTeachingDepartment();
+        TableUserTeachingOffice tableTeachingDepartmentr = new TableUserTeachingOffice();
         db.save(tableTeachingDepartmentr);
     }
 
-    public void creatTableMajor(){
-        TableMajor tableMajor = new TableMajor();
-        db.save(tableMajor);
-    }
-
-    public void creatTableSystem(){
-        TableSystem tableSystem =new TableSystem();
-        db.save(tableSystem);
-    }
-
     public void creatTableSystemLeader(){
-        TableSystemLeader tableSystemLeader =new TableSystemLeader();
-        db.save(tableSystemLeader);
+        TableUserDepartmentHead tableUserDepartmentHead =new TableUserDepartmentHead();
+        db.save(tableUserDepartmentHead);
     }
 
     public void creatTableClass(){
-        TableClass tableClass =new TableClass();
-        db.save(tableClass);
+        TableCourseMultiline tableCourseMultiline =new TableCourseMultiline();
+        db.save(tableCourseMultiline);
     }
 
     public void createTableTask(){
-        TableTask tableTask = new TableTask();
-        db.save(tableTask);
+        TableTaskInfo tableTaskInfo = new TableTaskInfo();
+        db.save(tableTaskInfo);
     }
 
     //插入数据
