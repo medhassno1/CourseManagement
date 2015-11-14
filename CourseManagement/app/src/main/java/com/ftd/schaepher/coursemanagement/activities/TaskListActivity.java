@@ -173,7 +173,7 @@ public class TaskListActivity extends AppCompatActivity
     // 初始化数据，从数据库中获取当前页面所需的数据
     private void initTaskListData() {
         dbHelper = new CourseDBHelper(this);
-        taskListData = dbHelper.findall(TableTaskInfo.class);
+        taskListData = dbHelper.findAll(TableTaskInfo.class);
     }
 
     // 显示数据，控件与数据绑定
