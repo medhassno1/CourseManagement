@@ -20,7 +20,7 @@ public class NetworkManager {
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/json-test.php";
     // 测试发送json数据地址
     public static final String URL_JSON_POST =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/json-post.php";
+            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/json-update.php";
 
     // 实例化对象
     private static AsyncHttpClient client = new AsyncHttpClient();
