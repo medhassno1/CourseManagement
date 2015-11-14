@@ -9,7 +9,6 @@ else
 {   
 	$name=$_POST["tableName"];
 	mysqli_query($con,"SET NAMES utf8");
-
 	$result = mysqli_query($con,"SELECT * FROM $name");
 	while($row = $result->fetch_assoc())
 	{

@@ -19,8 +19,8 @@ public class NetworkManager {
     public static final String URL_JSON_GET =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/query-by-table-name.php";
     // 测试发送json数据地址
-    public static final String URL_JSON_POST =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/update-teacher-table.php";
+    public static final String URL_POST_JSON =
+            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";
 
     // 实例化对象
     private static AsyncHttpClient client = new AsyncHttpClient();

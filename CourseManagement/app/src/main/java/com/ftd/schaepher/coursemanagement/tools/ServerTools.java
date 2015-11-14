@@ -27,7 +27,9 @@ public class ServerTools {
         parseJson = new ParseJson();
     }
 
-    public void postTableToServer(Class<?> tableClass,int action) {
+
+
+    public void postTableToServer(Class<?> tableClass,String tableName,int action) {
 
         List list = dbHelper.findAll(tableClass);
 
@@ -36,11 +38,13 @@ public class ServerTools {
 
         RequestParams params = new RequestParams();
         params.add("jsonData", jsonData);
+        params.add("tableName",tableName);
         params.add("action",String.valueOf(action));
 
-        NetworkManager.post(NetworkManager.URL_JSON_POST, params, new AsyncHttpResponseHandler() {
+        NetworkManager.post(NetworkManager.URL_POST_JSON, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
+
             }
 
             @Override
