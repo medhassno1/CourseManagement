@@ -27,6 +27,8 @@ import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
 
+import net.tsz.afinal.FinalDb;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -138,9 +140,8 @@ public class TaskCreationActivity extends AppCompatActivity
     //建表
     private void createTable() {
         SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-//        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-
-        dbHelper.createTableClass();
+        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+        db.execSQL(CourseDBHelper.CREATE_TABLE_COURSE_MULTILINE);
 
         TableCourseMultiline course = new TableCourseMultiline();
         //解析Excel表格
@@ -152,7 +153,6 @@ public class TaskCreationActivity extends AppCompatActivity
             course = courseList.get(i);
             dbHelper.insert(course);
         }
-
         //改名
         db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableCourseName);
         db.close();
