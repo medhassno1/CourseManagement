@@ -97,7 +97,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     public boolean onCreateOptionsMenu(Menu menu) {
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_detail_activity_actions, menu);
-        if (identity.equals("teacher")) {
+        if (identity.equals("user_teacher")) {
             menu.removeItem(R.id.action_export_file);
             menu.findItem(R.id.action_commit_task).setVisible(true);
         }
