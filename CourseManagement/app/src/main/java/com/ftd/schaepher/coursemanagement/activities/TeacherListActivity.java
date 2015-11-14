@@ -225,7 +225,9 @@ public class TeacherListActivity extends AppCompatActivity
                 startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
                 break;
             case R.id.add_teacher_from_file:
-                startActivity(new Intent(TeacherListActivity.this, FileSelectActivity.class));
+                Intent intent = new Intent(TeacherListActivity.this, FileSelectActivity.class);
+                intent.putExtra("isRequireImportTeacherFile",true);
+                startActivity(intent);
                 break;
             default:
                 break;

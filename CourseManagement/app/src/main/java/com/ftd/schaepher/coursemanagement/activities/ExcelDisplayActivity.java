@@ -2,6 +2,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -32,6 +33,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     private List<TableCourseMultiline> excelListData;
     private CourseDBHelper dbHelper;
+    private String tableName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +44,19 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("计算机专业.xls");
+
+        tableName = getIntent().getStringExtra("tableName");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initExcelData();
-        initExcelListView();
+        try {
+            initExcelData();
+            initExcelListView();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void initExcelData() {
@@ -58,11 +66,17 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 "任课教师", "备注");
         excelListData.add(excelHeader);
 
+        //根据表名查找数据库对应表数据
         dbHelper = new CourseDBHelper();
         dbHelper.createDataBase(this);
+        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+        db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
 
-        // 查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
-        excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
+        excelListData.addAll(dbHelper.findall(TableCourseMultiline.class));
+
+        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
+        db.close();
     }
 
     private void initExcelListView() {
