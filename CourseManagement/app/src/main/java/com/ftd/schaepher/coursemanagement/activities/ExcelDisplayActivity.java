@@ -73,7 +73,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
         db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
 
-        excelListData.addAll(dbHelper.findall(TableCourseMultiline.class));
+        excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
 
         db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
         db.close();
