@@ -12,8 +12,8 @@ public class NetworkManager {
 
     public static final String URL_LOGIN =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
-//    public static final String URL_LOGIN =
-//            "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";
+   /* public static final String URL_LOGIN =
+           "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";*/
 
     // 测试获取 json数据地址
     public static final String URL_JSON_GET =
