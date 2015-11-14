@@ -64,8 +64,8 @@ public class LoginActivity extends AppCompatActivity
         btnLogin.setOnClickListener(this);
 
         autoSetUserName();
-
         initDatabaseData();
+
         ServerTools serverTools = new ServerTools(this);
         serverTools.getTeacherTable();
     }

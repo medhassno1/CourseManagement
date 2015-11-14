@@ -51,7 +51,7 @@ public class TaskListActivity extends AppCompatActivity
 
 
     // 任务名映射
-    public static String taskNameChineseMapEnglisg(String string) {
+    public static String transferTableNameToEnglish(String string) {
         StringBuffer strTaskName = new StringBuffer();
         Pattern pattern = Pattern.compile("[a-zA-Z_]*");
         Matcher matcher = pattern.matcher(string);
@@ -292,7 +292,7 @@ public class TaskListActivity extends AppCompatActivity
             }
 
             viewHolder.taskState.setText(taskStateMap(task.getTaskState()));
-            viewHolder.taskName.setText(taskNameChineseMapEnglisg(task.getRelativeTable()));
+            viewHolder.taskName.setText(transferTableNameToEnglish(task.getRelativeTable()));
             return view;
         }
 
