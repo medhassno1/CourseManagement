@@ -57,6 +57,7 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
         proBarLogin = (ProgressView) findViewById(R.id.proBar_login);
+
         ownInformationSaveEditor = getSharedPreferences("userInformation", MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
