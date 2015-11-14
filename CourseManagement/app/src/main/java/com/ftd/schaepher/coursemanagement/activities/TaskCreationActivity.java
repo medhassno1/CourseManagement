@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,14 +25,10 @@ import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 import com.rey.material.app.SimpleDialog;
-import com.rey.material.drawable.CircularProgressDrawable;
 import com.rey.material.widget.Button;
-import com.rey.material.widget.ProgressView;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -64,6 +61,8 @@ public class TaskCreationActivity extends AppCompatActivity
         mActionBar.setTitle("发布报课任务");
 
         initWidgetAndListener();
+
+        dbHelper = new CourseDBHelper(TaskCreationActivity.this);
     }
 
     // 初始化控件及绑定监听事件
@@ -112,44 +111,16 @@ public class TaskCreationActivity extends AppCompatActivity
                 notificationDialog.positiveActionClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dbHelper = new CourseDBHelper(TaskCreationActivity.this);
                         TableTaskInfo task = getNewTaskInformation();
-                        dbHelper.insert(task);
-                        finish();
-                        tableCourseName = "tc_com_nor";
-                        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-                        db.execSQL("DROP TABLE IF EXISTS " + tableCourseName);
-                        db.execSQL("CREATE TABLE " + tableCourseName +
-                                " ( insertTime text primary key ," +
-                                "  grade text  ," +
-                                "  major text ," +
-                                "  people text," +
-                                "  courseName text ," +
-                                "  courseType text ," +
-                                "  courseCredit text ," +
-                                "  courseHour text ," +
-                                "  practiceHour text ," +
-                                "  onMachineHour text," +
-                                "  timePeriod text ," +
-                                "  teacherName text ," +
-                                "  remark text )");
-
-                        ExcelTools excelTools = new ExcelTools();
-                        excelTools.setPath(filePath);
-                        List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
-
-                        for (int i = 0; i < courseList.size(); i++) {
-                            db.execSQL("INSERT INTO " + tableCourseName + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                                    new Object[]{i+1,courseList.get(i).getGrade(),
-                                            courseList.get(i).getMajor(),
-                                            courseList.get(i).getPeople(),
-                                            courseList.get(i).getCourseName(),courseList.get(i).getCourseType(),
-                                            courseList.get(i).getCourseCredit(),courseList.get(i).getCourseHours(),
-                                            courseList.get(i).getPracticeHour(),courseList.get(i).getOnMachineHour(),
-                                            courseList.get(i).getTimePeriod(),courseList.get(i).getTeacherName(),
-                                            courseList.get(i).getRemark()});
+                        tableCourseName = task.getRelativeTable();
+                        try {
+                            createTable();
+                            dbHelper.insert(task);
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
-                        db.close();
+                        finish();
+
                     }
                 });
                 notificationDialog.negativeActionClickListener(new View.OnClickListener() {
@@ -164,7 +135,30 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 
-    // 获取即将发布的任务的信息
+    //建表
+    private void createTable() {
+        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+//        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+
+        dbHelper.createTableClass();
+
+        TableCourseMultiline course = new TableCourseMultiline();
+        //解析Excel表格
+        ExcelTools excelTools = new ExcelTools();
+        excelTools.setPath(filePath);
+        List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
+        //数据存入数据库
+        for (int i = 0; i < courseList.size(); i++) {
+            course = courseList.get(i);
+            dbHelper.insert(course);
+        }
+
+        //改名
+        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableCourseName);
+        db.close();
+    }
+
+    // 获取即将发布的任务的信息,未完成
     private TableTaskInfo getNewTaskInformation() {
         TableTaskInfo newTask = new TableTaskInfo();
         newTask.setYear("2015");
@@ -273,15 +267,7 @@ public class TaskCreationActivity extends AppCompatActivity
 
     // 任务名映射
     public String transferTaskNameToEnglish(String string) {
-        StringBuffer strTaskName = new StringBuffer();
-        Pattern pattern = Pattern.compile("^[.|x|l|s]*");
-        Matcher matcher = pattern.matcher(string);
-        if (matcher.find()) {
-            strTaskName.append(matcher.group());
-        }
-        Log.d("123456789", string);
-        Log.d("123456789", strTaskName.toString());
-        switch (strTaskName.toString()) {
+        switch (string) {
             case "计算机（卓越班）":
                 return "tc_com_exc";
             case "计算机专业":
@@ -303,18 +289,3 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 }
-/**
- * fileName = path.split("/")[path.split("/").length-1];
- * ExcelTools excelTools = new ExcelTools();
- * excelTools.setPath(path);
- * List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
- * //导入开课表
- * <p/>
- * CourseDBHelper dbHelper = new CourseDBHelper();
- * dbHelper.createDataBase(FileSelectActivity.this);
- * TableCourseMultiline course = new TableCourseMultiline();
- * for (int i = 0; i < courseList.size(); i++) {
- * course = courseList.get(i);
- * dbHelper.insert(course);
- * }
- */

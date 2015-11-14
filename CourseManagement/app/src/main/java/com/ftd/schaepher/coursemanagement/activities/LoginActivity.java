@@ -143,15 +143,6 @@ public class LoginActivity extends AppCompatActivity
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));
-                ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-                ownInformationSaveEditor.putString("userName", userName);
-                ownInformationSaveEditor.apply();
-
-                Intent intend = new Intent();
-                intend.setClass(LoginActivity.this, TaskListActivity.class);
-                intend.putExtra("teacherID", userName);
-                LoginActivity.this.finish();
-                startActivity(intend);
             }
         } else {
             layoutUserName.setError(null);
