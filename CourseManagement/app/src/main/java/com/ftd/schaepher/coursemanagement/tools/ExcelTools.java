@@ -15,14 +15,21 @@ import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.demo.Write;
 import jxl.read.biff.BiffException;
+import jxl.write.Label;
+import jxl.write.WritableCell;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
 
 
 /**
  * Created by Schaepher on 2015/10/27.
  */
 public class ExcelTools {
-
+    // 初始化数据
+    private static boolean init = false;
     public Context context;
     public Sheet sheet;
     // 模拟器sd卡中excel表格的路径
@@ -111,7 +118,7 @@ public class ExcelTools {
     }
 
 
-    // 读取course表格的所有数据
+    // 读取Teacher表格的所有数据
     public List<TableUserTeacher> readTeacherExcel() {
         int rows;
         int beginRows = 4;
@@ -166,5 +173,4 @@ public class ExcelTools {
         Cell c = sheet.getCell(col - 1, row - 1);
         return c.getContents().trim(); // 返回去掉空格后的值
     }
-
 }

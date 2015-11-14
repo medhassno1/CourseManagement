@@ -3,6 +3,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,8 +22,11 @@ import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+
+import net.tsz.afinal.annotation.sqlite.Table;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -118,7 +122,7 @@ public class FileSelectActivity extends AppCompatActivity
 
     private void importFile(File file) {
         final String path = file.getAbsolutePath();
-
+        boolean isTeacherFile = getIntent().getBooleanExtra("isRequireImportTeacherFile", false);
         Log.i("path", path);
 
         if (!path.endsWith(".xls")) {   //直接调用excelTools.isTrueFileName()会出错，暂时无解
@@ -130,7 +134,7 @@ public class FileSelectActivity extends AppCompatActivity
                         }
                     }).show();
 
-        } else {
+        } else if (isTeacherFile) {
             new AlertDialog.Builder(this).setTitle("提示").setMessage("是否导入教师表").setPositiveButton
                     (android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -145,7 +149,21 @@ public class FileSelectActivity extends AppCompatActivity
                                 TableUserTeacher teacher = teachersList.get(i);
                                 dbHelper.insert(teacher);
                             }
+                            finish();
+                        }
+                    }).setNegativeButton
+                    (android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
+                        }
+                    }).show();
+        } else {
+            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否导入开课表").setPositiveButton
+                    (android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            setResult(RESULT_OK,new Intent().putExtra("fileName",path));
                             finish();
                         }
                     }).setNegativeButton

@@ -63,7 +63,8 @@ public class Initialize {
 
         tableUserTeacher.setWorkNumber("02501");
         tableUserTeacher.setPassword("02501");
-        tableUserTeacher.setName("陈楠楠1111");
+        tableUserTeacher.setName("陈楠楠");
+        tableUserTeacher.setSex("男");
         tableUserTeacher.setTelephone("00000000005");
         tableUserTeacher.setDepartment("计算机类");
         dbHelper.insert(tableUserTeacher);
@@ -71,6 +72,7 @@ public class Initialize {
         tableUserTeacher.setWorkNumber("02502");
         tableUserTeacher.setPassword("02502");
         tableUserTeacher.setName("陈世发");
+        tableUserTeacher.setSex("男");
         tableUserTeacher.setTelephone("00000000006");
         tableUserTeacher.setDepartment("计算机类");
         dbHelper.insert(tableUserTeacher);
@@ -78,6 +80,7 @@ public class Initialize {
         tableUserTeacher.setWorkNumber("02503");
         tableUserTeacher.setPassword("02503");
         tableUserTeacher.setName("黄星");
+        tableUserTeacher.setSex("男");
         tableUserTeacher.setTelephone("00000000006");
         tableUserTeacher.setDepartment("计算机类");
         dbHelper.insert(tableUserTeacher);
@@ -85,6 +88,7 @@ public class Initialize {
         tableUserTeacher.setWorkNumber("02504");
         tableUserTeacher.setPassword("02504");
         tableUserTeacher.setName("洪耀坤");
+        tableUserTeacher.setSex("男");
         tableUserTeacher.setTelephone("00000000007");
         tableUserTeacher.setDepartment("计算机类");
         dbHelper.insert(tableUserTeacher);

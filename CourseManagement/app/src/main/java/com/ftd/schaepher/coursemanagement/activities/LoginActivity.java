@@ -163,8 +163,7 @@ public class LoginActivity extends AppCompatActivity
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                     String html = new String(response);
-                    Log.w("first post=", html); // 服务器返回的文本
-
+                    Log.w("Login收到的数据", html); // 服务器返回的文本
                     if (html.equals("true")) {
                         // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
                         proBarLogin.setVisibility(View.INVISIBLE);
@@ -175,7 +174,6 @@ public class LoginActivity extends AppCompatActivity
 
                         Intent intend = new Intent();
                         intend.setClass(LoginActivity.this, TaskListActivity.class);
-                        intend.putExtra("teacherID", userName);
                         LoginActivity.this.finish();
                         startActivity(intend);
                     } else {

@@ -45,7 +45,6 @@ public class TaskListActivity extends AppCompatActivity
     private List<TableTaskInfo> taskListData;
     private String userName;
     private String identity;
-    private String workNumber;
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
@@ -109,8 +108,6 @@ public class TaskListActivity extends AppCompatActivity
         setSupportDoubleBackExit(true);
 
         initUserInformation();
-        Intent intent = getIntent();
-        workNumber = intent.getStringExtra("teacherID");
     }
 
     // 左侧菜单的初始设置
@@ -139,23 +136,27 @@ public class TaskListActivity extends AppCompatActivity
 
     private void initUserInformation() {
         CourseDBHelper dbHelper = new CourseDBHelper(TaskListActivity.this);
+        String ownName;
         userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
         switch (identity) {
             case "teacher":
                 TableUserTeacher teacher =
                         (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
-                tvOwnName.setText(teacher.getName());
+                ownName = teacher == null ? "" : teacher.getName();
+                tvOwnName.setText(ownName);
                 break;
             case "teachingOffice":
                 TableUserTeachingOffice office =
                         (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
-                tvOwnName.setText(office.getName());
+                ownName = office == null ? "" : office.getName();
+                tvOwnName.setText(ownName);
                 break;
             case "departmentHead":
                 TableUserDepartmentHead departmentHead =
                         (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
-                tvOwnName.setText(departmentHead.getName());
+                ownName = departmentHead == null ? "" : departmentHead.getName();
+                tvOwnName.setText(ownName);
                 break;
             default:
                 break;
@@ -195,18 +196,14 @@ public class TaskListActivity extends AppCompatActivity
     // 左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Intent intend;
-        item.setChecked(true);
         switch (item.getItemId()) {
             case R.id.nav_task_list:
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
                 drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_teacher_list:
-                intend = new Intent();
-                intend.putExtra("teacherID", workNumber);
-                intend.setClass(TaskListActivity.this, TeacherListActivity.class);
-                startActivity(intend);
+                startActivity(new Intent(TaskListActivity.this, TeacherListActivity.class));
+                item.setChecked(true);
                 finish();
                 break;
             case R.id.nav_logout:
@@ -214,11 +211,7 @@ public class TaskListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                intend = new Intent();
-                intend.setClass(TaskListActivity.this, TeacherDetailActivity.class);
-                intend.putExtra("teacherID", workNumber);
-                startActivity(intend);
-
+                startActivity(new Intent(TaskListActivity.this, TeacherDetailActivity.class));
                 onBackPressed();
                 break;
             default:

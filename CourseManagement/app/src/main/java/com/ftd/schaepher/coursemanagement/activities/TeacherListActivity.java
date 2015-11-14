@@ -63,7 +63,6 @@ public class TeacherListActivity extends AppCompatActivity
     private Handler myHandler = new Handler();
     private String userName;
     private String identity;
-    private String workNumber;
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeacher> list;
 
@@ -78,9 +77,6 @@ public class TeacherListActivity extends AppCompatActivity
         // 侧滑菜单
         setNavViewConfig();
         setSupportDoubleBackExit(true);
-
-        Intent intent = getIntent();
-        workNumber = intent.getStringExtra("teacherID");
 
         setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick(); // 设置叉叉的监听器
@@ -143,6 +139,7 @@ public class TeacherListActivity extends AppCompatActivity
     }
 
     private void initUserInformation() {
+        String ownName;
         CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
         userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
@@ -150,17 +147,20 @@ public class TeacherListActivity extends AppCompatActivity
             case "teacher":
                 TableUserTeacher teacher =
                         (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
-                tvOwnName.setText(teacher.getName());
+                ownName = teacher == null ? "" : teacher.getName();
+                tvOwnName.setText(ownName);
                 break;
             case "teachingOffice":
                 TableUserTeachingOffice office =
                         (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
-                tvOwnName.setText(office.getName());
+                ownName = office == null ? "" : office.getName();
+                tvOwnName.setText(ownName);
                 break;
             case "departmentHead":
                 TableUserDepartmentHead departmentHead =
                         (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
-                tvOwnName.setText(departmentHead.getName());
+                ownName = departmentHead == null ? "" : departmentHead.getName();
+                tvOwnName.setText(ownName);
                 break;
             default:
                 break;
@@ -180,7 +180,6 @@ public class TeacherListActivity extends AppCompatActivity
     // 左菜单点击事件
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        item.setChecked(true);
         switch (item.getItemId()) {
             case R.id.nav_teacher_list:
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
@@ -188,6 +187,7 @@ public class TeacherListActivity extends AppCompatActivity
                 break;
             case R.id.nav_task_list:
                 startActivity(new Intent(TeacherListActivity.this, TaskListActivity.class));
+                item.setChecked(true);
                 finish();
                 break;
             case R.id.nav_logout:
@@ -195,10 +195,7 @@ public class TeacherListActivity extends AppCompatActivity
                 finish();
                 break;
             case R.id.nav_own_information:
-                Intent intend = new Intent();
-                intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
-                intend.putExtra("teacherID", workNumber);
-                startActivity(intend);
+                startActivity(new Intent(TeacherListActivity.this, TeacherDetailActivity.class));
                 onBackPressed();
                 break;
             default:
@@ -213,6 +210,7 @@ public class TeacherListActivity extends AppCompatActivity
         Intent intend = new Intent();
         intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
         intend.putExtra("teacherID", list.get(position).getWorkNumber());
+        intend.putExtra("isQueryOwnInfomation",false);
         startActivity(intend);
 
         Log.i("str", position + "    " + id);
@@ -227,7 +225,9 @@ public class TeacherListActivity extends AppCompatActivity
                 startActivity(new Intent(TeacherListActivity.this, TeacherCreationActivity.class));
                 break;
             case R.id.add_teacher_from_file:
-                startActivity(new Intent(TeacherListActivity.this, FileSelectActivity.class));
+                Intent intent = new Intent(TeacherListActivity.this, FileSelectActivity.class);
+                intent.putExtra("isRequireImportTeacherFile",true);
+                startActivity(intent);
                 break;
             default:
                 break;
