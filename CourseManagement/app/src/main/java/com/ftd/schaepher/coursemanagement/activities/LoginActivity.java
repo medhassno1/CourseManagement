@@ -62,17 +62,14 @@ public class LoginActivity extends AppCompatActivity
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
+
         autoSetUserName();
 
-        initDatabaseData();
+//        initDatabaseData();
+        ServerTools serverTools = new ServerTools(this);
+        serverTools.getTeacherTable();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        ServerTools serverTools = new ServerTools(this);
-        serverTools.postTeacherTable();
-    }
 
     /**
      * 自动保存用户名

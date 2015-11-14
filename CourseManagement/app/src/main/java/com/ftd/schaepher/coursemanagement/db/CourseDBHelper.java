@@ -63,6 +63,10 @@ public class CourseDBHelper {
         db.deleteById(clazz, id);
     }
 
+    public void deleteAll(Class<?> clazz){
+        db.deleteByWhere(clazz, null);
+    }
+
     // 改
     public void update(Object entity) {
         db.update(entity);
@@ -73,7 +77,7 @@ public class CourseDBHelper {
         return db.findById(id, clazz);
     }
 
-    public List findall(Class<?> clazz) {
+    public List findAll(Class<?> clazz) {
         return db.findAll(clazz);
     }
 

@@ -62,7 +62,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         dbHelper.createDataBase(this);
 
         // 查询数据库中的开课表，获取整张表信息,后期需动态获取需查询的表格
-        excelListData.addAll(dbHelper.findall(TableCourseMultiline.class));
+        excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
     }
 
     private void initExcelListView() {
