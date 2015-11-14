@@ -22,7 +22,7 @@ public class ParseJson {
         }.getType());
     }
 
-    public String getTeacherJson(List<TableUserTeacher> teacherList) {
-        return gson.toJson(teacherList);
+    public String getTeacherJson(List<?> list) {
+        return gson.toJson(list);
     }
 }

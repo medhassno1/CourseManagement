@@ -1,7 +1,6 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
@@ -10,9 +9,7 @@ import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -20,44 +17,59 @@ import java.util.List;
  */
 public class ServerTools {
     Context context;
+    CourseDBHelper dbHelper;
+    ParseJson parseJson;
 
     public ServerTools(Context context) {
         this.context = context;
+        dbHelper = new CourseDBHelper();
+        dbHelper.createDataBase(context);
+        parseJson = new ParseJson();
     }
 
-    public void postTeacherTable() {
-        CourseDBHelper dbHelper = new CourseDBHelper();
-        dbHelper.createDataBase(context);
-        List<TableUserTeacher> list = dbHelper.findall(TableUserTeacher.class);
 
-        ParseJson parseJson = new ParseJson();
+
+    public void postTableToServer(Class<?> tableClass,String tableName,int action) {
+
+        List list = dbHelper.findAll(tableClass);
+
         String jsonData = parseJson.getTeacherJson(list);
         jsonData = jsonData.replace("null", "\"\"");
 
         RequestParams params = new RequestParams();
         params.add("jsonData", jsonData);
+        params.add("tableName",tableName);
+        params.add("action",String.valueOf(action));
 
-//        Log.w("JsonData",jsonData);
-
-        NetworkManager.post(NetworkManager.URL_JSON_POST, params, new AsyncHttpResponseHandler() {
+        NetworkManager.post(NetworkManager.URL_POST_JSON, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
-                String html = new String(bytes);
-//                Log.w("发送数据给PHP", html);
+
             }
 
             @Override
             public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
             }
         });
+
     }
 
     public void getTeacherTable() {
-        NetworkManager.post(NetworkManager.URL_JSON_GET, null, new BaseJsonHttpResponseHandler() {
+        String tableName = "user_teacher";
+        RequestParams params = new RequestParams();
+        params.add("tableName", tableName);
+
+        NetworkManager.post(NetworkManager.URL_JSON_GET, params, new BaseJsonHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, String s, Object o) {
                 ParseJson parseJson = new ParseJson();
-                parseJson.getTeacherList(s);
+//                Log.w("服务器返回的数据", parseJson.getTeacherList(s).toString());
+                List<TableUserTeacher> list = parseJson.getTeacherList(s);
+                CourseDBHelper dbHelper = new CourseDBHelper(context);
+                dbHelper.deleteAll(TableUserTeacher.class);
+                for (TableUserTeacher teacher : list) {
+                    dbHelper.insert(teacher);
+                }
             }
 
             @Override
@@ -67,9 +79,10 @@ public class ServerTools {
 
             @Override
             protected Object parseResponse(String s, boolean b) throws Throwable {
-                JSONArray array = new JSONArray(s);
-                return array;
+                return null;
             }
+
+
         });
     }
 }

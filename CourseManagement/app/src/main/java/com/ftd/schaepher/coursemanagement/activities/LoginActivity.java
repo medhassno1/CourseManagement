@@ -63,17 +63,14 @@ public class LoginActivity extends AppCompatActivity
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
+
         autoSetUserName();
-
         initDatabaseData();
+
+        ServerTools serverTools = new ServerTools(this);
+        serverTools.getTeacherTable();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        ServerTools serverTools = new ServerTools(this);
-        serverTools.postTeacherTable();
-    }
 
     /**
      * 自动保存用户名
@@ -115,11 +112,11 @@ public class LoginActivity extends AppCompatActivity
                     if (rdoBtnId.isChecked()) {
                         identity = rdoBtnId.getText().toString().trim();
                         if (identity.equals("教师")) {
-                            identity = "teacher";
+                            identity = "user_teacher";
                         } else if (identity.equals("教学办")) {
-                            identity = "teachingOffice";
+                            identity = "user_teaching_office";
                         } else if (identity.equals("系负责人")) {
-                            identity = "departmentHead";
+                            identity = "user_department_head";
                         }
                     }
                 }
