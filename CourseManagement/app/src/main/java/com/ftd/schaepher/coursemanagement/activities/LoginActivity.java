@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.ServerTools;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -67,7 +68,7 @@ public class LoginActivity extends AppCompatActivity
         initDatabaseData();
 
         ServerTools serverTools = new ServerTools(this);
-        serverTools.getTeacherTable();
+        serverTools.postTableToServer(TableUserTeacher.class,"user_teacher",ServerTools.INSERT_TABLE);
     }
 
 

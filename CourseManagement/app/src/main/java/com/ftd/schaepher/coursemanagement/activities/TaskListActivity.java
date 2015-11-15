@@ -58,7 +58,7 @@ public class TaskListActivity extends AppCompatActivity
         if (matcher.find()) {
             strTaskName.append(matcher.group());
         }
-        Log.d("TAG", strTaskName.toString());
+//        Log.d("TAG", strTaskName.toString());
         switch (strTaskName.toString()) {
             case "tc_com_exc":
                 return "计算机（卓越班）";

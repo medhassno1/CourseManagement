@@ -17,12 +17,12 @@ public class ParseJson {
         gson = new GsonBuilder().serializeNulls().create();
     }
 
-    public List<TableUserTeacher> getTeacherList(String jsonArray) {
+    public List getListFromJsonString(String jsonArray) {
         return gson.fromJson(jsonArray, new TypeToken<List<TableUserTeacher>>() {
         }.getType());
     }
 
-    public String getTeacherJson(List<?> list) {
+    public String getJsonString(List<?> list) {
         return gson.toJson(list);
     }
 }
