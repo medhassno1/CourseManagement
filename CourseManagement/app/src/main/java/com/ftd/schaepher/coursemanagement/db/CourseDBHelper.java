@@ -23,6 +23,22 @@ public class CourseDBHelper {
     public CourseDBHelper() {
     }
 
+    public static final String CREATE_TABLE_COURSE_MULTILINE = "CREATE TABLE TableCourseMultiline "
+            + "( insertTime text primary key, "
+            + "workNumber text, "
+            + "grade text, "
+            + "major text , "
+            + "people text, "
+            + "courseName text, "
+            + "courseType text, "
+            + "courseCredit text, "
+            + "courseHours text, "
+            + "practiceHour text, "
+            + "onMachineHour text, "
+            + "timePeriod text,"
+            + "teacherName text,"
+            + "remark text)";
+
     // 创建数据库
     public void createDataBase(Context context) {
         db = FinalDb.create(context, "teacherclass.db");
@@ -55,7 +71,7 @@ public class CourseDBHelper {
 
     // 插入数据
     public void insert(Object entity) {
-        db.save(entity);
+            db.save(entity);
     }
 
     // 删除数据，class为id为表的主键
@@ -63,7 +79,7 @@ public class CourseDBHelper {
         db.deleteById(clazz, id);
     }
 
-    public void deleteAll(Class<?> clazz){
+    public void deleteAll(Class<?> clazz) {
         db.deleteByWhere(clazz, null);
     }
 

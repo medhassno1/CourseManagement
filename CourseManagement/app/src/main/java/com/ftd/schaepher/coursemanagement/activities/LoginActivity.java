@@ -11,18 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.ServerTools;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
-
-import org.apache.http.Header;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -58,6 +53,7 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
         proBarLogin = (ProgressView) findViewById(R.id.proBar_login);
+
         ownInformationSaveEditor = getSharedPreferences("userInformation", MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
@@ -150,7 +146,7 @@ public class LoginActivity extends AppCompatActivity
         return false;
     }
 
-    // 处理登录逻辑
+   /* // 处理登录逻辑
     public void login() {
         RequestParams params = new RequestParams();
         params.add("login-user", userName);
@@ -192,7 +188,19 @@ public class LoginActivity extends AppCompatActivity
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-    }
+    }*/
+   public void login() {
+                       proBarLogin.setVisibility(View.INVISIBLE);
+
+                       ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
+                       ownInformationSaveEditor.putString("userName", userName);
+                       ownInformationSaveEditor.apply();
+
+                       Intent intend = new Intent();
+                       intend.setClass(LoginActivity.this, TaskListActivity.class);
+                       LoginActivity.this.finish();
+                       startActivity(intend);
+   }
 
     // 处理输入错误提示
     @Override
