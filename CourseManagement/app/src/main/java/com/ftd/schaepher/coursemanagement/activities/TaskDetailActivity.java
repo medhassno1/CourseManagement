@@ -19,7 +19,6 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
-import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,7 +34,6 @@ import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -92,14 +90,14 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTeacherDeadline.setText(task.getTeacherDeadline());
         tvTaskRemark.setText(task.getRemark());
         tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
-        tvTaskName.setText(TaskListActivity.taskNameChineseMapEnglisg(task.getRelativeTable()));
+        tvTaskName.setText(TaskListActivity.transferTableNameToEnglish(task.getRelativeTable()));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_detail_activity_actions, menu);
-        if (identity.equals("teacher")) {
+        if (identity.equals("user_teacher")) {
             menu.removeItem(R.id.action_export_file);
             menu.findItem(R.id.action_commit_task).setVisible(true);
         }
@@ -115,7 +113,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 return true;
             case R.id.action_export_file:
                 try {
-                    expotrFile();
+                    exportFile();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -130,7 +128,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     //导出文件
-    private void expotrFile() throws Exception {
+    private void exportFile() throws Exception {
 
         filePath = Environment.getExternalStorageDirectory().getAbsoluteFile().toString()
                 + "/" + tvTaskName.getText().toString();
@@ -142,7 +140,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
         db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
 
-        copyExcel(dbHelper.findall(TableCourseMultiline.class));
+        copyExcel(dbHelper.findAll(TableCourseMultiline.class));
 
         db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
         db.close();

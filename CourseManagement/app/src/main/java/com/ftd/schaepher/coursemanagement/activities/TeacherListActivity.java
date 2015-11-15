@@ -120,7 +120,7 @@ public class TeacherListActivity extends AppCompatActivity
         CourseDBHelper dbHelper = new CourseDBHelper();
         dbHelper.createDataBase(this);
 
-        list = dbHelper.findall(TableUserTeacher.class);
+        list = dbHelper.findAll(TableUserTeacher.class);
         Log.i("string", list.size() + "");
 
         for (int i = 0; i < list.size(); i++) {

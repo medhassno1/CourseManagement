@@ -1,7 +1,8 @@
 package com.ftd.schaepher.coursemanagement;
 
-import android.app.Activity;
+import android.content.Context;
 import android.test.InstrumentationTestCase;
+import android.util.Log;
 
 import com.ftd.schaepher.coursemanagement.tools.ServerTools;
 
@@ -10,11 +11,17 @@ import com.ftd.schaepher.coursemanagement.tools.ServerTools;
  */
 public class ServerToolsTest extends InstrumentationTestCase {
 
-    public void serverToolTest()
-    {
-        Activity activity = new Activity();
-        ServerTools serverTools = new ServerTools(activity.getApplicationContext());
-        serverTools.postTeacherTable();
+    Context context;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        context = getInstrumentation().getTargetContext();
+    }
+
+    public void testServerTool() {
+        ServerTools serverTools = new ServerTools(context);
+        serverTools.getTeacherTable();
     }
 
 }
