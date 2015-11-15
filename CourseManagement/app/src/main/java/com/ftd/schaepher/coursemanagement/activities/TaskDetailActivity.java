@@ -1,13 +1,10 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -22,7 +19,6 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
-import com.rey.material.app.SimpleDialog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -103,7 +99,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     public boolean onCreateOptionsMenu(Menu menu) {
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_detail_activity_actions, menu);
-        if (identity.equals("user_teacher")) {
+        if (identity.equals(ConstantTools.ID_TEACHER)) {
             menu.removeItem(R.id.action_export_file);
             menu.findItem(R.id.action_commit_task).setVisible(true);
         }

@@ -73,14 +73,14 @@
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/rdoBtn_jxb"
+                android:id="@+id/rdoBtn_teaching_office"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="15dp"
                 android:text="教学办" />
 
             <RadioButton
-                android:id="@+id/rdoBtn_department"
+                android:id="@+id/rdoBtn_department_head"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="15dp"
