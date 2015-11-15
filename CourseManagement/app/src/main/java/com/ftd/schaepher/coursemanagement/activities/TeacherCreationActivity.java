@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
@@ -70,24 +71,29 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                 finish();
                 return true;
             case R.id.action_confim_add_teacher:
-                new AlertDialog.Builder(this).setTitle("提示").setMessage("是否确认添加").setPositiveButton
-                        (android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                CourseDBHelper dbHelper = new CourseDBHelper();
-                                dbHelper.createDataBase(TeacherCreationActivity.this);
-                                TableUserTeacher teacher = getTeacherData();
-                                dbHelper.insert(teacher);
-
-                                finish();
-                            }
-                        }).setNegativeButton
-                        (android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        }).show();
+               if(isAllWrite()){
+                    new AlertDialog.Builder(this).setTitle("提示").setMessage("是否确认添加").
+                            setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    CourseDBHelper dbHelper = new CourseDBHelper();
+                                    dbHelper.createDataBase(TeacherCreationActivity.this);
+                                    TableUserTeacher teacher = getTeacherData();
+                                    try {
+                                        dbHelper.insert(teacher);
+                                    } catch (Exception e) {
+                                        Toast.makeText(TeacherCreationActivity.this,
+                                                "该工号已存在，添加失败", Toast.LENGTH_SHORT).show();
+                                    }
+                                    finish();
+                                }
+                            }).setNegativeButton
+                            (android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            }).show();
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -186,5 +192,18 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
 
         return teacher;
+    }
+
+    private boolean isAllWrite(){
+        if(edtTxTeacherNumber.getText().toString().trim().equals("")){
+            edtTxTeacherNumber.setError("工号不能为空");
+        }else if(edtTxPassword.getText().toString().trim().equals("")){
+            edtTxPassword.setError("密码不能为空");
+        }else if(edtTxTeacherName.getText().toString().trim().equals("")){
+            edtTxTeacherName.setError("姓名不能为空");
+        }else {
+            return true;
+        }
+        return  false;
     }
 }
