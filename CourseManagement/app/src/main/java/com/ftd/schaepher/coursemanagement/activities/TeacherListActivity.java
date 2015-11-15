@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,6 +35,8 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -46,6 +49,7 @@ public class TeacherListActivity extends AppCompatActivity
         AdapterView.OnItemClickListener, MenuItem.OnMenuItemClickListener {
 
     private static final String TAG = "TeacherListActivity";
+    private static final int CLOSE_NAV = 1;
 
     private Toolbar mToolbar;
     private EditText eSearch;
@@ -196,7 +200,15 @@ public class TeacherListActivity extends AppCompatActivity
                 break;
             case R.id.nav_own_information:
                 startActivity(new Intent(TeacherListActivity.this, TeacherDetailActivity.class));
-                onBackPressed();
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Message msg = new Message();
+                        msg.what = CLOSE_NAV;
+                        mHandler.sendMessage(msg);
+                    }
+                }, 200);
                 break;
             default:
                 break;
@@ -302,6 +314,21 @@ public class TeacherListActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case CLOSE_NAV:
+                    onBackPressed();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
 
     /**
      * 任务列表的适配器

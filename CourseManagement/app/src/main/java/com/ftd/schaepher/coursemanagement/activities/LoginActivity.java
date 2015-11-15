@@ -15,8 +15,15 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.ServerTools;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
+
+import org.apache.http.Header;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -194,9 +201,7 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    public void login2() {
-        proBarLogin.setVisibility(View.INVISIBLE);
-
+    public void loginOffLine() {
         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
         ownInformationSaveEditor.putString("userName", userName);
         ownInformationSaveEditor.apply();
