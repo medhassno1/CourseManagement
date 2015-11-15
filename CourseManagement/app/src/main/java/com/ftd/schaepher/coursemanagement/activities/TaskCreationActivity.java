@@ -1,10 +1,13 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,11 +16,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
@@ -26,8 +29,6 @@ import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
-
-import net.tsz.afinal.FinalDb;
 
 import java.util.Calendar;
 import java.util.List;
@@ -51,6 +52,9 @@ public class TaskCreationActivity extends AppCompatActivity
     private String filePath;
     private String fileName;
     private String tableCourseName;
+    private static final int RELEASE = 1;
+    private static final int RELEASE_FAILURE = 2;
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,9 @@ public class TaskCreationActivity extends AppCompatActivity
                 finish();
                 return true;
             case R.id.action_release_task:
+                if (!isPassValidate()) {
+                    return true;
+                }
                 final SimpleDialog notificationDialog = new SimpleDialog(TaskCreationActivity.this);
                 notificationDialog.title("是否确认发布此任务？")
                         .positiveAction("确认")
@@ -113,16 +120,15 @@ public class TaskCreationActivity extends AppCompatActivity
                 notificationDialog.positiveActionClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        TableTaskInfo task = getNewTaskInformation();
-                        tableCourseName = task.getRelativeTable();
-                        try {
-                            createTable();
-                            dbHelper.insert(task);
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        finish();
-
+                        notificationDialog.cancel();
+                        progress = new ProgressDialog(TaskCreationActivity.this);
+                        progress.setMessage("发布任务中...");
+                        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progress.setCancelable(false);
+                        progress.show();
+                        Message msg = new Message();
+                        msg.what = RELEASE;
+                        mHandler.sendMessage(msg);
                     }
                 });
                 notificationDialog.negativeActionClickListener(new View.OnClickListener() {
@@ -135,6 +141,17 @@ public class TaskCreationActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean isPassValidate() {
+        if (edtTxTaskName.getText().toString().trim().equals("")) {
+            Toast.makeText(this, "请选择开课专业", Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (tvFileName.getText().toString().trim().equals("")) {
+            Toast.makeText(this, "请导入文件", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
     //建表
@@ -252,6 +269,43 @@ public class TaskCreationActivity extends AppCompatActivity
                 break;
         }
     }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case RELEASE:
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            TableTaskInfo task = getNewTaskInformation();
+                            tableCourseName = task.getRelativeTable();
+                            try {
+                                createTable();
+                                dbHelper.insert(task);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Message msg = new Message();
+                                msg.what = RELEASE_FAILURE;
+                                mHandler.sendMessage(msg);
+                            } finally {
+                                progress.cancel();
+                                finish();
+                            }
+                        }
+                    }.start();
+                    break;
+
+                case RELEASE_FAILURE:
+                    Toast.makeText(TaskCreationActivity.this,"发布错误，请重新发布",Toast.LENGTH_SHORT).show();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
