@@ -1,5 +1,6 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,11 +12,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.ServerTools;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
+
+import org.apache.http.Header;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -31,7 +38,7 @@ public class LoginActivity extends AppCompatActivity
     private RadioGroup rdoGroup;
     private TextInputLayout layoutUserName;
     private TextInputLayout layoutPassWord;
-    private ProgressView proBarLogin;
+    private ProgressDialog progress;
 
     private String userName;
     private String password;
@@ -50,7 +57,6 @@ public class LoginActivity extends AppCompatActivity
         btnLogin = (Button) findViewById(R.id.btn_login);
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
-        proBarLogin = (ProgressView) findViewById(R.id.proBar_login);
 
         ownInformationSaveEditor = getSharedPreferences("userInformation", MODE_PRIVATE).edit();
 
@@ -115,8 +121,13 @@ public class LoginActivity extends AppCompatActivity
                     }
                 }
                 if (isTrueForm()) {
-                    proBarLogin.setVisibility(View.VISIBLE);
+                    progress = new ProgressDialog(LoginActivity.this);
+                    progress.setMessage("登录中...");
+                    progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progress.setCancelable(true);
+                    progress.show();
                     login();
+//                    loginOffLine();
                 }
                 break;
 
@@ -144,7 +155,7 @@ public class LoginActivity extends AppCompatActivity
         return false;
     }
 
-   /* // 处理登录逻辑
+    // 处理登录逻辑
     public void login() {
         RequestParams params = new RequestParams();
         params.add("login-user", userName);
@@ -154,11 +165,11 @@ public class LoginActivity extends AppCompatActivity
             NetworkManager.post(NetworkManager.URL_LOGIN, params, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                    progress.cancel();
                     String html = new String(response);
                     Log.w("Login收到的数据", html); // 服务器返回的文本
                     if (html.equals("true")) {
                         // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
-                        proBarLogin.setVisibility(View.INVISIBLE);
 
                         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
                         ownInformationSaveEditor.putString("userName", userName);
@@ -169,7 +180,6 @@ public class LoginActivity extends AppCompatActivity
                         LoginActivity.this.finish();
                         startActivity(intend);
                     } else {
-                        proBarLogin.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "账号或密码错误",
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -178,27 +188,26 @@ public class LoginActivity extends AppCompatActivity
                 @Override
                 public void onFailure(int statusCode, Header[] headers,
                                       byte[] response, Throwable throwable) {
+                    progress.cancel();
                     Toast.makeText(LoginActivity.this, "登录失败，请检查网络状况",
                             Toast.LENGTH_SHORT).show();
-                    proBarLogin.setVisibility(View.INVISIBLE);
                 }
             });
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-    }*/
-   public void login() {
-                       proBarLogin.setVisibility(View.INVISIBLE);
+    }
 
-                       ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-                       ownInformationSaveEditor.putString("userName", userName);
-                       ownInformationSaveEditor.apply();
+    public void loginOffLine() {
+        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
+        ownInformationSaveEditor.putString("userName", userName);
+        ownInformationSaveEditor.apply();
 
-                       Intent intend = new Intent();
-                       intend.setClass(LoginActivity.this, TaskListActivity.class);
-                       LoginActivity.this.finish();
-                       startActivity(intend);
-   }
+        Intent intend = new Intent();
+        intend.setClass(LoginActivity.this, TaskListActivity.class);
+        LoginActivity.this.finish();
+        startActivity(intend);
+    }
 
     // 处理输入错误提示
     @Override

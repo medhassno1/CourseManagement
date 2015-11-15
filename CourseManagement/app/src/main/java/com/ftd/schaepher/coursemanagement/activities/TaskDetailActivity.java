@@ -1,10 +1,13 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -19,6 +22,7 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.rey.material.app.SimpleDialog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,6 +51,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private TextView tvTaskState;
     private TextView tvTaskName;
     private TextView tvTaskTerm;
+    private ProgressDialog progress;
 
     private String identity;
     private String taskId;
@@ -54,6 +59,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private CourseDBHelper dbHelper;
     private String tableName;
     private String filePath;
+    private static final int EXPORT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,11 +118,29 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 finish();
                 return true;
             case R.id.action_export_file:
-                try {
-                    exportFile();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                final SimpleDialog notificationDialog = new SimpleDialog(TaskDetailActivity.this);
+                        notificationDialog.title("是否导出文件")
+                        .positiveAction("确定")
+                        .positiveActionClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                notificationDialog.cancel();
+                                progress = new ProgressDialog(TaskDetailActivity.this);
+                                progress.setMessage("导出中...");
+                                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                progress.setCancelable(false);
+                                progress.show();
+                                Message msg = new Message();
+                                msg.what = EXPORT;
+                                mHandler.sendMessage(msg);
+                            }
+                        }).negativeAction("取消")
+                        .negativeActionClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                notificationDialog.cancel();
+                            }
+                        }).show();
                 return true;
             case R.id.action_commit_task:
                 Log.d("TAG", "commit task");
@@ -167,7 +191,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         WritableWorkbook wbook = Workbook.createWorkbook(file, book); // 根据book创建一个操作对象
         WritableSheet sh = wbook.getSheet(0);// 得到一个工作对象
         // 从最后一行开始加
-        for (int i = 0; i < list.size(); i++,length++) {
+        for (int i = 0; i < list.size(); i++, length++) {
             column = 0;
             Label label = new Label(column++, length, list.get(i).getGrade());
             sh.addCell(label);
@@ -198,6 +222,32 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         wbook.close();
 
     }
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case EXPORT:
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            try {
+                                exportFile();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                progress.cancel();
+                            }
+                        }
+                    }.start();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
 
     // 点击查看文件跳转逻辑
     @Override
