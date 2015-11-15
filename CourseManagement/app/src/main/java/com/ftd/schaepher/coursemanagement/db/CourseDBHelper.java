@@ -55,7 +55,7 @@ public class CourseDBHelper {
 
     // 插入数据
     public void insert(Object entity) {
-        db.save(entity);
+            db.save(entity);
     }
 
     // 删除数据，class为id为表的主键
