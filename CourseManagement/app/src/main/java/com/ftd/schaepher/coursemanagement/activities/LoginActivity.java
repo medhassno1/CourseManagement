@@ -9,15 +9,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.ServerTools;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.rey.material.widget.ProgressView;
+
+import org.apache.http.Header;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -27,6 +32,7 @@ public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, View.OnFocusChangeListener {
 
     private static final String TAG = "LoginActivity";
+
     private Button btnLogin;
     private EditText edtTxUserName;
     private EditText edtTxPassWord;
@@ -64,12 +70,12 @@ public class LoginActivity extends AppCompatActivity
         initDatabaseData();
 
         ServerTools serverTools = new ServerTools(this);
-        serverTools.postTableToServer(TableUserTeacher.class,"user_teacher",ServerTools.INSERT_TABLE);
+        serverTools.postTableToServer(TableUserTeacher.class, ConstantTools.ID_TEACHER, ServerTools.INSERT_TABLE);
     }
 
 
     /**
-     * 自动保存用户名
+     * 自动输入保存的用户名
      */
     private void autoSetUserName() {
         userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
@@ -86,14 +92,15 @@ public class LoginActivity extends AppCompatActivity
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (isFirstRun) {
-            Log.v("debug", "第一次运行");
+            Log.v("初始化数据库", "正在初始化");
             editor.putBoolean("isFirstRun", false);
             editor.apply();
 
-            Initialize initialize = new Initialize();//初始化数据库
+            Initialize initialize = new Initialize(); // 初始化数据库
             initialize.init(this);
+            Log.v("初始化数据库", "初始化完成");
         } else {
-            Log.v("debug", "不是第一次运行");
+            Log.v("初始化数据库", "已初始化过");
         }
     }
 
@@ -103,19 +110,20 @@ public class LoginActivity extends AppCompatActivity
             case R.id.btn_login:
                 userName = edtTxUserName.getText().toString().trim();
                 password = edtTxPassWord.getText().toString().trim();
-                for (int i = 0; i < rdoGroup.getChildCount(); i++) {
-                    RadioButton rdoBtnId = (RadioButton) rdoGroup.getChildAt(i);
-                    if (rdoBtnId.isChecked()) {
-                        identity = rdoBtnId.getText().toString().trim();
-                        if (identity.equals("教师")) {
-                            identity = "user_teacher";
-                        } else if (identity.equals("教学办")) {
-                            identity = "user_teaching_office";
-                        } else if (identity.equals("系负责人")) {
-                            identity = "user_department_head";
-                        }
-                    }
+                switch (rdoGroup.getCheckedRadioButtonId()) {
+                    case R.id.rdoBtn_teacher:
+                        identity = ConstantTools.ID_TEACHER;
+                        break;
+                    case R.id.rdoBtn_department_head:
+                        identity = ConstantTools.ID_DEPARTMENT_HEAD;
+                        break;
+                    case R.id.rdoBtn_teaching_office:
+                        identity = ConstantTools.ID_TEACHING_OFFICE;
+                        break;
+                    default:
+                        break;
                 }
+
                 if (isTrueForm()) {
                     proBarLogin.setVisibility(View.VISIBLE);
                     login();
@@ -146,7 +154,7 @@ public class LoginActivity extends AppCompatActivity
         return false;
     }
 
-   /* // 处理登录逻辑
+    // 处理登录逻辑
     public void login() {
         RequestParams params = new RequestParams();
         params.add("login-user", userName);
@@ -188,19 +196,20 @@ public class LoginActivity extends AppCompatActivity
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-    }*/
-   public void login() {
-                       proBarLogin.setVisibility(View.INVISIBLE);
+    }
 
-                       ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-                       ownInformationSaveEditor.putString("userName", userName);
-                       ownInformationSaveEditor.apply();
+    public void login2() {
+        proBarLogin.setVisibility(View.INVISIBLE);
 
-                       Intent intend = new Intent();
-                       intend.setClass(LoginActivity.this, TaskListActivity.class);
-                       LoginActivity.this.finish();
-                       startActivity(intend);
-   }
+        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
+        ownInformationSaveEditor.putString("userName", userName);
+        ownInformationSaveEditor.apply();
+
+        Intent intend = new Intent();
+        intend.setClass(LoginActivity.this, TaskListActivity.class);
+        LoginActivity.this.finish();
+        startActivity(intend);
+    }
 
     // 处理输入错误提示
     @Override

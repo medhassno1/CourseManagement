@@ -19,6 +19,7 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -97,7 +98,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     public boolean onCreateOptionsMenu(Menu menu) {
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_detail_activity_actions, menu);
-        if (identity.equals("user_teacher")) {
+        if (identity.equals(ConstantTools.ID_TEACHER)) {
             menu.removeItem(R.id.action_export_file);
             menu.findItem(R.id.action_commit_task).setVisible(true);
         }

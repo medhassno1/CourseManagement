@@ -28,6 +28,7 @@ import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
+import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -121,7 +122,7 @@ public class TaskListActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
 
-        if (identity.equals("user_teacher")) {
+        if (identity.equals(ConstantTools.ID_TEACHER)) {
             navigationView.getMenu().removeItem(R.id.nav_teacher_list);
         }
         tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
@@ -140,19 +141,19 @@ public class TaskListActivity extends AppCompatActivity
         userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
         switch (identity) {
-            case "user_teacher":
+            case ConstantTools.ID_TEACHER:
                 TableUserTeacher teacher =
                         (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
                 ownName = teacher == null ? "" : teacher.getName();
                 tvOwnName.setText(ownName);
                 break;
-            case "user_teaching_office":
+            case  ConstantTools.ID_TEACHING_OFFICE:
                 TableUserTeachingOffice office =
                         (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
                 ownName = office == null ? "" : office.getName();
                 tvOwnName.setText(ownName);
                 break;
-            case "user_department_head":
+            case  ConstantTools.ID_DEPARTMENT_HEAD:
                 TableUserDepartmentHead departmentHead =
                         (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
                 ownName = departmentHead == null ? "" : departmentHead.getName();
@@ -225,7 +226,7 @@ public class TaskListActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
-        if (identity.equals("user_teacher")) {
+        if (identity.equals(ConstantTools.ID_TEACHER)) {
             menu.removeItem(R.id.action_add_task);
         }
         return true;
