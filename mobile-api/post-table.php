@@ -30,6 +30,11 @@ if (!$con){
 		case "insertUserTable":
 			insertTable();
 			break;
+		case "insertTable":
+			insertTable();
+			break;
+		default:
+			break;
 	}
 }
 
@@ -37,19 +42,19 @@ if (!$con){
 function updateCbTable() {
 	
     foreach ($jsonData as $row) {
-        $search = mysqli_query($con, "select * from $cbTable WHERE courseName = '$row[courseName]' ");
+        $search = mysqli_query($con, "select * from $tableName WHERE courseName = '$row[courseName]' ");
         $result = mysqli_fetch_array($search);
         //更新老师
         $updateTeacher = $result['teacherName'] . $row['teacherName'] . ';';
         $updateTimePeriod = $result['timePeriod'] . $row['timePeriod'] . ';';
         $updateRemark = $result['remark'] . $row['remark'] . ';';
-        $sql = "UPDATE $cbTable SET timePeriod='$updateTimePeriod' WHERE courseName = '$row[courseName]'";
+        $sql = "UPDATE $tableName SET timePeriod='$updateTimePeriod' WHERE courseName = '$row[courseName]'";
         mysqli_query($con, $sql);
 
-        $sql = "UPDATE $cbTable SET teacherName ='$updateTeacher' WHERE courseName = '$row[courseName]'";
+        $sql = "UPDATE $tableName SET teacherName ='$updateTeacher' WHERE courseName = '$row[courseName]'";
         mysqli_query($con, $sql);
 
-        $sql = "UPDATE $cbTable SET remark='$updateRemark' WHERE courseName = '$row[courseName]'";
+        $sql = "UPDATE $tableName SET remark='$updateRemark' WHERE courseName = '$row[courseName]'";
         mysqli_query($con, $sql);
     }
 }
