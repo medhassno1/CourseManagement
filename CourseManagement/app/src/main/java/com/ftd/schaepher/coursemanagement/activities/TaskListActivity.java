@@ -3,6 +3,8 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -31,6 +33,8 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +45,7 @@ import java.util.regex.Pattern;
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "TaskListActivity";
+    private static final int CLOSE_NAV = 1;
     private Toolbar mToolbar;
     private TextView tvOwnName;
     private List<TableTaskInfo> taskListData;
@@ -213,7 +218,15 @@ public class TaskListActivity extends AppCompatActivity
                 break;
             case R.id.nav_own_information:
                 startActivity(new Intent(TaskListActivity.this, TeacherDetailActivity.class));
-                onBackPressed();
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Message msg = new Message();
+                        msg.what = CLOSE_NAV;
+                        mHandler.sendMessage(msg);
+                    }
+                },200);
                 break;
             default:
                 break;
@@ -303,4 +316,18 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case CLOSE_NAV:
+                    onBackPressed();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
 }

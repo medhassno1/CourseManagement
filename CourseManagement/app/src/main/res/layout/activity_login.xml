@@ -111,16 +111,7 @@
                 android:textColor="@color/colorPrimaryDark"
                 app:rd_enable="true"
                 android:elevation="5dp"/>
-            
-            <com.rey.material.widget.ProgressView
-                android:id="@+id/proBar_login"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                app:pv_autostart="true"
-                app:pv_circular="false"
-                app:pv_progressMode="indeterminate"
-                app_verticalAlign="top"
-                android:visibility="invisible"/>
+
         </LinearLayout>
     </LinearLayout>
     
