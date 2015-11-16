@@ -3,6 +3,8 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,8 +30,11 @@ import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
+import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +45,7 @@ import java.util.regex.Pattern;
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "TaskListActivity";
+    private static final int CLOSE_NAV = 1;
     private Toolbar mToolbar;
     private TextView tvOwnName;
     private List<TableTaskInfo> taskListData;
@@ -58,7 +64,7 @@ public class TaskListActivity extends AppCompatActivity
         if (matcher.find()) {
             strTaskName.append(matcher.group());
         }
-        Log.d("TAG", strTaskName.toString());
+//        Log.d("TAG", strTaskName.toString());
         switch (strTaskName.toString()) {
             case "tc_com_exc":
                 return "计算机（卓越班）";
@@ -121,7 +127,7 @@ public class TaskListActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
 
-        if (identity.equals("user_teacher")) {
+        if (identity.equals(ConstantTools.ID_TEACHER)) {
             navigationView.getMenu().removeItem(R.id.nav_teacher_list);
         }
         tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
@@ -140,19 +146,19 @@ public class TaskListActivity extends AppCompatActivity
         userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
         switch (identity) {
-            case "user_teacher":
+            case ConstantTools.ID_TEACHER:
                 TableUserTeacher teacher =
                         (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
                 ownName = teacher == null ? "" : teacher.getName();
                 tvOwnName.setText(ownName);
                 break;
-            case "user_teaching_office":
+            case  ConstantTools.ID_TEACHING_OFFICE:
                 TableUserTeachingOffice office =
                         (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
                 ownName = office == null ? "" : office.getName();
                 tvOwnName.setText(ownName);
                 break;
-            case "user_department_head":
+            case  ConstantTools.ID_DEPARTMENT_HEAD:
                 TableUserDepartmentHead departmentHead =
                         (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
                 ownName = departmentHead == null ? "" : departmentHead.getName();
@@ -212,7 +218,15 @@ public class TaskListActivity extends AppCompatActivity
                 break;
             case R.id.nav_own_information:
                 startActivity(new Intent(TaskListActivity.this, TeacherDetailActivity.class));
-                onBackPressed();
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Message msg = new Message();
+                        msg.what = CLOSE_NAV;
+                        mHandler.sendMessage(msg);
+                    }
+                },200);
                 break;
             default:
                 break;
@@ -225,7 +239,7 @@ public class TaskListActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
         getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
-        if (identity.equals("user_teacher")) {
+        if (identity.equals(ConstantTools.ID_TEACHER)) {
             menu.removeItem(R.id.action_add_task);
         }
         return true;
@@ -302,4 +316,18 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case CLOSE_NAV:
+                    onBackPressed();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
 }

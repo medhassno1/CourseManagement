@@ -2,7 +2,6 @@ package com.ftd.schaepher.coursemanagement;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
-import android.util.Log;
 
 import com.ftd.schaepher.coursemanagement.tools.ServerTools;
 
@@ -21,7 +20,6 @@ public class ServerToolsTest extends InstrumentationTestCase {
 
     public void testServerTool() {
         ServerTools serverTools = new ServerTools(context);
-        serverTools.getTeacherTable();
     }
 
 }

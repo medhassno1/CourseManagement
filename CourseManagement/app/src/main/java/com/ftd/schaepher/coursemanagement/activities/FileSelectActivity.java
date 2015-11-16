@@ -22,11 +22,8 @@ import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
-
-import net.tsz.afinal.annotation.sqlite.Table;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -147,7 +144,10 @@ public class FileSelectActivity extends AppCompatActivity
                                 CourseDBHelper dbHelper = new CourseDBHelper();
                                 dbHelper.createDataBase(FileSelectActivity.this);
                                 TableUserTeacher teacher = teachersList.get(i);
-                                dbHelper.insert(teacher);
+                                try{
+                                    dbHelper.insert(teacher);
+                                }catch(Exception e){
+                                }
                             }
                             finish();
                         }
@@ -163,7 +163,7 @@ public class FileSelectActivity extends AppCompatActivity
                     (android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            setResult(RESULT_OK,new Intent().putExtra("fileName",path));
+                            setResult(RESULT_OK, new Intent().putExtra("fileName", path));
                             finish();
                         }
                     }).setNegativeButton
