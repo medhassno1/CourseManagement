@@ -34,7 +34,7 @@ public class CourseDBHelperTest extends InstrumentationTestCase {
         TableUserTeacher teacher2;
         String number = "3443";
         teacher2 =(TableUserTeacher)dbHelper.findById(number,TableUserTeacher.class);
-        assertEquals("张三", teacher2.getName());
+        assertEquals("张三", teacher2.getName().toString());
     }
 
 }

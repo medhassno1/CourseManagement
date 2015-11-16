@@ -69,6 +69,8 @@ public class LoginActivity extends AppCompatActivity
         autoSetUserName();
         initDatabaseData();
 
+        ServerTools serverTools = new ServerTools(this);
+        serverTools.postTableToServer(TableUserTeacher.class, ConstantTools.ID_TEACHER, ServerTools.INSERT_TABLE);
     }
 
 
