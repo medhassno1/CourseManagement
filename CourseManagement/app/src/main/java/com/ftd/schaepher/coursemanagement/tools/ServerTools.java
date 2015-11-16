@@ -53,6 +53,7 @@ public class ServerTools {
                 Charset charset = Charset.defaultCharset();
                 String string = new String(bytes,charset);
                 Log.w("post",string);
+                System.out.println(string);
             }
 
             @Override
