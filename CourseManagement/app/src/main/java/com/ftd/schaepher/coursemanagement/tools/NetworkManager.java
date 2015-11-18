@@ -17,20 +17,16 @@ public class NetworkManager {
 
     public static final String URL_LOGIN =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
-   /* public static final String URL_LOGIN =
-           "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";*/
-
-    // 测试获取 json数据地址
+    /* public static final String URL_LOGIN =
+            "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";*/
     public static final String URL_GET_JSON =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/query-by-table-name.php";
-    // 测试发送json数据地址
     public static final String URL_POST_JSON =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";
 
     public static final String UPDATE_CB_TABLE = "updateCbTable";
     public static final String UPDATE_TASK_TABLE = "updateTaskTable";
     public static final String INSERT_TABLE = "insert";
-
 
     private static final OkHttpClient client = new OkHttpClient();
 

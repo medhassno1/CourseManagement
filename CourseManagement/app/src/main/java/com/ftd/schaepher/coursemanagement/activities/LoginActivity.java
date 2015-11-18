@@ -14,11 +14,16 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -62,8 +67,7 @@ public class LoginActivity extends AppCompatActivity
         btnLogin.setOnClickListener(this);
 
         autoSetUserName();
-        initDatabaseData();
-
+//        initDatabaseData();
     }
 
 
@@ -166,9 +170,13 @@ public class LoginActivity extends AppCompatActivity
                 intend.setClass(LoginActivity.this, TaskListActivity.class);
                 LoginActivity.this.finish();
                 startActivity(intend);
-            } else {
+            } else if (result.equals("false")){
                 progress.cancel();
                 Toast.makeText(LoginActivity.this, "账号或密码错误",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                progress.cancel();
+                Toast.makeText(LoginActivity.this, "请求服务器失败",
                         Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
