@@ -1,9 +1,14 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import android.os.StrictMode;
+
+import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 
 /**
  * Created by Schaepher on 2015/10/27.
@@ -16,31 +21,83 @@ public class NetworkManager {
            "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";*/
 
     // 测试获取 json数据地址
-    public static final String URL_JSON_GET =
+    public static final String URL_GET_JSON =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/query-by-table-name.php";
     // 测试发送json数据地址
     public static final String URL_POST_JSON =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";
 
-    // 实例化对象
-    private static AsyncHttpClient client = new AsyncHttpClient();
+    public static final String UPDATE_CB_TABLE = "updateCbTable";
+    public static final String UPDATE_TASK_TABLE = "updateTaskTable";
+    public static final String INSERT_TABLE = "insert";
 
-    public static void post(String urlString, RequestParams params, BaseJsonHttpResponseHandler res) {
-        client.post(urlString, params, res);
+
+    private static final OkHttpClient client = new OkHttpClient();
+
+    public NetworkManager() {
+        // 强制允许在UI线程访问网络
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
+        StrictMode.setThreadPolicy(policy);
     }
 
-    public static void post(String urlString, RequestParams params,
-                            AsyncHttpResponseHandler res) {
-        client.post(urlString, params, res);
+    public String postJsonString(String tableName, String jsonData, String action) throws IOException {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("tableName", tableName)
+                .add("jsonData", jsonData)
+                .add("action", action)
+                .build();
+        Request request = new Request.Builder()
+                .url(URL_POST_JSON)
+                .post(formBody)
+                .build();
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            return response.body().string();
+        } else {
+            throw new IOException("Unexpected code " + response);
+        }
     }
 
-    public static void get(String urlString, RequestParams params,
-                           AsyncHttpResponseHandler res) {
-        client.get(urlString, params, res);
+    public String getJsonString(String tableName) throws IOException {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("tableName", tableName)
+                .build();
+        Request request = new Request.Builder()
+                .url(URL_GET_JSON)
+                .post(formBody)
+                .build();
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            return response.body().string();
+        } else {
+            throw new IOException("Unexpected code " + response);
+        }
     }
 
-    public static AsyncHttpClient getClient() {
-        return client;
+    public String login(String userName, String password, String identity) throws IOException {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("login-user", userName)
+                .add("login-password", password)
+                .add("ident", identity)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(URL_LOGIN)
+                .post(formBody)
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                return response.body().string();
+            } else {
+                throw new IOException("Unexpected code " + response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+
     }
 
 }
