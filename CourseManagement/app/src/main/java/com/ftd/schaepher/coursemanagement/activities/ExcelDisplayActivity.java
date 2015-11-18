@@ -150,7 +150,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tvDialogCourseName.setText(excelListData.get(position).getCourseName());
         tvDialogType.setText(excelListData.get(position).getCourseType());
         tvDialogCredit.setText(excelListData.get(position).getCourseCredit());
-        tvDialogClassHour.setText(excelListData.get(position).getCourseHours());
+        tvDialogClassHour.setText(excelListData.get(position).getCourseHour());
         tvDialogExperimentHour.setText(excelListData.get(position).getPracticeHour());
         tvDialogComputerHour.setText(excelListData.get(position).getOnMachineHour());
         edtTxDialogFromtoEnd.setText(excelListData.get(position).getTimePeriod());
@@ -209,7 +209,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             mViewHolder.tvSum.setText(courseCur.getPeople());
             mViewHolder.tvCourseName.setText(courseCur.getCourseName());
             mViewHolder.tvCredit.setText(courseCur.getCourseCredit());
-            mViewHolder.tvClassHour.setText(courseCur.getCourseHours());
+            mViewHolder.tvClassHour.setText(courseCur.getCourseHour());
             mViewHolder.tvType.setText(courseCur.getCourseType());
             mViewHolder.tvExperimentHour.setText(courseCur.getPracticeHour());
             mViewHolder.tvComputerHour.setText(courseCur.getOnMachineHour());

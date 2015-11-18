@@ -206,7 +206,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
             sh.addCell(label);
             label = new Label(column++, length, list.get(i).getCourseCredit());
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseHours());
+            label = new Label(column++, length, list.get(i).getCourseHour());
             sh.addCell(label);
             label = new Label(column++, length, list.get(i).getPracticeHour());
             sh.addCell(label);

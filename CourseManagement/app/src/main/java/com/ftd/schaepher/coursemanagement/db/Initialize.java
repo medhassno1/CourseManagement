@@ -211,7 +211,7 @@ public class Initialize {
         tableCourseMultiline.setGrade("2012");
         tableCourseMultiline.setMajor("计算机科学与技术");
         tableCourseMultiline.setPeople("87");
-        tableCourseMultiline.setCourseHours("24");
+        tableCourseMultiline.setCourseHour("24");
         tableCourseMultiline.setCourseCredit("1");
         dbHelper.insert(tableCourseMultiline);
         tableCourseMultiline.setCourseName("计算机仿真技术");
@@ -219,7 +219,7 @@ public class Initialize {
         tableCourseMultiline.setMajor("计算机科学与技术");
         tableCourseMultiline.setPeople("87");
         tableCourseMultiline.setCourseType("实践选修");
-        tableCourseMultiline.setCourseHours("24");
+        tableCourseMultiline.setCourseHour("24");
         tableCourseMultiline.setCourseCredit("1");
         tableCourseMultiline.setPracticeHour("12");
         dbHelper.insert(tableCourseMultiline);
@@ -228,7 +228,7 @@ public class Initialize {
         tableCourseMultiline.setMajor("计算机科学与技术");
         tableCourseMultiline.setPeople("87");
         tableCourseMultiline.setCourseType("专业方向");
-        tableCourseMultiline.setCourseHours("32");
+        tableCourseMultiline.setCourseHour("32");
         tableCourseMultiline.setCourseCredit("2");
         tableCourseMultiline.setOnMachineHour("12");
         dbHelper.insert(tableCourseMultiline);
@@ -237,7 +237,7 @@ public class Initialize {
         tableCourseMultiline.setMajor("计算机类");
         tableCourseMultiline.setPeople("191");
         tableCourseMultiline.setCourseType("实践选修");
-        tableCourseMultiline.setCourseHours("48");
+        tableCourseMultiline.setCourseHour("48");
         tableCourseMultiline.setCourseCredit("2");
         tableCourseMultiline.setOnMachineHour("18");
         dbHelper.insert(tableCourseMultiline);

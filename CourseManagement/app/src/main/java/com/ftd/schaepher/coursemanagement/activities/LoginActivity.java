@@ -14,16 +14,16 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
-import com.ftd.schaepher.coursemanagement.tools.ServerTools;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-import com.rey.material.widget.ProgressView;
 
-import org.apache.http.Header;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by sxq on 2015/10/28.
@@ -67,10 +67,7 @@ public class LoginActivity extends AppCompatActivity
         btnLogin.setOnClickListener(this);
 
         autoSetUserName();
-        initDatabaseData();
-
-        ServerTools serverTools = new ServerTools(this);
-        serverTools.postTableToServer(TableUserTeacher.class, ConstantTools.ID_TEACHER, ServerTools.INSERT_TABLE);
+//        initDatabaseData();
     }
 
 
@@ -158,48 +155,78 @@ public class LoginActivity extends AppCompatActivity
         return false;
     }
 
-    // 处理登录逻辑
     public void login() {
-        RequestParams params = new RequestParams();
-        params.add("login-user", userName);
-        params.add("login-password", password);
-        params.add("ident", identity);
+        NetworkManager manager = new NetworkManager();
         try {
-            NetworkManager.post(NetworkManager.URL_LOGIN, params, new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                    progress.cancel();
-                    String html = new String(response);
-                    Log.w("Login收到的数据", html); // 服务器返回的文本
-                    if (html.equals("true")) {
-                        // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
 
-                        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-                        ownInformationSaveEditor.putString("userName", userName);
-                        ownInformationSaveEditor.apply();
+            String result = manager.login(userName,password,identity);
 
-                        Intent intend = new Intent();
-                        intend.setClass(LoginActivity.this, TaskListActivity.class);
-                        LoginActivity.this.finish();
-                        startActivity(intend);
-                    } else {
-                        Toast.makeText(LoginActivity.this, "账号或密码错误",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
+            if (result.equals("true")) {
+                ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
+                ownInformationSaveEditor.putString("userName", userName);
+                ownInformationSaveEditor.apply();
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers,
-                                      byte[] response, Throwable throwable) {
-                    progress.cancel();
-                    Toast.makeText(LoginActivity.this, "登录失败，请检查网络状况",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-        } catch (Exception e) {
-            Log.e(TAG, e.toString());
+                Intent intend = new Intent();
+                intend.setClass(LoginActivity.this, TaskListActivity.class);
+                LoginActivity.this.finish();
+                startActivity(intend);
+            } else if (result.equals("false")){
+                progress.cancel();
+                Toast.makeText(LoginActivity.this, "账号或密码错误",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                progress.cancel();
+                Toast.makeText(LoginActivity.this, "请求服务器失败",
+                        Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+
+//    // 处理登录逻辑
+//    public void login() {
+//        RequestParams params = new RequestParams();
+//        params.add("login-user", userName);
+//        params.add("login-password", password);
+//        params.add("ident", identity);
+//        try {
+//            NetworkManager.post(NetworkManager.URL_LOGIN, params, new AsyncHttpResponseHandler() {
+//                @Override
+//                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+//                    progress.cancel();
+//                    String html = new String(response);
+//                    Log.w("Login收到的数据", html); // 服务器返回的文本
+//                    if (html.equals("true")) {
+//                        // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
+//
+//                        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
+//                        ownInformationSaveEditor.putString("userName", userName);
+//                        ownInformationSaveEditor.apply();
+//
+//                        Intent intend = new Intent();
+//                        intend.setClass(LoginActivity.this, TaskListActivity.class);
+//                        LoginActivity.this.finish();
+//                        startActivity(intend);
+//                    } else {
+//                        Toast.makeText(LoginActivity.this, "账号或密码错误",
+//                                Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(int statusCode, Header[] headers,
+//                                      byte[] response, Throwable throwable) {
+//                    progress.cancel();
+//                    Toast.makeText(LoginActivity.this, "登录失败，请检查网络状况",
+//                            Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        } catch (Exception e) {
+//            Log.e(TAG, e.toString());
+//        }
+//    }
 
     public void loginOffLine() {
         ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
