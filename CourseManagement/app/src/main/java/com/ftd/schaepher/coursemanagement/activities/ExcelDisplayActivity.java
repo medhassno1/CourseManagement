@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     private List<TableCourseMultiline> excelListData;
     private CourseDBHelper dbHelper;
+    private SQLiteDatabase db;
     private String tableName;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +46,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("计算机专业.xls");
 
         tableName = getIntent().getStringExtra("tableName");
+        actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
+
+        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_NAME, "");
+
     }
 
     @Override
@@ -54,7 +60,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         try {
             initExcelData();
             initExcelListView();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -67,9 +73,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         excelListData.add(excelHeader);
 
         //根据表名查找数据库对应表数据
-        dbHelper = new CourseDBHelper();
-        dbHelper.createDataBase(this);
-        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        dbHelper = new CourseDBHelper(this);
+        db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
         db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
         db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
 
@@ -112,12 +117,24 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         EditText edtTxDialogNote =
                                 (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
 
-                        TableCourseMultiline courseModify = new TableCourseMultiline();
-                        courseModify.setCourseName(excelListData.get(position).getCourseName());
-                        courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
-                        courseModify.setRemark(edtTxDialogNote.getText().toString());
-                        courseModify.setTeacherName("张三");
-                        dbHelper.update(courseModify);
+                        try {
+                            db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+                            db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+                            db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+
+                            TableCourseMultiline courseModify = new TableCourseMultiline();
+                            courseModify.setCourseName(excelListData.get(position).getCourseName());
+                            courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
+                            courseModify.setRemark(edtTxDialogNote.getText().toString());
+                            courseModify.setTeacherName(userName);
+                            dbHelper.update(courseModify);
+
+                            db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
+                            db.close();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         onResume();
                     }
                 })
@@ -131,7 +148,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     // 设置弹窗的数据
     private void initAlertDialogData(int position, View v) {
-        position = position - 1;
+        position = position;
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
