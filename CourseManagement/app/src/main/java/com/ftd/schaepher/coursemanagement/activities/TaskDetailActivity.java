@@ -97,12 +97,12 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTeacherDeadline.setText(task.getTeacherDeadline());
         tvTaskRemark.setText(task.getRemark());
         tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
-        tvTaskName.setText(TaskListActivity.transferTableNameToEnglish(task.getRelativeTable()));
+        tvTaskName.setText(TaskListActivity.transferTableNameToChinese(task.getRelativeTable()));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, null);
         getMenuInflater().inflate(R.menu.task_detail_activity_actions, menu);
         if (identity.equals(ConstantTools.ID_TEACHER)) {
             menu.removeItem(R.id.action_export_file);

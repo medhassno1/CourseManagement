@@ -2,6 +2,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -54,10 +55,11 @@ public class TaskListActivity extends AppCompatActivity
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
+    private SharedPreferences.Editor ownInformationSaveEditor;
 
 
     // 任务名映射
-    public static String transferTableNameToEnglish(String string) {
+    public static String transferTableNameToChinese(String string) {
         StringBuffer strTaskName = new StringBuffer();
         Pattern pattern = Pattern.compile("[a-zA-Z_]*");
         Matcher matcher = pattern.matcher(string);
@@ -118,7 +120,7 @@ public class TaskListActivity extends AppCompatActivity
 
     // 左侧菜单的初始设置
     private void setNavViewConfig() {
-        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, null);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -142,31 +144,32 @@ public class TaskListActivity extends AppCompatActivity
 
     private void initUserInformation() {
         CourseDBHelper dbHelper = new CourseDBHelper(TaskListActivity.this);
-        String ownName;
-        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
-        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
+        String ownName = "";
+        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
         switch (identity) {
             case ConstantTools.ID_TEACHER:
                 TableUserTeacher teacher =
                         (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
                 ownName = teacher == null ? "" : teacher.getName();
-                tvOwnName.setText(ownName);
                 break;
             case  ConstantTools.ID_TEACHING_OFFICE:
                 TableUserTeachingOffice office =
                         (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
                 ownName = office == null ? "" : office.getName();
-                tvOwnName.setText(ownName);
                 break;
             case  ConstantTools.ID_DEPARTMENT_HEAD:
                 TableUserDepartmentHead departmentHead =
                         (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
                 ownName = departmentHead == null ? "" : departmentHead.getName();
-                tvOwnName.setText(ownName);
                 break;
             default:
                 break;
         }
+        tvOwnName.setText(ownName);
+        ownInformationSaveEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
+        ownInformationSaveEditor.putString(ConstantTools.USER_NAME, ownName);
+        ownInformationSaveEditor.apply();
     }
 
     @Override
@@ -237,7 +240,7 @@ public class TaskListActivity extends AppCompatActivity
     // 添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, null);
         getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
         if (identity.equals(ConstantTools.ID_TEACHER)) {
             menu.removeItem(R.id.action_add_task);
@@ -306,7 +309,7 @@ public class TaskListActivity extends AppCompatActivity
             }
 
             viewHolder.taskState.setText(taskStateMap(task.getTaskState()));
-            viewHolder.taskName.setText(transferTableNameToEnglish(task.getRelativeTable()));
+            viewHolder.taskName.setText(transferTableNameToChinese(task.getRelativeTable()));
             return view;
         }
 

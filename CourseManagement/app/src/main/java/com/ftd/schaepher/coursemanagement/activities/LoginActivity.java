@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
-        ownInformationSaveEditor = getSharedPreferences("userInformation", MODE_PRIVATE).edit();
+        ownInformationSaveEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的用户名
      */
     private void autoSetUserName() {
-        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
+        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
         if (!userName.equals("")) {
             edtTxUserName.setText(userName);
         }
@@ -131,6 +131,7 @@ public class LoginActivity extends AppCompatActivity
                     progress.setCancelable(true);
                     progress.show();
                     login();
+//                    loginOffLine();
                 }
                 break;
 
@@ -174,8 +175,8 @@ public class LoginActivity extends AppCompatActivity
                     if (html.equals("true")) {
                         // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
 
-                        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-                        ownInformationSaveEditor.putString("userName", userName);
+                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
+                        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
                         ownInformationSaveEditor.apply();
 
                         Intent intend = new Intent();
@@ -202,8 +203,8 @@ public class LoginActivity extends AppCompatActivity
     }
 
     public void loginOffLine() {
-        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-        ownInformationSaveEditor.putString("userName", userName);
+        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
+        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
         ownInformationSaveEditor.apply();
 
         Intent intend = new Intent();
