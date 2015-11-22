@@ -161,15 +161,13 @@ public class LoginActivity extends AppCompatActivity
         try {
 
             String result = manager.login(userName,password,identity);
-                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-                        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
-                        ownInformationSaveEditor.apply();
+
 
             if (result.equals("true")) {
-                ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-                ownInformationSaveEditor.putString("userName", userName);
+                ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
+                ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
                 ownInformationSaveEditor.apply();
-
+                
                 Intent intend = new Intent();
                 intend.setClass(LoginActivity.this, TaskListActivity.class);
                 LoginActivity.this.finish();
