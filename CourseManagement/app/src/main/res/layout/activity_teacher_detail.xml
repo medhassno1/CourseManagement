@@ -53,7 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="工号"
-                    android:text="00000"
+                    android:inputType="number"
                     android:enabled="false"/>
             </android.support.design.widget.TextInputLayout>
 
@@ -67,7 +67,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="密码"
-                    android:text="00000"
                    />
             </android.support.design.widget.TextInputLayout>
 
@@ -81,7 +80,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="姓名"
-                    android:text="张三"
                     />
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
@@ -114,7 +112,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="所属系别"
-                android:text="计算机系"
                 />
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
@@ -127,7 +124,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="所负责专业"
-                android:text="计算机实验班\n计算机类"
                 />
         </android.support.design.widget.TextInputLayout>
     </LinearLayout>

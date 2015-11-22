@@ -10,12 +10,12 @@ import net.tsz.afinal.annotation.sqlite.Table;
 @Table(name = "TableCourseMultiline")
 public class TableCourseMultiline {
     @Id
+    private String courseName;
     private String insertTime;
     private String workNumber;
     private String grade;
     private String major;
     private String people;
-    private String courseName;
     private String courseType;
     private String courseCredit;
     private String courseHour;

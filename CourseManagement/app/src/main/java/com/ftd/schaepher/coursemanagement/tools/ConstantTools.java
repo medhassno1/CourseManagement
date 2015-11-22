@@ -11,4 +11,8 @@ public class ConstantTools {
     public static final String TABLE_USER_TEACHER = "user_teacher";
     public static final String TABLE_TEACHER_OFFICE = "user_teaching_office";
     public static final String TABLE_DEPARTMENT_HEAD = "user_department_head";
+    public static final String USER_IDENTITY = "identity";
+    public static final String USER_NAME = "userName";
+    public static final String USER_ACCOUNT = "account";
+    public static final String USER_INFORMATION = "userInformation";
 }

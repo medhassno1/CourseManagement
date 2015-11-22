@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity
         layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
-        ownInformationSaveEditor = getSharedPreferences("userInformation", MODE_PRIVATE).edit();
+        ownInformationSaveEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
 
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的用户名
      */
     private void autoSetUserName() {
-        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
+        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
         if (!userName.equals("")) {
             edtTxUserName.setText(userName);
         }
@@ -128,6 +128,7 @@ public class LoginActivity extends AppCompatActivity
                     progress.setCancelable(true);
                     progress.show();
                     login();
+//                    loginOffLine();
                 }
                 break;
 
@@ -160,6 +161,9 @@ public class LoginActivity extends AppCompatActivity
         try {
 
             String result = manager.login(userName,password,identity);
+                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
+                        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
+                        ownInformationSaveEditor.apply();
 
             if (result.equals("true")) {
                 ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
@@ -184,53 +188,9 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-
-//    // 处理登录逻辑
-//    public void login() {
-//        RequestParams params = new RequestParams();
-//        params.add("login-user", userName);
-//        params.add("login-password", password);
-//        params.add("ident", identity);
-//        try {
-//            NetworkManager.post(NetworkManager.URL_LOGIN, params, new AsyncHttpResponseHandler() {
-//                @Override
-//                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-//                    progress.cancel();
-//                    String html = new String(response);
-//                    Log.w("Login收到的数据", html); // 服务器返回的文本
-//                    if (html.equals("true")) {
-//                        // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
-//
-//                        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-//                        ownInformationSaveEditor.putString("userName", userName);
-//                        ownInformationSaveEditor.apply();
-//
-//                        Intent intend = new Intent();
-//                        intend.setClass(LoginActivity.this, TaskListActivity.class);
-//                        LoginActivity.this.finish();
-//                        startActivity(intend);
-//                    } else {
-//                        Toast.makeText(LoginActivity.this, "账号或密码错误",
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(int statusCode, Header[] headers,
-//                                      byte[] response, Throwable throwable) {
-//                    progress.cancel();
-//                    Toast.makeText(LoginActivity.this, "登录失败，请检查网络状况",
-//                            Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        } catch (Exception e) {
-//            Log.e(TAG, e.toString());
-//        }
-//    }
-
     public void loginOffLine() {
-        ownInformationSaveEditor.putString("identity", identity);//保存用户名、身份
-        ownInformationSaveEditor.putString("userName", userName);
+        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
+        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
         ownInformationSaveEditor.apply();
 
         Intent intend = new Intent();
