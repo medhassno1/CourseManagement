@@ -32,7 +32,7 @@ public class CourseDBHelper {
             + "courseName text, "
             + "courseType text, "
             + "courseCredit text, "
-            + "courseHours text, "
+            + "courseHour text, "
             + "practiceHour text, "
             + "onMachineHour text, "
             + "timePeriod text,"

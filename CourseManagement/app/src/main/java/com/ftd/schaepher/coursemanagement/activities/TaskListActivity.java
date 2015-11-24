@@ -91,7 +91,9 @@ public class TaskListActivity extends AppCompatActivity
 
     // 任务状态映射
     public static String taskStateMap(String string) {
-        if (string == null) { return null; }
+        if (string == null) {
+            return null;
+        }
         switch (string) {
             case "0":
                 return "进行中";
@@ -153,12 +155,12 @@ public class TaskListActivity extends AppCompatActivity
                         (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
                 ownName = teacher == null ? "" : teacher.getName();
                 break;
-            case  ConstantTools.ID_TEACHING_OFFICE:
+            case ConstantTools.ID_TEACHING_OFFICE:
                 TableUserTeachingOffice office =
                         (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
                 ownName = office == null ? "" : office.getName();
                 break;
-            case  ConstantTools.ID_DEPARTMENT_HEAD:
+            case ConstantTools.ID_DEPARTMENT_HEAD:
                 TableUserDepartmentHead departmentHead =
                         (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
                 ownName = departmentHead == null ? "" : departmentHead.getName();
@@ -229,7 +231,7 @@ public class TaskListActivity extends AppCompatActivity
                         msg.what = CLOSE_NAV;
                         mHandler.sendMessage(msg);
                     }
-                },200);
+                }, 200);
                 break;
             default:
                 break;
@@ -242,7 +244,7 @@ public class TaskListActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, null);
         getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
-        if (identity.equals(ConstantTools.ID_TEACHER)) {
+        if (!identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
             menu.removeItem(R.id.action_add_task);
         }
         return true;
@@ -319,10 +321,10 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case CLOSE_NAV:
                     onBackPressed();
                     break;
