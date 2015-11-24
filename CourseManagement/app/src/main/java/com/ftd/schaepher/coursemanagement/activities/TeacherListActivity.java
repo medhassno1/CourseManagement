@@ -66,6 +66,7 @@ public class TeacherListActivity extends AppCompatActivity
     private Handler myHandler = new Handler();
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeacher> list;
+    private String identity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,9 @@ public class TeacherListActivity extends AppCompatActivity
         mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
+
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantTools.USER_IDENTITY, null);
 
         // 侧滑菜单
         setNavViewConfig();
@@ -147,10 +151,12 @@ public class TeacherListActivity extends AppCompatActivity
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
-        MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
-        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
-        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
+        if (identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
+            getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
+            MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
+            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
+            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
+        }
         return true;
     }
 
