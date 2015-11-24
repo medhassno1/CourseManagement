@@ -16,6 +16,7 @@ if (!$con){
 	
 	switch($action){
 		case "updateCbTable":
+            updateCbTable($con,$tableName,$jsonArry);
 			break;
 		case "updateTaskTable":
 			break;
@@ -49,14 +50,9 @@ function updateCbTable($con,$tableName,$jsonArry) {
         $updateTeacher = $result['teacherName'] . $row['teacherName'] . ';';
         $updateTimePeriod = $result['timePeriod'] . $row['timePeriod'] . ';';
         $updateRemark = $result['remark'] . $row['remark'] . ';';
-        $sql = "UPDATE $tableName SET timePeriod='$updateTimePeriod' WHERE courseName = '$row[courseName]'";
+        $sql = "UPDATE $tableName SET timePeriod='$updateTimePeriod',teacherName ='$updateTeacher',remark='$updateRemark' WHERE courseName = '$row[courseName]'";
         mysqli_query($con, $sql);
 
-        $sql = "UPDATE $tableName SET teacherName ='$updateTeacher' WHERE courseName = '$row[courseName]'";
-        mysqli_query($con, $sql);
-
-        $sql = "UPDATE $tableName SET remark='$updateRemark' WHERE courseName = '$row[courseName]'";
-        mysqli_query($con, $sql);
     }
 }
 
@@ -83,12 +79,11 @@ function insertTable($con,$tableName,$jsonArry) {
     $keys = array_keys($jsonArry[0]);
     $tableList= '(' . implode($keys, ',') . ')';
 
-    $statement = "INSERT INTO $tableName $tableList VALUES ";
-    $statement_row=$statement;
+
     foreach ($jsonArry as $row) {
-        $statement_row .=' ("' . implode($row, '","') . '")';
-        $sql = mysqli_query($con,$statement_row);
-        $statement_row=$statement;
+        $statement ="INSERT INTO $tableName $tableList VALUES ".' ("' . implode($row, '","') . '")';
+        $sql = mysqli_query($con,$statement);
+
     }
 
 
