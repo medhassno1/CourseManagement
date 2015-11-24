@@ -84,14 +84,15 @@ function insertTable($con,$tableName,$jsonArry) {
     $tableList= '(' . implode($keys, ',') . ')';
 
     $statement = "INSERT INTO $tableName $tableList VALUES ";
+    $statement_row=$statement;
     foreach ($jsonArry as $row) {
-        $statement .=' ("' . implode($row, '","') . '"),';
+        $statement_row .=' ("' . implode($row, '","') . '")';
+        $sql = mysqli_query($con,$statement_row);
+        $statement_row=$statement;
     }
-	// 去掉最后的“,”，并添加“;”
-	$statement = rtrim($statement, ",");
-	$statement .= ";";
-	echo $statement;
-    $sql = mysqli_query($con,$statement);
+
+
+
 }
 
 
