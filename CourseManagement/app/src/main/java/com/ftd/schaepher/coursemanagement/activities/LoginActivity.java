@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,12 +18,14 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -33,6 +37,8 @@ public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, View.OnFocusChangeListener {
 
     private static final String TAG = "LoginActivity";
+    private static final int RESULT_OTHER = 1;
+    private static final int RESULT_FALSE = 0;
 
     private Button btnLogin;
     private EditText edtTxUserName;
@@ -127,6 +133,7 @@ public class LoginActivity extends AppCompatActivity
                     progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progress.setCancelable(true);
                     progress.show();
+
                     login();
 //                    loginOffLine();
                 }
@@ -157,33 +164,38 @@ public class LoginActivity extends AppCompatActivity
     }
 
     public void login() {
-        NetworkManager manager = new NetworkManager();
-        try {
+        final NetworkManager manager = new NetworkManager();
 
-            String result = manager.login(userName,password,identity);
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Log.d(TAG,"RUN");
+                    String result = manager.login(userName, password, identity);
+                    Log.d(TAG,result);
+                    if (result.equals("true")) {
+                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
+                        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
+                        ownInformationSaveEditor.apply();
 
-
-            if (result.equals("true")) {
-                ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-                ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
-                ownInformationSaveEditor.apply();
-                
-                Intent intend = new Intent();
-                intend.setClass(LoginActivity.this, TaskListActivity.class);
-                LoginActivity.this.finish();
-                startActivity(intend);
-            } else if (result.equals("false")){
-                progress.cancel();
-                Toast.makeText(LoginActivity.this, "账号或密码错误",
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                progress.cancel();
-                Toast.makeText(LoginActivity.this, "请求服务器失败",
-                        Toast.LENGTH_SHORT).show();
+                        Intent intend = new Intent();
+                        intend.setClass(LoginActivity.this, TaskListActivity.class);
+                        LoginActivity.this.finish();
+                        startActivity(intend);
+                    } else if (result.equals("false")) {
+                        Message msg = new Message();
+                        msg.what = RESULT_FALSE;
+                        mHandler.sendMessage(msg);
+                    } else {
+                        Message msg = new Message();
+                        msg.what = RESULT_OTHER;
+                        mHandler.sendMessage(msg);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }.start();
     }
 
     public void loginOffLine() {
@@ -208,4 +220,27 @@ public class LoginActivity extends AppCompatActivity
             layoutPassWord.setError(null);
         }
     }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case RESULT_OTHER:
+                    progress.cancel();
+                    Toast.makeText(LoginActivity.this, "请求服务器失败",
+                            Toast.LENGTH_SHORT).show();
+                    break;
+                case RESULT_FALSE:
+                    progress.cancel();
+                    Toast.makeText(LoginActivity.this, "账号或密码错误",
+                            Toast.LENGTH_SHORT).show();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
+
 }

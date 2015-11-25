@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
@@ -87,6 +88,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
                         edtTxTeacherName.setText(departmentHead.getName());
                         edtTxPhoneNumber.setText(departmentHead.getTelephone());
                         edtTxDepartment.setText(departmentHead.getDepartment());
+                        edtTxMajor.setVisibility(View.VISIBLE);
+                        edtTxMajor.setText(departmentHead.getManagedMajor());
                     }
                     break;
 
@@ -98,6 +101,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                         edtTxPassword.setText(office.getPassword());
                         edtTxTeacherName.setText(office.getName());
                         edtTxPhoneNumber.setText(office.getTelephone());
+                        edtTxDepartment.setVisibility(View.GONE);
                     }
                     break;
 
@@ -119,8 +123,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
     private void initUserPermission() {
         if (!identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
-            edtTxMajor.setEnabled(false);
             edtTxDepartment.setEnabled(false);
+            edtTxMajor.setEnabled(false);
+            edtTxTeacherNumber.setEnabled(false);
         }
     }
 
