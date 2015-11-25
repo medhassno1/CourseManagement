@@ -17,7 +17,7 @@ public class TableCourseCombine {
     private String courseName;
     private String courseType;
     private String courseCredit;
-    private String courseHours;
+    private String courseHour;
     private String practiceHour;
     private String onMachineHour;
     private String timePeriod;
@@ -27,14 +27,14 @@ public class TableCourseCombine {
     public TableCourseCombine() {
     }
 
-    public TableCourseCombine( String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHours, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
+    public TableCourseCombine(String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHour, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
         this.grade = grade;
         this.major = major;
         this.people = people;
         this.courseName = courseName;
         this.courseType = courseType;
         this.courseCredit = courseCredit;
-        this.courseHours = courseHours;
+        this.courseHour = courseHour;
         this.practiceHour = practiceHour;
         this.onMachineHour = onMachineHour;
         this.timePeriod = timePeriod;
@@ -98,12 +98,12 @@ public class TableCourseCombine {
         this.courseCredit = courseCredit;
     }
 
-    public String getCourseHours() {
-        return courseHours;
+    public String getCourseHour() {
+        return courseHour;
     }
 
-    public void setCourseHours(String courseHours) {
-        this.courseHours = courseHours;
+    public void setCourseHour(String courseHour) {
+        this.courseHour = courseHour;
     }
 
     public String getPracticeHour() {
@@ -149,14 +149,14 @@ public class TableCourseCombine {
     @Override
     public String toString() {
         return "TableCourseCombine{" +
-                "insertTime='" + insertTime + '\'' +
+                "courseCredit='" + courseCredit + '\'' +
+                ", insertTime='" + insertTime + '\'' +
                 ", grade='" + grade + '\'' +
                 ", major='" + major + '\'' +
                 ", people='" + people + '\'' +
                 ", courseName='" + courseName + '\'' +
                 ", courseType='" + courseType + '\'' +
-                ", courseCredit='" + courseCredit + '\'' +
-                ", courseHours='" + courseHours + '\'' +
+                ", courseHour='" + courseHour + '\'' +
                 ", practiceHour='" + practiceHour + '\'' +
                 ", onMachineHour='" + onMachineHour + '\'' +
                 ", timePeriod='" + timePeriod + '\'' +

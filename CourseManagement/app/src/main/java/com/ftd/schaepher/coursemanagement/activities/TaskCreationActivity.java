@@ -3,16 +3,19 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,9 +30,12 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+import com.ftd.schaepher.coursemanagement.widget.WheelView;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -48,13 +54,19 @@ public class TaskCreationActivity extends AppCompatActivity
     private ImageView imgvFileImg;
     private TextView tvFileName;
     private Button btnImportFile;
+    private ProgressDialog progress;
     private CourseDBHelper dbHelper;
     private String filePath;
     private String fileName;
     private String tableCourseName;
+    private String year;
+    private String semester;
+
     private static final int RELEASE = 1;
     private static final int RELEASE_FAILURE = 2;
-    private ProgressDialog progress;
+    private static final String[] SEMESTER = new String[]{"01", "02", "03", "04"};
+
+    private List<String> termYear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +77,6 @@ public class TaskCreationActivity extends AppCompatActivity
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("发布报课任务");
-
         initWidgetAndListener();
 
         dbHelper = new CourseDBHelper(TaskCreationActivity.this);
@@ -85,14 +96,17 @@ public class TaskCreationActivity extends AppCompatActivity
         edtTxTeacherDeadline.setOnFocusChangeListener(this);
         edtTxDepartmentDeadline.setOnFocusChangeListener(this);
         edtTxTaskName.setOnFocusChangeListener(this);
+        edtTxTaskTeam.setOnFocusChangeListener(this);
 
         edtTxTaskName.setOnClickListener(this);
         btnImportFile.setOnClickListener(this);
         edtTxDepartmentDeadline.setOnClickListener(this);
         edtTxTeacherDeadline.setOnClickListener(this);
+        edtTxTaskTeam.setOnClickListener(this);
         edtTxDepartmentDeadline.setInputType(InputType.TYPE_NULL);
         edtTxTeacherDeadline.setInputType(InputType.TYPE_NULL);
         edtTxTaskName.setInputType(InputType.TYPE_NULL);
+        edtTxTaskTeam.setInputType(InputType.TYPE_NULL);
     }
 
     @Override
@@ -178,37 +192,21 @@ public class TaskCreationActivity extends AppCompatActivity
     // 获取即将发布的任务的信息,未完成
     private TableTaskInfo getNewTaskInformation() {
         TableTaskInfo newTask = new TableTaskInfo();
-        newTask.setYear("2015");
-        newTask.setSemester("02");
+        newTask.setYear(year);
+        newTask.setSemester(semester);
         newTask.setTaskState("0");
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
         newTask.setRemark(edtTxTaskRemark.getText().toString());
-        newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + "201502");
+        newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + year + semester);
         return newTask;
     }
 
     // 控件的焦点监听事件
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        switch (v.getId()) {
-            case R.id.edtTx_add_task_department_deadline:
-                if (hasFocus) {
-                    onClick(v);
-                }
-                break;
-            case R.id.edtTx_add_task_teacher_deadline:
-                if (hasFocus) {
-                    onClick(v);
-                }
-                break;
-            case R.id.edtTx_add_task_name: {
-                if (hasFocus) {
-                    onClick(v);
-                }
-            }
-            default:
-                break;
+        if (hasFocus) {
+            onClick(v);
         }
     }
 
@@ -221,6 +219,10 @@ public class TaskCreationActivity extends AppCompatActivity
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         switch (v.getId()) {
+            case R.id.edtTx_add_task_team:
+                selectTerm();
+                break;
+
             case R.id.edtTx_add_task_department_deadline:
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -270,6 +272,49 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 
+    private void selectTerm() {
+        //计算年份，给出近十年可供选择
+        Calendar mCalendar = Calendar.getInstance();
+        mCalendar.setTimeInMillis(System.currentTimeMillis());
+        int yearCur = mCalendar.get(Calendar.YEAR);
+//        Log.d("TaskCreationActivity", yearCur);
+        if (termYear == null) {
+            termYear = new ArrayList<String>();
+            for (int i = yearCur - 5; i < yearCur + 5; i++) {
+                termYear.add(String.valueOf(i));
+            }
+        }
+        View wheelView = LayoutInflater.from(this).inflate(R.layout.dialog_wheel_view, null);
+        final WheelView wvSelectTermYear = (WheelView) wheelView.findViewById(R.id.wheel_view_term_year);
+        final WheelView wvSelectTermDay = (WheelView) wheelView.findViewById(R.id.wheel_view_term_day);
+        wvSelectTermYear.setOffset(1);
+        wvSelectTermYear.setItems(termYear);
+        wvSelectTermYear.setSeletion(5);
+        wvSelectTermDay.setOffset(1);
+        wvSelectTermDay.setItems(Arrays.asList(SEMESTER));
+        wvSelectTermDay.setSeletion(0);
+
+        new AlertDialog.Builder(this)
+                .setTitle("选择学期")
+                .setView(wheelView)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        year = wvSelectTermYear.getSeletedItem();
+                        semester = wvSelectTermDay.getSeletedItem();
+                        edtTxTaskTeam.setText(year+semester);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+    }
+
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -297,7 +342,7 @@ public class TaskCreationActivity extends AppCompatActivity
                     break;
 
                 case RELEASE_FAILURE:
-                    Toast.makeText(TaskCreationActivity.this,"发布错误，请重新发布",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TaskCreationActivity.this, "发布错误，请重新发布", Toast.LENGTH_SHORT).show();
                     break;
 
                 default:

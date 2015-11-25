@@ -29,9 +29,8 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
+import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,10 +64,9 @@ public class TeacherListActivity extends AppCompatActivity
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private Handler myHandler = new Handler();
-    private String userName;
-    private String identity;
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeacher> list;
+    private String identity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +75,9 @@ public class TeacherListActivity extends AppCompatActivity
         mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
+
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantTools.USER_IDENTITY, null);
 
         // 侧滑菜单
         setNavViewConfig();
@@ -143,41 +144,19 @@ public class TeacherListActivity extends AppCompatActivity
     }
 
     private void initUserInformation() {
-        String ownName;
-        CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
-        userName = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
-        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
-        switch (identity) {
-            case "teacher":
-                TableUserTeacher teacher =
-                        (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
-                ownName = teacher == null ? "" : teacher.getName();
-                tvOwnName.setText(ownName);
-                break;
-            case "teachingOffice":
-                TableUserTeachingOffice office =
-                        (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
-                ownName = office == null ? "" : office.getName();
-                tvOwnName.setText(ownName);
-                break;
-            case "departmentHead":
-                TableUserDepartmentHead departmentHead =
-                        (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
-                ownName = departmentHead == null ? "" : departmentHead.getName();
-                tvOwnName.setText(ownName);
-                break;
-            default:
-                break;
-        }
+        String ownName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_NAME, "");
+        tvOwnName.setText(ownName);
     }
 
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
-        MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
-        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
-        addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
+        if (identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
+            getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
+            MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
+            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
+            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
+        }
         return true;
     }
 
@@ -222,7 +201,7 @@ public class TeacherListActivity extends AppCompatActivity
         Intent intend = new Intent();
         intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
         intend.putExtra("teacherID", list.get(position).getWorkNumber());
-        intend.putExtra("isQueryOwnInfomation",false);
+        intend.putExtra("isQueryOwnInfomation", false);
         startActivity(intend);
 
         Log.i("str", position + "    " + id);
@@ -238,7 +217,7 @@ public class TeacherListActivity extends AppCompatActivity
                 break;
             case R.id.add_teacher_from_file:
                 Intent intent = new Intent(TeacherListActivity.this, FileSelectActivity.class);
-                intent.putExtra("isRequireImportTeacherFile",true);
+                intent.putExtra("isRequireImportTeacherFile", true);
                 startActivity(intent);
                 break;
             default:
@@ -315,10 +294,10 @@ public class TeacherListActivity extends AppCompatActivity
         }
     }
 
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case CLOSE_NAV:
                     onBackPressed();
                     break;

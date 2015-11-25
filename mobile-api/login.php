@@ -6,19 +6,20 @@ $workNumber = $_POST["login-user"];
 $password = $_POST["login-password"];
 $tableName = $_POST["ident"];
 
-$con = mysql_connect("localhost","root","");
+$con = mysqli_connect("localhost", "root", "", "teacher_class_system");
 if (!$con) {
-  	die('Could not connect: ' . mysql_error());
+    die('Could not connect: ' . mysql_error());
 } else {
-		
-  	mysql_select_db("teacher_class_system", $con);
-	
-	$result = mysql_query("SELECT * FROM $tableName where workNumber = $workNumber and password = $password");
-	if(mysql_num_rows($result) < 1){
-		echo "false";
-	} else {
-		echo "true";
-	}
+    mysqli_query($con, "SET NAMES utf8");
+
+    $result = mysqli_query($con, "SELECT * FROM $tableName where workNumber = $workNumber and password = $password");
+    if (mysqli_num_rows($result) < 1) {
+        echo "false";
+    } else {
+        $result_arr = mysqli_fetch_assoc($result);
+        echo json_encode($result_arr, JSON_UNESCAPED_UNICODE);
+
+    }
 }
 
 ?>

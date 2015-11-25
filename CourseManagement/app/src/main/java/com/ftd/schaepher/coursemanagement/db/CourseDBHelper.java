@@ -32,7 +32,7 @@ public class CourseDBHelper {
             + "courseName text, "
             + "courseType text, "
             + "courseCredit text, "
-            + "courseHours text, "
+            + "courseHour text, "
             + "practiceHour text, "
             + "onMachineHour text, "
             + "timePeriod text,"
@@ -71,7 +71,13 @@ public class CourseDBHelper {
 
     // 插入数据
     public void insert(Object entity) {
-            db.save(entity);
+        db.save(entity);
+    }
+
+    public void insertAll(List list) {
+        for (Object obj : list) {
+            db.save(obj);
+        }
     }
 
     // 删除数据，class为id为表的主键

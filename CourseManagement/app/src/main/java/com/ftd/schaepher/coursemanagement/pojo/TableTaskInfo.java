@@ -10,7 +10,7 @@ import net.tsz.afinal.annotation.sqlite.Table;
 @Table(name = "TableTaskInfo")
 public class TableTaskInfo {
     @Id
-    private int id;
+    private transient int id;
     private String relativeTable;
     private String year;
     private String semester;

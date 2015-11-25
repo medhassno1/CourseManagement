@@ -53,6 +53,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_detail_major);
 
         initTeacherData();
+        initUserPermission();
     }
 
     /**
@@ -61,10 +62,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private void initTeacherData() {
         Intent intent = getIntent();
         CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
         if (intent.getBooleanExtra("isQueryOwnInfomation", true)) {
-            workNumber = getSharedPreferences("userInformation", MODE_PRIVATE).getString("userName", "");
-            identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", "");
-
+            workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
             switch (identity) {
                 case ConstantTools.ID_TEACHER:
                     TableUserTeacher teacher = (TableUserTeacher)
@@ -114,6 +114,13 @@ public class TeacherDetailActivity extends AppCompatActivity {
             edtTxTeacherName.setText(ownInformation.getName());
             edtTxPhoneNumber.setText(ownInformation.getTelephone());
             edtTxDepartment.setText(ownInformation.getDepartment());
+        }
+    }
+
+    private void initUserPermission() {
+        if (!identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
+            edtTxMajor.setEnabled(false);
+            edtTxDepartment.setEnabled(false);
         }
     }
 

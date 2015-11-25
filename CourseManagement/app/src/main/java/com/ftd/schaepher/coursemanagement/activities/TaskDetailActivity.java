@@ -34,8 +34,11 @@ import java.util.List;
 
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.format.Alignment;
+import jxl.format.CellFormat;
 import jxl.read.biff.BiffException;
 import jxl.write.Label;
+import jxl.write.WritableCellFormat;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
@@ -97,12 +100,12 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTeacherDeadline.setText(task.getTeacherDeadline());
         tvTaskRemark.setText(task.getRemark());
         tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
-        tvTaskName.setText(TaskListActivity.transferTableNameToEnglish(task.getRelativeTable()));
+        tvTaskName.setText(TaskListActivity.transferTableNameToChinese(task.getRelativeTable()));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        identity = getSharedPreferences("userInformation", MODE_PRIVATE).getString("identity", null);
+        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, null);
         getMenuInflater().inflate(R.menu.task_detail_activity_actions, menu);
         if (identity.equals(ConstantTools.ID_TEACHER)) {
             menu.removeItem(R.id.action_export_file);
@@ -186,37 +189,48 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Workbook book = Workbook.getWorkbook(file);
         Sheet sheet = book.getSheet(0);
         // 获取行
-        int length = sheet.getRows();
-        System.out.println(length);
+        int row = sheet.getRows();
+        System.out.println(row);
         int column;
         WritableWorkbook wbook = Workbook.createWorkbook(file, book); // 根据book创建一个操作对象
         WritableSheet sh = wbook.getSheet(0);// 得到一个工作对象
+
+        CellFormat cellFormat;
+        if(!sh.getCell(0,1).getContents().equals("")){
+            cellFormat = sh.getCell(0,1).getCellFormat();
+        }else{
+            cellFormat = sh.getCell(0,2).getCellFormat();
+        }
+        WritableCellFormat cellFormatLeft = new WritableCellFormat(cellFormat);//相同格式，左对齐
+        cellFormatLeft.setAlignment(Alignment.LEFT);
+        WritableCellFormat cellFormatCenter = new WritableCellFormat(cellFormat);//相同格式，居中
+        cellFormatCenter.setAlignment(Alignment.CENTRE);
         // 从最后一行开始加
-        for (int i = 0; i < list.size(); i++, length++) {
+        for (int i = 0; i < list.size(); i++, row++) {
             column = 0;
-            Label label = new Label(column++, length, list.get(i).getGrade());
+            Label label = new Label(column++, row, list.get(i).getGrade(),cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getMajor());
+            label = new Label(column++, row, list.get(i).getMajor(),cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getPeople());
+            label = new Label(column++, row, list.get(i).getPeople(),cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseName());
+            label = new Label(column++, row, list.get(i).getCourseName(),cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseType());
+            label = new Label(column++, row, list.get(i).getCourseType(),cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseCredit());
+            label = new Label(column++, row, list.get(i).getCourseCredit(),cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseHours());
+            label = new Label(column++, row, list.get(i).getCourseHour(),cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getPracticeHour());
+            label = new Label(column++, row, list.get(i).getPracticeHour(),cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getOnMachineHour());
+            label = new Label(column++, row, list.get(i).getOnMachineHour(),cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getTimePeriod());
+            label = new Label(column++, row, list.get(i).getTimePeriod(),cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getTeacherName());
+            label = new Label(column++, row, list.get(i).getTeacherName(),cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getRemark());
+            label = new Label(column++, row, list.get(i).getRemark(),cellFormatLeft);
             sh.addCell(label);
         }
         wbook.write();

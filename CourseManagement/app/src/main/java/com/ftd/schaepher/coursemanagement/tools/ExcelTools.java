@@ -15,13 +15,7 @@ import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
-import jxl.demo.Write;
 import jxl.read.biff.BiffException;
-import jxl.write.Label;
-import jxl.write.WritableCell;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
 
 
 /**
@@ -95,7 +89,7 @@ public class ExcelTools {
                     course.setCourseName(getCellValue(i, 4));
                     course.setCourseType(getCellValue(i, 5));
                     course.setCourseCredit(getCellValue(i, 6));
-                    course.setCourseHours(getCellValue(i, 7));
+                    course.setCourseHour(getCellValue(i, 7));
                     course.setPracticeHour(getCellValue(i, 8));
                     course.setOnMachineHour(getCellValue(i, 9));
                     course.setTimePeriod(getCellValue(i, 10));
