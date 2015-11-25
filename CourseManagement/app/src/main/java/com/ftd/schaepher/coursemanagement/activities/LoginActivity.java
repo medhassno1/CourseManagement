@@ -122,8 +122,8 @@ public class LoginActivity extends AppCompatActivity
                     progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progress.setCancelable(true);
                     progress.show();
-//                    login();
-                    loginOffLine();
+                    login();
+//                    loginOffLine();
                 }
                 break;
 

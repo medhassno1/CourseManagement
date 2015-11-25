@@ -63,6 +63,9 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private CourseDBHelper dbHelper;
     private String tableName;
     private String filePath;
+    private String excelTitle;
+    private String taskTerm;
+    private String taskName;
     private static final int EXPORT = 1;
 
     @Override
@@ -94,13 +97,14 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Log.d("TASKID", taskId);
         task = (TableTaskInfo) dbHelper.findById(taskId, TableTaskInfo.class);
         Log.d("TAG", task.toString());
-        String taskTerm = task.getYear() + task.getSemester();
+        taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
         tvTeacherDeadline.setText(task.getTeacherDeadline());
         tvTaskRemark.setText(task.getRemark());
         tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
-        tvTaskName.setText(TaskListActivity.transferTableNameToChinese(task.getRelativeTable()));
+        taskName = TaskListActivity.transferTableNameToChinese(task.getRelativeTable());
+        tvTaskName.setText(taskName);
     }
 
     @Override
@@ -160,8 +164,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
         filePath = Environment.getExternalStorageDirectory().getAbsoluteFile().toString()
                 + "/" + tvTaskName.getText().toString();
-
-
         tableName = task.getRelativeTable();
 
         SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
@@ -205,10 +207,22 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cellFormatLeft.setAlignment(Alignment.LEFT);
         WritableCellFormat cellFormatCenter = new WritableCellFormat(cellFormat);//相同格式，居中
         cellFormatCenter.setAlignment(Alignment.CENTRE);
+
+        //设置excel表格标题
+        String term = taskTerm.substring(4,6);
+        if(term.equals("01")){
+            term="上学期";
+        }else if(term.equals("02")){
+            term="下学期";
+        }
+        excelTitle = taskTerm.substring(0,4)+"学年"+term+taskName+"开课计划书";
+        Label label = new Label(0,0,excelTitle,sh.getCell(0,0).getCellFormat());
+        sh.addCell(label);
+
         // 从最后一行开始加
         for (int i = 0; i < list.size(); i++, row++) {
             column = 0;
-            Label label = new Label(column++, row, list.get(i).getGrade(),cellFormatCenter);
+            label = new Label(column++, row, list.get(i).getGrade(),cellFormatCenter);
             sh.addCell(label);
             label = new Label(column++, row, list.get(i).getMajor(),cellFormatLeft);
             sh.addCell(label);
