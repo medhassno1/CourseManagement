@@ -18,14 +18,13 @@ public class TableUserDepartmentHead {
     private String telephone;
     private String email;
     private String department;
-    private String managedMajor;
 
     public TableUserDepartmentHead() {
     }
 
     public TableUserDepartmentHead(String workNumber, String password, String name, String sex,
                                    String birthday, String telephone, String email,
-                                   String department, String managedMajor) {
+                                   String department) {
         this.workNumber = workNumber;
         this.password = password;
         this.name = name;
@@ -34,7 +33,6 @@ public class TableUserDepartmentHead {
         this.telephone = telephone;
         this.email = email;
         this.department = department;
-        this.managedMajor = managedMajor;
     }
 
     public String getWorkNumber() {
@@ -101,13 +99,6 @@ public class TableUserDepartmentHead {
         this.department = department;
     }
 
-    public String getManagedMajor() {
-        return managedMajor;
-    }
-
-    public void setManagedMajor(String managedMajor) {
-        this.managedMajor = managedMajor;
-    }
 
     @Override
     public String toString() {
@@ -120,7 +111,6 @@ public class TableUserDepartmentHead {
                 ", telephone='" + telephone + '\'' +
                 ", email='" + email + '\'' +
                 ", department='" + department + '\'' +
-                ", managedMajor='" + managedMajor + '\'' +
                 '}';
     }
 }
