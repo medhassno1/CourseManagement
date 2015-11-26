@@ -302,7 +302,7 @@ public class TaskCreationActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int which) {
                         year = wvSelectTermYear.getSeletedItem();
                         semester = wvSelectTermDay.getSeletedItem();
-                        edtTxTaskTeam.setText(year + semester);
+                        edtTxTaskTeam.setText(year+semester);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {

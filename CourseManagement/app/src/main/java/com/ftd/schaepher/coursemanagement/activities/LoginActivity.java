@@ -20,7 +20,6 @@ import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
 import java.io.IOException;
 
-
 /**
  * Created by sxq on 2015/10/28.
  * 登录界面
@@ -61,6 +60,7 @@ public class LoginActivity extends AppCompatActivity
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
+
 
         autoSetUserName();
 //        initDatabaseData();
@@ -123,8 +123,9 @@ public class LoginActivity extends AppCompatActivity
                     progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progress.setCancelable(true);
                     progress.show();
-                    //login();
-                    loginOffLine();
+
+                    login();
+//                    loginOffLine();
                 }
                 break;
 
@@ -155,7 +156,7 @@ public class LoginActivity extends AppCompatActivity
     public void login() {
         NetworkManager manager = new NetworkManager();
         try {
-            String result = manager.login(userName, password, identity);
+            String result = manager.login(userName,password,identity);
             if (result.equals("true")) {
                 ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
                 ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
@@ -165,7 +166,7 @@ public class LoginActivity extends AppCompatActivity
                 intend.setClass(LoginActivity.this, TaskListActivity.class);
                 LoginActivity.this.finish();
                 startActivity(intend);
-            } else if (result.equals("false")) {
+            } else if (result.equals("false")){
                 progress.cancel();
                 Toast.makeText(LoginActivity.this, "账号或密码错误",
                         Toast.LENGTH_SHORT).show();

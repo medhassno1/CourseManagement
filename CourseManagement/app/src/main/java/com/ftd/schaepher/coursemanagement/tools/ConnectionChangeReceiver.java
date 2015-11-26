@@ -25,7 +25,8 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
             Data.setIsFirstLoseNetConnect(false);
             Data.setIsFirstNetConnect(true);
             Log.i("netstatus", "网络不可用");
-        } else if (networkInfo.isConnected() && Data.isFirstNetConnect()) {
+        }
+        if (networkInfo != null&&networkInfo.isConnected() && Data.isFirstNetConnect()) {
             Toast.makeText(context, "网络恢复", Toast.LENGTH_SHORT).show();
             Data.setIsFirstNetConnect(false);
             Data.setIsFirstLoseNetConnect(true);
