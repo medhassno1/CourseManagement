@@ -5,6 +5,8 @@ error_reporting(0);
 $workNumber = $_POST["login-user"];
 $password = $_POST["login-password"];
 $tableName = $_POST["ident"];
+session_start();
+$_SESSION['id']=$tableName;
 
 $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
 if (!$con) {
