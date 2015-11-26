@@ -18,6 +18,6 @@ if (!$con) {
 
         $statement2 = "INSERT INTO department_head_majors(workNumber,major) $tableList VALUES ('$row[workNumber]','$row[major]')";
         mysqli_query($con, $statement2);
-       
+
     }
 }

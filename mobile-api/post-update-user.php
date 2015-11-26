@@ -26,7 +26,7 @@ if (!$con) {
         foreach ($jsonArry as $row) {
             $sql = "UPDATE $tableName SET password='$row[password]',name ='$row[name]',sex='$row[sex]',birthday='$row[birthday]',telephone='$row[telephone]',email='$row[email]' WHERE workNumber = '$row[workNumber]'";
             mysqli_query($con, $sql);
-           
+
         }
     }
 }
