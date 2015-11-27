@@ -16,8 +16,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkManager {
 
+//    public static final String URL_LOGIN =
+//            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
     public static final String URL_LOGIN =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
+            "http://114.215.153.57/tcs/mobile-api/login.php";
     /* public static final String URL_LOGIN =
             "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";*/
     public static final String URL_GET_JSON =
