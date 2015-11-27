@@ -18,20 +18,21 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
         //获取网络连接管理者
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        // NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        NetworkInfo mobNetInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        NetworkInfo wifiNetInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-        if (!mobNetInfo.isConnected() && !wifiNetInfo.isConnected()) {
-            Toast.makeText(context, "网络不可用",
-                    Toast.LENGTH_SHORT).show();
-            Log.i("net", "网络不可用");
-            Log.i("net1", mobNetInfo.getTypeName());
-        } else {
-            Toast.makeText(context, "网络恢复",
-                    Toast.LENGTH_SHORT).show();
-            Log.i("net2", "网络恢复");
+        if (networkInfo == null && Data.isFirstLoseNetConnect()) {
+            Toast.makeText(context, "网络不可用", Toast.LENGTH_SHORT).show();
+            Data.setIsFirstLoseNetConnect(false);
+            Data.setIsFirstNetConnect(true);
+            Log.i("netstatus", "网络不可用");
         }
+        if (networkInfo != null&&networkInfo.isConnected() && Data.isFirstNetConnect()) {
+            Toast.makeText(context, "网络恢复", Toast.LENGTH_SHORT).show();
+            Data.setIsFirstNetConnect(false);
+            Data.setIsFirstLoseNetConnect(true);
+            Log.i("netstatus", "网络恢复");
+        }
+
+
     }
 }

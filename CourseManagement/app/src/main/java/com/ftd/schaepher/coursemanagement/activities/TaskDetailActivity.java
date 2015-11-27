@@ -34,8 +34,11 @@ import java.util.List;
 
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.format.Alignment;
+import jxl.format.CellFormat;
 import jxl.read.biff.BiffException;
 import jxl.write.Label;
+import jxl.write.WritableCellFormat;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
@@ -60,6 +63,9 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private CourseDBHelper dbHelper;
     private String tableName;
     private String filePath;
+    private String excelTitle;
+    private String taskTerm;
+    private String taskName;
     private static final int EXPORT = 1;
 
     @Override
@@ -91,13 +97,14 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Log.d("TASKID", taskId);
         task = (TableTaskInfo) dbHelper.findById(taskId, TableTaskInfo.class);
         Log.d("TAG", task.toString());
-        String taskTerm = task.getYear() + task.getSemester();
+        taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
         tvTeacherDeadline.setText(task.getTeacherDeadline());
         tvTaskRemark.setText(task.getRemark());
         tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
-        tvTaskName.setText(TaskListActivity.transferTableNameToChinese(task.getRelativeTable()));
+        taskName = TaskListActivity.transferTableNameToChinese(task.getRelativeTable());
+        tvTaskName.setText(taskName);
     }
 
     @Override
@@ -120,7 +127,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 return true;
             case R.id.action_export_file:
                 final SimpleDialog notificationDialog = new SimpleDialog(TaskDetailActivity.this);
-                        notificationDialog.title("是否导出文件")
+                notificationDialog.title("是否导出文件")
                         .positiveAction("确定")
                         .positiveActionClickListener(new View.OnClickListener() {
                             @Override
@@ -157,8 +164,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
         filePath = Environment.getExternalStorageDirectory().getAbsoluteFile().toString()
                 + "/" + tvTaskName.getText().toString();
-
-
         tableName = task.getRelativeTable();
 
         SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
@@ -186,37 +191,60 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Workbook book = Workbook.getWorkbook(file);
         Sheet sheet = book.getSheet(0);
         // 获取行
-        int length = sheet.getRows();
-        System.out.println(length);
+        int row = sheet.getRows();
+        System.out.println(row);
         int column;
         WritableWorkbook wbook = Workbook.createWorkbook(file, book); // 根据book创建一个操作对象
         WritableSheet sh = wbook.getSheet(0);// 得到一个工作对象
+
+        CellFormat cellFormat;
+        if (!sh.getCell(0, 1).getContents().equals("")) {
+            cellFormat = sh.getCell(0, 1).getCellFormat();
+        } else {
+            cellFormat = sh.getCell(0, 2).getCellFormat();
+        }
+        WritableCellFormat cellFormatLeft = new WritableCellFormat(cellFormat);//相同格式，左对齐
+        cellFormatLeft.setAlignment(Alignment.LEFT);
+        WritableCellFormat cellFormatCenter = new WritableCellFormat(cellFormat);//相同格式，居中
+        cellFormatCenter.setAlignment(Alignment.CENTRE);
+
+        //设置excel表格标题
+        String term = taskTerm.substring(4, 6);
+        if (term.equals("01")) {
+            term = "上学期";
+        } else if (term.equals("02")) {
+            term = "下学期";
+        }
+        excelTitle = taskTerm.substring(0, 4) + "学年" + term + taskName + "开课计划书";
+        Label label = new Label(0, 0, excelTitle, sh.getCell(0, 0).getCellFormat());
+        sh.addCell(label);
+
         // 从最后一行开始加
-        for (int i = 0; i < list.size(); i++, length++) {
+        for (int i = 0; i < list.size(); i++, row++) {
             column = 0;
-            Label label = new Label(column++, length, list.get(i).getGrade());
+            label = new Label(column++, row, list.get(i).getGrade(), cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getMajor());
+            label = new Label(column++, row, list.get(i).getMajor(), cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getPeople());
+            label = new Label(column++, row, list.get(i).getPeople(), cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseName());
+            label = new Label(column++, row, list.get(i).getCourseName(), cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseType());
+            label = new Label(column++, row, list.get(i).getCourseType(), cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseCredit());
+            label = new Label(column++, row, list.get(i).getCourseCredit(), cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getCourseHour());
+            label = new Label(column++, row, list.get(i).getCourseHour(), cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getPracticeHour());
+            label = new Label(column++, row, list.get(i).getPracticeHour(), cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getOnMachineHour());
+            label = new Label(column++, row, list.get(i).getOnMachineHour(), cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getTimePeriod());
+            label = new Label(column++, row, list.get(i).getTimePeriod(), cellFormatCenter);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getTeacherName());
+            label = new Label(column++, row, list.get(i).getTeacherName(), cellFormatLeft);
             sh.addCell(label);
-            label = new Label(column++, length, list.get(i).getRemark());
+            label = new Label(column++, row, list.get(i).getRemark(), cellFormatLeft);
             sh.addCell(label);
         }
         wbook.write();
@@ -224,12 +252,12 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case EXPORT:
-                    new Thread(){
+                    new Thread() {
                         @Override
                         public void run() {
                             try {

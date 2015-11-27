@@ -158,7 +158,8 @@ public class TableCourseMultiline {
     @Override
     public String toString() {
         return "TableCourseMultiline{" +
-                "insertTime='" + insertTime + '\'' +
+                "courseCredit='" + courseCredit + '\'' +
+                ", insertTime='" + insertTime + '\'' +
                 ", workNumber='" + workNumber + '\'' +
                 ", grade='" + grade + '\'' +
                 ", major='" + major + '\'' +
