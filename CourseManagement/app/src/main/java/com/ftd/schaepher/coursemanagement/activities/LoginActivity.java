@@ -20,6 +20,7 @@ import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
 import java.io.IOException;
 
+
 /**
  * Created by sxq on 2015/10/28.
  * 登录界面
@@ -60,7 +61,6 @@ public class LoginActivity extends AppCompatActivity
         edtTxUserName.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
-
 
         autoSetUserName();
 //        initDatabaseData();
@@ -161,7 +161,6 @@ public class LoginActivity extends AppCompatActivity
                 ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
                 ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
                 ownInformationSaveEditor.apply();
-
                 Intent intend = new Intent();
                 intend.setClass(LoginActivity.this, TaskListActivity.class);
                 LoginActivity.this.finish();

@@ -28,7 +28,7 @@ public class TableCourseMultiline {
     public TableCourseMultiline() {
     }
 
-    public TableCourseMultiline(  String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHour, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
+    public TableCourseMultiline(String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHour, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
         this.grade = grade;
         this.major = major;
         this.people = people;
@@ -166,6 +166,7 @@ public class TableCourseMultiline {
                 ", people='" + people + '\'' +
                 ", courseName='" + courseName + '\'' +
                 ", courseType='" + courseType + '\'' +
+                ", courseCredit='" + courseCredit + '\'' +
                 ", courseHour='" + courseHour + '\'' +
                 ", practiceHour='" + practiceHour + '\'' +
                 ", onMachineHour='" + onMachineHour + '\'' +

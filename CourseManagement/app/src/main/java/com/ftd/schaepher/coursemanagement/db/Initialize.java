@@ -3,6 +3,7 @@ package com.ftd.schaepher.coursemanagement.db;
 import android.content.Context;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
@@ -321,5 +322,11 @@ public class Initialize {
         task.setRemark("务必在截止时间前完成");
         task.setTaskState("0");
         dbHelper.insert(task);
+
+        dbHelper.createTableMajor();
+        TableManageMajor manageMajor = new TableManageMajor();
+        manageMajor.setWorkNumber("00001");
+        manageMajor.setMajor("计算机系");
+        dbHelper.insert(manageMajor);
     }
 }

@@ -23,9 +23,9 @@ public class JsonTools {
         gson = new GsonBuilder().serializeNulls().create();
     }
 
-    public List getJsonList(String json,String pojoName) {
+    public <T> T getJsonList(String json,Class tableClass) {
         Type type;
-        switch(pojoName){
+        switch(tableClass.getSimpleName()){
             case "TableUserTeacher":
                 type = new TypeToken<List<TableUserTeacher>>(){}.getType();
                 break;
