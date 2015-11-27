@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,9 +35,16 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,13 +58,16 @@ public class TaskListActivity extends AppCompatActivity
     private static final int CLOSE_NAV = 1;
     private Toolbar mToolbar;
     private TextView tvOwnName;
+    private Spinner spinnerSelectTerm;
     private List<TableTaskInfo> taskListData;
     private String userName;
     private String identity;
+    private String selectedTerm;
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private SharedPreferences.Editor ownInformationSaveEditor;
+    private TaskAdapter mTaskAdapter;
 
 
     // 任务名映射
@@ -117,7 +129,47 @@ public class TaskListActivity extends AppCompatActivity
         setNavViewConfig();
         setSupportDoubleBackExit(true);
 
+        dbHelper = new CourseDBHelper(TaskListActivity.this);
+
         initUserInformation();
+    }
+
+    private void initSpinner() {
+        spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
+        final ArrayAdapter<Set> mAdapter = new ArrayAdapter<Set>(this,R.layout.spinner_item);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        Set termData = new HashSet();
+        final List<TableTaskInfo> taskInfo ;
+        taskInfo =  dbHelper.findAll(TableTaskInfo.class);
+        for (TableTaskInfo list:taskInfo){
+            termData.add(list.getYear()+list.getSemester());
+        }
+        TreeSet soredTermData = new TreeSet(termData);
+        soredTermData.comparator();
+        mAdapter.addAll(soredTermData);
+        spinnerSelectTerm.setAdapter(mAdapter);
+        spinnerSelectTerm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedTerm = (String) parent.getItemAtPosition(position);
+                Log.d(TAG, "selectedTerm:" + selectedTerm);
+                taskListData.clear();
+                for (TableTaskInfo task:taskInfo){
+                    String term = task.getYear()+task.getSemester();
+                    if (term.equals(selectedTerm)){
+                        Log.d(TAG, "task:" + term);
+                        taskListData.add(task);
+                    }
+                }
+                mTaskAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     // 左侧菜单的初始设置
@@ -145,7 +197,6 @@ public class TaskListActivity extends AppCompatActivity
     }
 
     private void initUserInformation() {
-        CourseDBHelper dbHelper = new CourseDBHelper(TaskListActivity.this);
         String ownName = "";
         userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
         identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
@@ -177,19 +228,19 @@ public class TaskListActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        initSpinner();
         initTaskListData();
         initTaskListView();
     }
 
     // 初始化数据，从数据库中获取当前页面所需的数据
     private void initTaskListData() {
-        dbHelper = new CourseDBHelper(this);
         taskListData = dbHelper.findAll(TableTaskInfo.class);
     }
 
     // 显示数据，控件与数据绑定
     private void initTaskListView() {
-        TaskAdapter mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
+        mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
         ListView mListView = (ListView) findViewById(R.id.lv_task_list);
         mListView.setAdapter(mTaskAdapter);
         mListView.setOnItemClickListener(this);
@@ -335,4 +386,5 @@ public class TaskListActivity extends AppCompatActivity
             }
         }
     };
+
 }
