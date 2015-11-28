@@ -27,19 +27,24 @@ public class TableCourseCombine {
     public TableCourseCombine() {
     }
 
-    public TableCourseCombine(String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHour, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
-        this.grade = grade;
-        this.major = major;
-        this.people = people;
-        this.courseName = courseName;
-        this.courseType = courseType;
+    public TableCourseCombine(String insertTime, String courseCredit,
+                              String courseHour, String courseName, String courseType,
+                              String grade, String major, String onMachineHour, String people,
+                              String practiceHour, String remark, String teacherName,
+                              String timePeriod) {
+        this.insertTime = insertTime;
         this.courseCredit = courseCredit;
         this.courseHour = courseHour;
-        this.practiceHour = practiceHour;
+        this.courseName = courseName;
+        this.courseType = courseType;
+        this.grade = grade;
+        this.major = major;
         this.onMachineHour = onMachineHour;
-        this.timePeriod = timePeriod;
-        this.teacherName = teacherName;
+        this.people = people;
+        this.practiceHour = practiceHour;
         this.remark = remark;
+        this.teacherName = teacherName;
+        this.timePeriod = timePeriod;
     }
 
     public String getInsertTime() {

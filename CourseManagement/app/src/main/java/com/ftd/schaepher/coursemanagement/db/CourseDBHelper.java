@@ -3,6 +3,7 @@ package com.ftd.schaepher.coursemanagement.db;
 import android.content.Context;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
@@ -67,6 +68,11 @@ public class CourseDBHelper {
     public void createTableTask() {
         TableTaskInfo tableTaskInfo = new TableTaskInfo();
         db.save(tableTaskInfo);
+    }
+
+    public void createTableMajor() {
+        TableManageMajor tableManageMajor = new TableManageMajor();
+        db.save(tableManageMajor);
     }
 
     // 插入数据
