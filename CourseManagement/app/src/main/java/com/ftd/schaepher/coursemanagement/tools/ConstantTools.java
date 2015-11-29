@@ -14,5 +14,6 @@ public class ConstantTools {
     public static final String USER_IDENTITY = "identity";
     public static final String USER_NAME = "userName";
     public static final String USER_ACCOUNT = "account";
+    public static final String USER_WORKNUMBER = "workNumber";
     public static final String USER_INFORMATION = "userInformation";
 }

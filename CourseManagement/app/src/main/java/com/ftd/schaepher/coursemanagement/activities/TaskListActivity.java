@@ -55,7 +55,7 @@ public class TaskListActivity extends AppCompatActivity
     private TextView tvOwnName;
     private Spinner spinnerSelectTerm;
     private List<TableTaskInfo> taskListData;
-    private String userName;
+    private String workNumber;
     private String identity;
     private String selectedTerm;
     private CourseDBHelper dbHelper;
@@ -193,22 +193,22 @@ public class TaskListActivity extends AppCompatActivity
 
     private void initUserInformation() {
         String ownName = "";
-        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
+        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
         identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
         switch (identity) {
             case ConstantTools.ID_TEACHER:
                 TableUserTeacher teacher =
-                        (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
+                        (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
                 ownName = teacher == null ? "" : teacher.getName();
                 break;
             case ConstantTools.ID_TEACHING_OFFICE:
                 TableUserTeachingOffice office =
-                        (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
+                        (TableUserTeachingOffice) dbHelper.findById(workNumber, TableUserTeachingOffice.class);
                 ownName = office == null ? "" : office.getName();
                 break;
             case ConstantTools.ID_DEPARTMENT_HEAD:
                 TableUserDepartmentHead departmentHead =
-                        (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
+                        (TableUserDepartmentHead) dbHelper.findById(workNumber, TableUserDepartmentHead.class);
                 ownName = departmentHead == null ? "" : departmentHead.getName();
                 break;
             default:
