@@ -37,6 +37,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private SQLiteDatabase db;
     private String tableName;
     private String userName;
+    private String workNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
 
         userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_NAME, "");
-
     }
 
     @Override

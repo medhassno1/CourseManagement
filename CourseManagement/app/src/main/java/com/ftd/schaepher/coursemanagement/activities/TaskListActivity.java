@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -35,13 +34,9 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
@@ -60,7 +55,7 @@ public class TaskListActivity extends AppCompatActivity
     private TextView tvOwnName;
     private Spinner spinnerSelectTerm;
     private List<TableTaskInfo> taskListData;
-    private String userName;
+    private String workNumber;
     private String identity;
     private String selectedTerm;
     private CourseDBHelper dbHelper;
@@ -198,22 +193,22 @@ public class TaskListActivity extends AppCompatActivity
 
     private void initUserInformation() {
         String ownName = "";
-        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
+        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
         identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
         switch (identity) {
             case ConstantTools.ID_TEACHER:
                 TableUserTeacher teacher =
-                        (TableUserTeacher) dbHelper.findById(userName, TableUserTeacher.class);
+                        (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
                 ownName = teacher == null ? "" : teacher.getName();
                 break;
             case ConstantTools.ID_TEACHING_OFFICE:
                 TableUserTeachingOffice office =
-                        (TableUserTeachingOffice) dbHelper.findById(userName, TableUserTeachingOffice.class);
+                        (TableUserTeachingOffice) dbHelper.findById(workNumber, TableUserTeachingOffice.class);
                 ownName = office == null ? "" : office.getName();
                 break;
             case ConstantTools.ID_DEPARTMENT_HEAD:
                 TableUserDepartmentHead departmentHead =
-                        (TableUserDepartmentHead) dbHelper.findById(userName, TableUserDepartmentHead.class);
+                        (TableUserDepartmentHead) dbHelper.findById(workNumber, TableUserDepartmentHead.class);
                 ownName = departmentHead == null ? "" : departmentHead.getName();
                 break;
             default:
