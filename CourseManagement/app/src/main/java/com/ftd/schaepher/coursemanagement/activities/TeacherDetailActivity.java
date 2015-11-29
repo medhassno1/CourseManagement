@@ -65,7 +65,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
         identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
         if (intent.getBooleanExtra("isQueryOwnInfomation", true)) {
-            workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
+            workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
             switch (identity) {
                 case ConstantTools.ID_TEACHER:
                     TableUserTeacher teacher = (TableUserTeacher)
