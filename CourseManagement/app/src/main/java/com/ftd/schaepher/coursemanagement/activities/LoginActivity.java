@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的账号
      */
     private void autoSetWorkNumber() {
-        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
+        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
         if (!workNumber.equals("")) {
             edtTxWorkNumber.setText(workNumber);
         }
