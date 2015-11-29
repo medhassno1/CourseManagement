@@ -31,7 +31,10 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -121,18 +124,28 @@ public class TeacherListActivity extends AppCompatActivity
 
     // 初始化教师列表数据
     private void initTeacherListData() {
+        CourseDBHelper dbHelper= new CourseDBHelper(this);
+        //从服务器获取教师数据，并更新到本地数据库
+        NetworkManager manager = new NetworkManager();
+        try {
+            String response = manager.getJsonString(ConstantTools.TABLE_USER_TEACHER);
+            JsonTools jsonTools = new JsonTools();
+            List list = jsonTools.getJsonList(response, TableUserTeacher.class);
+            Log.w("jsonList", list.toString());
+
+            dbHelper.deleteAll(TableUserTeacher.class);
+            dbHelper.insertAll(list);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //从本地数据库获取教师数据
         teacherListData = new ArrayList<>();
-        CourseDBHelper dbHelper = new CourseDBHelper();
-        dbHelper.createDataBase(this);
-
         list = dbHelper.findAll(TableUserTeacher.class);
-        Log.i("string", list.size() + "");
-
         for (int i = 0; i < list.size(); i++) {
             teacherListData.add(list.get(i));
             Log.i("string", list.get(i).getName());
         }
-
     }
 
     // 初始化教师列表界面的控件

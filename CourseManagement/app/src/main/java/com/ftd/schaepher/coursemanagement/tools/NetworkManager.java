@@ -16,14 +16,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkManager {
 
-    public static final String URL_LOGIN =
+  /*  public static final String URL_LOGIN =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
-    /* public static final String URL_LOGIN =
-            "http://jeek-zsy.imwork.net:12051/TeacherClass/Teacher_class_syetemDemo1.1/php/login.php";*/
     public static final String URL_GET_JSON =
             "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/query-by-table-name.php";
     public static final String URL_POST_JSON =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";
+            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";*/
+    public static final String URL_LOGIN =
+            "http://114.215.153.57/tcs/mobile-api/login.php";
+    public static final String URL_GET_JSON =
+            "http://114.215.153.57/tcs/mobile-api/query-by-table-name.php";
+    public static final String URL_POST_JSON =
+            "http://114.215.153.57/tcs/mobile-api/post-table.php";
 
     public static final String UPDATE_CB_TABLE = "updateCbTable";
     public static final String UPDATE_TASK_TABLE = "updateTaskTable";

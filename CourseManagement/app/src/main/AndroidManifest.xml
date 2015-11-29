@@ -37,7 +37,9 @@
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".activities.ExcelDisplayActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="sensor">
+        </activity>
         <activity
             android:name=".activities.TaskListActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
