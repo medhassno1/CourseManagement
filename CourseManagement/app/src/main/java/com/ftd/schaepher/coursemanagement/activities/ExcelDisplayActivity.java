@@ -52,6 +52,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
 
         userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_NAME, "");
+        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
     }
 
     @Override
@@ -127,6 +128,32 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
                             courseModify.setRemark(edtTxDialogNote.getText().toString());
                             courseModify.setTeacherName(userName);
+                            courseModify.setWorkNumber(workNumber);
+                            dbHelper.update(courseModify);
+
+                            db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
+                            db.close();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        onResume();
+                    }
+                })
+                .setNeutralButton("删除", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+                            db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+                            db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+
+                            TableCourseMultiline courseModify = new TableCourseMultiline();
+                            courseModify.setCourseName(excelListData.get(position).getCourseName());
+                            courseModify.setTimePeriod("");
+                            courseModify.setRemark("");
+                            courseModify.setTeacherName("");
+                            courseModify.setWorkNumber("");
                             dbHelper.update(courseModify);
 
                             db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
@@ -143,6 +170,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 });
+
         return mBuilder.create();
     }
 

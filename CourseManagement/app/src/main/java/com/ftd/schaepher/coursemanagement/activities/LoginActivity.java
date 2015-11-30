@@ -229,6 +229,4 @@ public class LoginActivity extends AppCompatActivity
             layoutPassWord.setError(null);
         }
     }
-
-
 }
