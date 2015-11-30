@@ -1,7 +1,6 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
-import android.os.StrictMode;
-
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -16,12 +15,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkManager {
 
-  /*  public static final String URL_LOGIN =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
-    public static final String URL_GET_JSON =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/query-by-table-name.php";
-    public static final String URL_POST_JSON =
-            "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";*/
+    /*  public static final String URL_LOGIN =
+              "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
+      public static final String URL_GET_JSON =
+              "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/query-by-table-name.php";
+      public static final String URL_POST_JSON =
+              "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";*/
     public static final String URL_LOGIN =
             "http://114.215.153.57/tcs/mobile-api/login.php";
     public static final String URL_GET_JSON =
@@ -35,16 +34,13 @@ public class NetworkManager {
 
     private static final OkHttpClient client = new OkHttpClient();
 
-    public NetworkManager() {
-        // 强制允许在UI线程访问网络
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
-        StrictMode.setThreadPolicy(policy);
+    static {
         client.setConnectTimeout(10, TimeUnit.SECONDS);
         client.setWriteTimeout(10, TimeUnit.SECONDS);
         client.setReadTimeout(30, TimeUnit.SECONDS);
     }
 
-    public String postJsonString(String tableName, String jsonData, String action) throws IOException {
+    public static String postJsonString(String tableName, String jsonData, String action) throws IOException {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .add("jsonData", jsonData)
@@ -62,7 +58,8 @@ public class NetworkManager {
         }
     }
 
-    public String getJsonString(String tableName) throws IOException {
+    public static void getJsonString(String tableName,
+                                     ResponseCallback callback) throws IOException {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .build();
@@ -70,15 +67,11 @@ public class NetworkManager {
                 .url(URL_GET_JSON)
                 .post(formBody)
                 .build();
-        Response response = client.newCall(request).execute();
-        if (response.isSuccessful()) {
-            return response.body().string();
-        } else {
-            throw new IOException("Unexpected code " + response);
-        }
+        client.newCall(request).enqueue(callback);
     }
 
-    public String login(String userName, String password, String identity) throws IOException {
+    public static void login(String userName, String password, String identity,
+                             ResponseCallback callback) throws IOException {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("login-user", userName)
                 .add("login-password", password)
@@ -90,18 +83,15 @@ public class NetworkManager {
                 .post(formBody)
                 .build();
 
-        try {
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful()) {
-                return response.body().string();
-            } else {
-                throw new IOException("Unexpected code " + response);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
+        client.newCall(request).enqueue(callback);
+    }
 
+    public interface ResponseCallback extends Callback {
+        @Override
+        void onResponse(Response response) throws IOException;
+
+        @Override
+        void onFailure(Request request, IOException e);
     }
 
 }

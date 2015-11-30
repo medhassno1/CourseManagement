@@ -65,7 +65,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
         identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
         if (intent.getBooleanExtra("isQueryOwnInfomation", true)) {
-            workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
+            workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
             switch (identity) {
                 case ConstantTools.ID_TEACHER:
                     TableUserTeacher teacher = (TableUserTeacher)
@@ -109,15 +109,47 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     break;
             }
         } else {
+            String queryIdentity = intent.getStringExtra("teacherIdentity");
             workNumber = intent.getStringExtra("teacherID");
-            Log.i("str2", "工号" + workNumber);
+            Log.i("str2", "工号" + workNumber + "身份" + queryIdentity);
 
-            TableUserTeacher ownInformation = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
-            edtTxTeacherNumber.setText(ownInformation.getWorkNumber());
-            edtTxPassword.setText(ownInformation.getPassword());
-            edtTxTeacherName.setText(ownInformation.getName());
-            edtTxPhoneNumber.setText(ownInformation.getTelephone());
-            edtTxDepartment.setText(ownInformation.getDepartment());
+            switch (queryIdentity) {
+                case ConstantTools.ID_TEACHING_OFFICE: {
+                    TableUserTeachingOffice Information = (TableUserTeachingOffice) dbHelper.findById(workNumber, TableUserTeachingOffice.class);
+                    if (Information != null) {
+                        edtTxTeacherNumber.setText(Information.getWorkNumber());
+                        edtTxPassword.setText(Information.getPassword());
+                        edtTxTeacherName.setText(Information.getName());
+                        edtTxPhoneNumber.setText(Information.getTelephone());
+                    }
+                }
+                break;
+                case ConstantTools.ID_DEPARTMENT_HEAD: {
+                    TableUserDepartmentHead Information = (TableUserDepartmentHead) dbHelper.findById(workNumber, TableUserDepartmentHead.class);
+                    if (Information != null){
+                        edtTxTeacherNumber.setText(Information.getWorkNumber());
+                        edtTxPassword.setText(Information.getPassword());
+                        edtTxTeacherName.setText(Information.getName());
+                        edtTxPhoneNumber.setText(Information.getTelephone());
+                        edtTxDepartment.setText(Information.getDepartment());
+                        edtTxMajor.setVisibility(View.VISIBLE);
+                    }
+                }
+                break;
+                case ConstantTools.ID_TEACHER: {
+                    TableUserTeacher Information = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
+                    if (Information != null){
+                        edtTxTeacherNumber.setText(Information.getWorkNumber());
+                        edtTxPassword.setText(Information.getPassword());
+                        edtTxTeacherName.setText(Information.getName());
+                        edtTxPhoneNumber.setText(Information.getTelephone());
+                        edtTxDepartment.setText(Information.getDepartment());
+                    }
+                }
+                break;
+                default:
+                    break;
+            }
         }
     }
 

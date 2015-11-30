@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,9 +17,10 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-
 
 
 /**
@@ -47,7 +46,7 @@ public class LoginActivity extends AppCompatActivity
     private String password;
     private String identity;
 
-    private SharedPreferences.Editor ownInformationSaveEditor;
+    private SharedPreferences.Editor informationEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +60,7 @@ public class LoginActivity extends AppCompatActivity
         layoutWorkNumber = (TextInputLayout) findViewById(R.id.inputLayout_login_workNumber);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
-        ownInformationSaveEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
+        informationEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
 
         edtTxWorkNumber.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
@@ -159,44 +158,59 @@ public class LoginActivity extends AppCompatActivity
     }
 
     public void login() {
-        final NetworkManager manager = new NetworkManager();
+        try {
+            NetworkManager.login(workNumber, password, identity, new NetworkManager.ResponseCallback() {
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    String result = response.body().string();
+                    Log.d(TAG, result);
+                    progress.cancel();
 
-        new Thread() {
+                    switch (result) {
+                        case "true":
+                            informationEditor.putString(ConstantTools.USER_IDENTITY, identity);
+                            informationEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
+                            informationEditor.apply();
+
+                            Intent intend = new Intent();
+                            intend.setClass(LoginActivity.this, TaskListActivity.class);
+                            LoginActivity.this.finish();
+                            startActivity(intend);
+                            break;
+                        case "false":
+                            sendToast("账号或密码错误");
+                            break;
+                        default:
+                            sendToast("请求服务器失败");
+                            break;
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Request request, IOException e) {
+
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendToast(final String message) {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Log.d(TAG,"RUN");
-                    String result = manager.login(workNumber, password, identity);
-                    Log.d(TAG,result);
-                    if (result.equals("true")) {
-                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存账号、身份
-                        ownInformationSaveEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
-                        ownInformationSaveEditor.apply();
-
-                        Intent intend = new Intent();
-                        intend.setClass(LoginActivity.this, TaskListActivity.class);
-                        LoginActivity.this.finish();
-                        startActivity(intend);
-                    } else if (result.equals("false")) {
-                        Message msg = new Message();
-                        msg.what = RESULT_FALSE;
-                        mHandler.sendMessage(msg);
-                    } else {
-                        Message msg = new Message();
-                        msg.what = RESULT_OTHER;
-                        mHandler.sendMessage(msg);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Toast.makeText(LoginActivity.this, message,
+                        Toast.LENGTH_SHORT).show();
             }
-        }.start();
+        });
     }
 
     public void loginOffLine() {
-        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-        ownInformationSaveEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
-        ownInformationSaveEditor.apply();
+        informationEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
+        informationEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
+        informationEditor.apply();
 
         Intent intend = new Intent();
         intend.setClass(LoginActivity.this, TaskListActivity.class);
@@ -215,27 +229,4 @@ public class LoginActivity extends AppCompatActivity
             layoutPassWord.setError(null);
         }
     }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case RESULT_OTHER:
-                    progress.cancel();
-                    Toast.makeText(LoginActivity.this, "请求服务器失败",
-                            Toast.LENGTH_SHORT).show();
-                    break;
-                case RESULT_FALSE:
-                    progress.cancel();
-                    Toast.makeText(LoginActivity.this, "账号或密码错误",
-                            Toast.LENGTH_SHORT).show();
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    };
-
 }

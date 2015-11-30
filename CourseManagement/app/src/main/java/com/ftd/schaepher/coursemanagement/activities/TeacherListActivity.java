@@ -1,6 +1,5 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,13 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,19 +24,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.adapter.DepartmentHeadAdapter;
+import com.ftd.schaepher.coursemanagement.adapter.TeacherAdapter;
+import com.ftd.schaepher.coursemanagement.adapter.TeacherOfficeAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.widget.MoreListView;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by sxq on 2015/11/2.
@@ -68,7 +69,8 @@ public class TeacherListActivity extends AppCompatActivity
     private long betweenDoubleBackTime;
     private Handler myHandler = new Handler();
     private List<TableUserTeacher> teacherListData;
-    private List<TableUserTeacher> list;
+    private List<TableUserTeachingOffice> officeListData;
+    private List<TableUserDepartmentHead> departmentListData;
     private String identity;
 
     @Override
@@ -112,48 +114,69 @@ public class TeacherListActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        updateTeacherDataList();
-        initUserInformation();
-
-    }
-
-    public void updateTeacherDataList() {
         initTeacherListData();
-        initTeacherListView();
+        initUserInformation();
     }
 
     // 初始化教师列表数据
     private void initTeacherListData() {
-        CourseDBHelper dbHelper= new CourseDBHelper(this);
-        //从服务器获取教师数据，并更新到本地数据库
-        NetworkManager manager = new NetworkManager();
         try {
-            String response = manager.getJsonString(ConstantTools.TABLE_USER_TEACHER);
-            JsonTools jsonTools = new JsonTools();
-            List list = jsonTools.getJsonList(response, TableUserTeacher.class);
-            Log.w("jsonList", list.toString());
+            NetworkManager.getJsonString(ConstantTools.TABLE_USER_TEACHER,
+                    new NetworkManager.ResponseCallback() {
+                        @Override
+                        public void onResponse(Response response) throws IOException {
+                            //从服务器获取教师数据，并更新到本地数据库
+                            CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
+                            JsonTools jsonTools = new JsonTools();
+                            List list = jsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
+                            Log.w("jsonList", list.toString());
 
-            dbHelper.deleteAll(TableUserTeacher.class);
-            dbHelper.insertAll(list);
+                            dbHelper.deleteAll(TableUserTeacher.class);
+                            dbHelper.insertAll(list);
+                            //从本地数据库获取教师数据
+                            teacherListData = dbHelper.findAll(TableUserTeacher.class);
+                            officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+                            departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+
+                            TeacherListActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initTeacherListView();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Request request, IOException e) {
+
+                        }
+                    });
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //从本地数据库获取教师数据
-        teacherListData = new ArrayList<>();
-        list = dbHelper.findAll(TableUserTeacher.class);
-        for (int i = 0; i < list.size(); i++) {
-            teacherListData.add(list.get(i));
-            Log.i("string", list.get(i).getName());
-        }
     }
+
 
     // 初始化教师列表界面的控件
     private void initTeacherListView() {
-        TeacherAdapter mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
-        ListView mListView = (ListView) findViewById(R.id.lv_teacher_list);
-        mListView.setAdapter(mTeacherAdapter);
-        mListView.setOnItemClickListener(this);
+        if (teacherListData != null) {
+            TeacherAdapter mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
+            ListView mListView = (MoreListView) findViewById(R.id.lv_teacher_list);
+            mListView.setAdapter(mTeacherAdapter);
+            mListView.setOnItemClickListener(this);
+        }
+        if (departmentListData != null) {
+            DepartmentHeadAdapter departmentAdapter = new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
+            ListView departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
+            departmentListView.setAdapter(departmentAdapter);
+            departmentListView.setOnItemClickListener(this);
+        }
+        if (officeListData != null) {
+            TeacherOfficeAdapter officeAdapter = new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
+            ListView officeListView = (MoreListView) findViewById(R.id.lv_office_list);
+            officeListView.setAdapter(officeAdapter);
+            officeListView.setOnItemClickListener(this);
+        }
     }
 
     private void initUserInformation() {
@@ -213,12 +236,38 @@ public class TeacherListActivity extends AppCompatActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intend = new Intent();
         intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
-        intend.putExtra("teacherID", list.get(position).getWorkNumber());
+        String queryWorkNumber;
+        String queryIdentity;
+        switch (parent.getId()) {
+            case R.id.lv_office_list:
+                Log.i("parent", "教学办");
+                queryWorkNumber = officeListData.get(position).getWorkNumber();
+                queryIdentity = ConstantTools.ID_TEACHING_OFFICE;
+                break;
+            case R.id.lv_department_list:
+                Log.i("parent", "系负责人");
+                queryWorkNumber = departmentListData.get(position).getWorkNumber();
+                queryIdentity = ConstantTools.ID_DEPARTMENT_HEAD;
+                break;
+            case R.id.lv_teacher_list:
+                queryWorkNumber = teacherListData.get(position).getWorkNumber();
+                queryIdentity = ConstantTools.ID_TEACHER;
+                Log.i("parent", "教师");
+                break;
+            default:
+                Log.i("parent", "无" + parent.getCount());
+                queryWorkNumber = "";
+                queryIdentity = "";
+                break;
+        }
+        intend.putExtra("teacherID", queryWorkNumber);
+        intend.putExtra("teacherIdentity", queryIdentity);
         intend.putExtra("isQueryOwnInfomation", false);
         startActivity(intend);
 
+        Log.i("str", String.valueOf(parent));
         Log.i("str", position + "    " + id);
-        Log.i("str", list.get(position).getWorkNumber() + list.get(position).getName());
+        Log.i("str", queryWorkNumber + "  " + queryIdentity);
     }
 
     // 点击标题栏的子菜单事件
@@ -321,43 +370,4 @@ public class TeacherListActivity extends AppCompatActivity
             }
         }
     };
-
-    /**
-     * 任务列表的适配器
-     */
-    class TeacherAdapter extends ArrayAdapter<TableUserTeacher> {
-        private int resourceId;
-
-        public TeacherAdapter(Context context, int resource, List<TableUserTeacher> objects) {
-            super(context, resource, objects);
-            this.resourceId = resource;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TableUserTeacher teacher = getItem(position);
-            View view;
-            viewHolder viewHolder;
-            if (convertView == null) {
-                view = LayoutInflater.from(getContext()).inflate(resourceId, null);
-                viewHolder = new viewHolder();
-                viewHolder.teacherImageId = (CircleImageView) view.findViewById(R.id.circle_img_teacher);
-                viewHolder.teacherName = (TextView) view.findViewById(R.id.tv_teacher_name);
-                view.setTag(viewHolder);
-            } else {
-                view = convertView;
-                viewHolder = (TeacherAdapter.viewHolder) view.getTag();
-            }
-
-            viewHolder.teacherImageId.setImageResource(R.drawable.ic_people);
-            viewHolder.teacherName.setText(teacher.getName());
-            return view;
-        }
-
-        class viewHolder {
-            CircleImageView teacherImageId;
-            TextView teacherName;
-        }
-    }
-
 }

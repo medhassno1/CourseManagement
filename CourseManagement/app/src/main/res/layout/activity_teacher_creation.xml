@@ -52,6 +52,7 @@
                     android:id="@+id/edtTx_teacher_creation_workNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="number"
                     android:hint="工号" />
             </android.support.design.widget.TextInputLayout>
 
