@@ -32,8 +32,13 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.widget.MoreListView;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -109,38 +114,48 @@ public class TeacherListActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        updateTeacherDataList();
-        initUserInformation();
-
-    }
-
-    public void updateTeacherDataList() {
         initTeacherListData();
-        initTeacherListView();
+        initUserInformation();
     }
 
     // 初始化教师列表数据
     private void initTeacherListData() {
-        CourseDBHelper dbHelper = new CourseDBHelper(this);
-        //从服务器获取教师数据，并更新到本地数据库
-      /*  NetworkManager manager = new NetworkManager();
         try {
-            String response = manager.getJsonString(ConstantTools.TABLE_USER_TEACHER);
-            JsonTools jsonTools = new JsonTools();
-            List list = jsonTools.getJsonList(response, TableUserTeacher.class);
-            Log.w("jsonList", list.toString());
+            NetworkManager.getJsonString(ConstantTools.TABLE_USER_TEACHER,
+                    new NetworkManager.ResponseCallback() {
+                        @Override
+                        public void onResponse(Response response) throws IOException {
+                            //从服务器获取教师数据，并更新到本地数据库
+                            CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
+                            JsonTools jsonTools = new JsonTools();
+                            List list = jsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
+                            Log.w("jsonList", list.toString());
 
-            dbHelper.deleteAll(TableUserTeacher.class);
-            dbHelper.insertAll(list);
+                            dbHelper.deleteAll(TableUserTeacher.class);
+                            dbHelper.insertAll(list);
+                            //从本地数据库获取教师数据
+                            teacherListData = dbHelper.findAll(TableUserTeacher.class);
+                            officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+                            departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+
+                            TeacherListActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initTeacherListView();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Request request, IOException e) {
+
+                        }
+                    });
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
-
-        //从本地数据库获取教师数据
-        teacherListData = dbHelper.findAll(TableUserTeacher.class);
-        officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
-        departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+        }
     }
+
 
     // 初始化教师列表界面的控件
     private void initTeacherListView() {
