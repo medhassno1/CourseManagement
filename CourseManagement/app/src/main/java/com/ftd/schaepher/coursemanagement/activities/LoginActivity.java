@@ -16,18 +16,11 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
-import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
-import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
-import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
 
 
 
@@ -43,14 +36,14 @@ public class LoginActivity extends AppCompatActivity
     private static final int RESULT_FALSE = 0;
 
     private Button btnLogin;
-    private EditText edtTxUserName;
+    private EditText edtTxWorkNumber;
     private EditText edtTxPassWord;
     private RadioGroup rdoGroup;
-    private TextInputLayout layoutUserName;
+    private TextInputLayout layoutWorkNumber;
     private TextInputLayout layoutPassWord;
     private ProgressDialog progress;
 
-    private String userName;
+    private String workNumber;
     private String password;
     private String identity;
 
@@ -61,31 +54,31 @@ public class LoginActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        edtTxUserName = (EditText) findViewById(R.id.edtTx_login_username);
+        edtTxWorkNumber = (EditText) findViewById(R.id.edtTx_login_workNumber);
         edtTxPassWord = (EditText) findViewById(R.id.edtTx_login_password);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_check_identity);
         btnLogin = (Button) findViewById(R.id.btn_login);
-        layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
+        layoutWorkNumber = (TextInputLayout) findViewById(R.id.inputLayout_login_workNumber);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
         ownInformationSaveEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
 
-        edtTxUserName.setOnFocusChangeListener(this);
+        edtTxWorkNumber.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
 
-        autoSetUserName();
+        autoSetWorkNumber();
         initDatabaseData();
     }
 
 
     /**
-     * 自动输入保存的用户名
+     * 自动输入保存的账号
      */
-    private void autoSetUserName() {
-        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
-        if (!userName.equals("")) {
-            edtTxUserName.setText(userName);
+    private void autoSetWorkNumber() {
+        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
+        if (!workNumber.equals("")) {
+            edtTxWorkNumber.setText(workNumber);
         }
     }
 
@@ -113,7 +106,7 @@ public class LoginActivity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                userName = edtTxUserName.getText().toString().trim();
+                workNumber = edtTxWorkNumber.getText().toString().trim();
                 password = edtTxPassWord.getText().toString().trim();
                 switch (rdoGroup.getCheckedRadioButtonId()) {
                     case R.id.rdoBtn_teacher:
@@ -150,15 +143,15 @@ public class LoginActivity extends AppCompatActivity
      * 检查账号密码
      */
     private boolean isTrueForm() {
-        if (userName.equals("") || password.equals("")) {
-            if (userName.equals("")) {
-                layoutUserName.setError(getString(R.string.nullUserName));
+        if (workNumber.equals("") || password.equals("")) {
+            if (workNumber.equals("")) {
+                layoutWorkNumber.setError(getString(R.string.nullWorkNumber));
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));
             }
         } else {
-            layoutUserName.setError(null);
+            layoutWorkNumber.setError(null);
             layoutPassWord.setError(null);
             return true;
         }
@@ -173,11 +166,11 @@ public class LoginActivity extends AppCompatActivity
             public void run() {
                 try {
                     Log.d(TAG,"RUN");
-                    String result = manager.login(userName, password, identity);
+                    String result = manager.login(workNumber, password, identity);
                     Log.d(TAG,result);
                     if (result.equals("true")) {
-                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-                        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
+                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存账号、身份
+                        ownInformationSaveEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
                         ownInformationSaveEditor.apply();
 
                         Intent intend = new Intent();
@@ -202,7 +195,7 @@ public class LoginActivity extends AppCompatActivity
 
     public void loginOffLine() {
         ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
+        ownInformationSaveEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
         ownInformationSaveEditor.apply();
 
         Intent intend = new Intent();
@@ -214,8 +207,8 @@ public class LoginActivity extends AppCompatActivity
     // 处理输入错误提示
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        if (!edtTxUserName.getText().toString().equals("")) {
-            layoutUserName.setError(null);
+        if (!edtTxWorkNumber.getText().toString().equals("")) {
+            layoutWorkNumber.setError(null);
         }
 
         if (!edtTxPassWord.getText().toString().equals("")) {

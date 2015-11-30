@@ -40,7 +40,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("添加用户");
 
-        edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_username);
+        edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_workNumber);
         edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_creation_password);
         edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_creation_name);
         edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_phone_number);

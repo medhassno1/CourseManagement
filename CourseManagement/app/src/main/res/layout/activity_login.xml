@@ -37,14 +37,14 @@
         android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/inputLayout_login_username"
+            android:id="@+id/inputLayout_login_workNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             app:errorEnabled="true">
 
             <EditText
-                android:id="@+id/edtTx_login_username"
+                android:id="@+id/edtTx_login_workNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="账号"

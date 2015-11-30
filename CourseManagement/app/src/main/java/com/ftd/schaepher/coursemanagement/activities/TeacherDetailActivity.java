@@ -46,7 +46,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("用户信息");
 
-        edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_username);
+        edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_workNumber);
         edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_detail_password);
         edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_detail_name);
         edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_phone_number);
