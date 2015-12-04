@@ -140,9 +140,22 @@ public class TaskCreationActivity extends AppCompatActivity
                         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                         progress.setCancelable(false);
                         progress.show();
-                        Message msg = new Message();
-                        msg.what = RELEASE;
-                        mHandler.sendMessage(msg);
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                TableTaskInfo task = getNewTaskInformation();
+                                tableCourseName = task.getRelativeTable();
+                                try {
+                                    createTable();
+                                    dbHelper.insert(task);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    showError();
+                                } finally {
+                                    closeProgress();
+                                }
+                            }
+                        }.start();
                     }
                 });
                 notificationDialog.negativeActionClickListener(new View.OnClickListener() {
@@ -155,6 +168,25 @@ public class TaskCreationActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showError() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TaskCreationActivity.this, "发布错误，请重新发布", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void closeProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+                finish();
+            }
+        });
     }
 
     private boolean isPassValidate() {
@@ -313,44 +345,6 @@ public class TaskCreationActivity extends AppCompatActivity
                 })
                 .show();
     }
-
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case RELEASE:
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            TableTaskInfo task = getNewTaskInformation();
-                            tableCourseName = task.getRelativeTable();
-                            try {
-                                createTable();
-                                dbHelper.insert(task);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Message msg = new Message();
-                                msg.what = RELEASE_FAILURE;
-                                mHandler.sendMessage(msg);
-                            } finally {
-                                progress.cancel();
-                                finish();
-                            }
-                        }
-                    }.start();
-                    break;
-
-                case RELEASE_FAILURE:
-                    Toast.makeText(TaskCreationActivity.this, "发布错误，请重新发布", Toast.LENGTH_SHORT).show();
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

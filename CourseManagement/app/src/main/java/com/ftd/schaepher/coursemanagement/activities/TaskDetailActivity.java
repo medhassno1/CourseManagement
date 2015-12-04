@@ -3,11 +3,10 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -66,7 +65,8 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private String excelTitle;
     private String taskTerm;
     private String taskName;
-    private static final int EXPORT = 1;
+
+    private SharedPreferences.Editor informationEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +77,8 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle("报课任务详情");
         mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        informationEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
 
         taskId = getIntent().getStringExtra("taskId");
         dbHelper = new CourseDBHelper(this);
@@ -138,9 +140,18 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                                 progress.setCancelable(false);
                                 progress.show();
-                                Message msg = new Message();
-                                msg.what = EXPORT;
-                                mHandler.sendMessage(msg);
+                                new Thread(){
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            exportFile();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        } finally {
+                                            closeProgress();
+                                        }
+                                    }
+                                }.start();
                             }
                         }).negativeAction("取消")
                         .negativeActionClickListener(new View.OnClickListener() {
@@ -153,10 +164,20 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
             case R.id.action_commit_task:
                 Log.d("TAG", "commit task");
                 //点击提交报课逻辑
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void closeProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+            }
+        });
     }
 
     //导出文件
@@ -251,32 +272,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         wbook.close();
 
     }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case EXPORT:
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                exportFile();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            } finally {
-                                progress.cancel();
-                            }
-                        }
-                    }.start();
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    };
 
     // 点击查看文件跳转逻辑
     @Override
