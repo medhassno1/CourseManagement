@@ -10,7 +10,6 @@ import net.tsz.afinal.annotation.sqlite.Table;
 @Table(name = "TableTaskInfo")
 public class TableTaskInfo {
     @Id
-    private transient int id;
     private String relativeTable;
     private String year;
     private String semester;
@@ -25,14 +24,6 @@ public class TableTaskInfo {
     public TableTaskInfo(String taskState, String relativeTable) {
         this.taskState = taskState;
         this.relativeTable = relativeTable;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getRelativeTable() {
@@ -94,7 +85,6 @@ public class TableTaskInfo {
     @Override
     public String toString() {
         return "TableTaskInfo{" +
-                "id=" + id +
                 ", relativeTable='" + relativeTable + '\'' +
                 ", year='" + year + '\'' +
                 ", semester='" + semester + '\'' +
