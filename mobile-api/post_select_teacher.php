@@ -7,7 +7,7 @@ $workNumber = $_POST["workNumber"];
 //$tableName = 'tc_net_pro201502';
 //$workNumber = '10003';
 session_start();
-$_SESSION['id'] = 'user_teaching_office';
+$ident = $_SESSION['id'];
 $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
 if (!$con) {
     die('Could not connect: ' . mysql_error());
