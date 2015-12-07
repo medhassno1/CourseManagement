@@ -58,7 +58,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private ProgressDialog progress;
 
     private String identity;
-    private String taskId;
+    private String relativeTable;
     private TableTaskInfo task;
     private CourseDBHelper dbHelper;
     private String tableName;
@@ -78,7 +78,8 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         mActionBar.setTitle("报课任务详情");
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        taskId = getIntent().getStringExtra("taskId");
+        relativeTable = getIntent().getStringExtra("relativeTable");
+        Log.i("TAG","relativeTable"+relativeTable);
         dbHelper = new CourseDBHelper(this);
         initWidgetValue();
     }
@@ -94,8 +95,8 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cardvTaskDetail = (CardView) findViewById(R.id.cardv_task_detail);
         cardvTaskDetail.setOnClickListener(this);
 
-        Log.d("TASKID", taskId);
-        task = (TableTaskInfo) dbHelper.findById(taskId, TableTaskInfo.class);
+        Log.d("relativeTable", relativeTable);
+        task = (TableTaskInfo) dbHelper.findById(relativeTable, TableTaskInfo.class);
         Log.d("TAG", task.toString());
         taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);
