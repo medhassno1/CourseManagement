@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -70,6 +69,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private String taskTerm;
     private String taskName;
     private String workNumber;
+    private boolean isFinishCommitTask;
 
     private SharedPreferences.Editor informationEditor;
 
@@ -86,7 +86,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         informationEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
         workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
         relativeTable = getIntent().getStringExtra("relativeTable");
-        Log.i("TAG","relativeTable"+relativeTable);
+        Log.i("TAG", "relativeTable" + relativeTable);
         dbHelper = new CourseDBHelper(this);
         initWidgetValue();
     }
@@ -170,43 +170,65 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
             case R.id.action_commit_task:
                 Log.d("TAG", "commit task");
                 //点击提交报课逻辑
-                final SimpleDialog commitTaskDialog = new SimpleDialog(TaskDetailActivity.this);
-                commitTaskDialog.message("一旦提交将不能再次修改报课信息！")
-                        .title("是否提交报课")
-                        .positiveAction("确定")
-                        .positiveActionClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                commitTaskDialog.cancel();
-                                progress = new ProgressDialog(TaskDetailActivity.this);
-                                progress.setMessage("提交中...");
-                                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                                progress.setCancelable(false);
-                                progress.show();
-                                new Thread() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            commitTask();
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        } finally {
-                                            closeProgress();
-                                        }
-                                    }
-                                }.start();
-                            }
-                        }).negativeAction("取消")
-                        .negativeActionClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                commitTaskDialog.cancel();
-                            }
-                        }).show();
+                isFinishCommitTask = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getBoolean("isFinishCommitTask", false);
+                if (isFinishCommitTask){
+                    showForbidCommitDialog();
+                }else {
+                    showCommitTaskDialog();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showCommitTaskDialog() {
+        final SimpleDialog commitTaskDialog = new SimpleDialog(TaskDetailActivity.this);
+        commitTaskDialog.message("一旦提交将不能再次修改报课信息！")
+                .title("是否提交报课")
+                .positiveAction("确定")
+                .positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                        progress = new ProgressDialog(TaskDetailActivity.this);
+                        progress.setMessage("提交中...");
+                        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progress.setCancelable(false);
+                        progress.show();
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    commitTask();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    closeProgress();
+                                }
+                            }
+                        }.start();
+                    }
+                }).negativeAction("取消")
+                .negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                    }
+                }).show();
+    }
+
+    private void showForbidCommitDialog() {
+        final SimpleDialog commitTaskDialog = new SimpleDialog(TaskDetailActivity.this);
+        commitTaskDialog.message("您已提交过报课，不能再次提交！")
+                .title("提示")
+                .positiveAction("确定")
+                .positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                    }
+                }).show();
     }
 
     private void commitTask() {
