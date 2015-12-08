@@ -33,7 +33,12 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -125,8 +130,18 @@ public class TaskListActivity extends AppCompatActivity
         setSupportDoubleBackExit(true);
 
         dbHelper = new CourseDBHelper(TaskListActivity.this);
+        //dbHelper.deleteAll(TableTaskInfo.class);
+
+        initSpinner();
+        initTaskListData();
 
         initUserInformation();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initSpinner();
     }
 
     private void initSpinner() {
@@ -137,6 +152,7 @@ public class TaskListActivity extends AppCompatActivity
         Set termData = new HashSet();
         final List<TableTaskInfo> taskInfo ;
         taskInfo =  dbHelper.findAll(TableTaskInfo.class);
+
         for (TableTaskInfo list:taskInfo){
             termData.add(list.getYear()+list.getSemester());
         }
@@ -148,16 +164,19 @@ public class TaskListActivity extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedTerm = (String) parent.getItemAtPosition(position);
-                Log.d(TAG, "selectedTerm:" + selectedTerm);
-                taskListData.clear();
-                for (TableTaskInfo task : taskInfo) {
-                    String term = task.getYear() + task.getSemester();
-                    if (term.equals(selectedTerm)) {
-                        Log.d(TAG, "task:" + term);
-                        taskListData.add(task);
+                try {
+                    taskListData.clear();
+                    for (TableTaskInfo task : taskInfo) {
+                        String term = task.getYear() + task.getSemester();
+                        if (term.equals(selectedTerm)) {
+                            Log.d("TAG", task.toString());
+                            taskListData.add(task);
+                        }
                     }
+
+                    mTaskAdapter.notifyDataSetChanged();
+                }catch(Exception e){
                 }
-                mTaskAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -220,17 +239,40 @@ public class TaskListActivity extends AppCompatActivity
         ownInformationSaveEditor.apply();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initSpinner();
-        initTaskListData();
-        initTaskListView();
-    }
-
     // 初始化数据，从数据库中获取当前页面所需的数据
     private void initTaskListData() {
-        taskListData = dbHelper.findAll(TableTaskInfo.class);
+        try {
+            NetworkManager.getJsonString(ConstantTools.TABLE_TASK_INFO,
+                    new NetworkManager.ResponseCallback() {
+                        @Override
+                        public void onResponse(Response response) throws IOException {
+                            //从服务器获取报课任务数据，并更新到本地数据库
+                            JsonTools jsonTools = new JsonTools();
+                            List list = jsonTools.getJsonList(response.body().string(), TableTaskInfo.class);
+                            Log.w("jsonList", list.toString());
+
+                            dbHelper.deleteAll(TableTaskInfo.class);
+                            Log.i("TAG1", "getJsonString中taskListData是否为空" + (taskListData == null));
+                            dbHelper.insertAll(list);
+                            //从本地数据库获取报课任务数据
+                            taskListData = dbHelper.findAll(TableTaskInfo.class);
+                            Log.i("TAG1", "getJsonString中taskListData是否为空" + (taskListData == null));
+                            TaskListActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initTaskListView();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Request request, IOException e) {
+
+                        }
+                    });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // 显示数据，控件与数据绑定
@@ -239,14 +281,15 @@ public class TaskListActivity extends AppCompatActivity
         ListView mListView = (ListView) findViewById(R.id.lv_task_list);
         mListView.setAdapter(mTaskAdapter);
         mListView.setOnItemClickListener(this);
+        Log.i("TAG","显示数据");
     }
 
     // 点击任务列表项跳转操作
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(TAG, String.valueOf(taskListData.get(position).getId()));
+        //Log.d(TAG, String.valueOf(taskListData.get(position).getId()));
         Intent intent = new Intent(TaskListActivity.this, TaskDetailActivity.class);
-        intent.putExtra("taskId", String.valueOf(taskListData.get(position).getId()));
+        intent.putExtra("relativeTable", String.valueOf(taskListData.get(position).getRelativeTable()));
         startActivity(intent);
     }
 
