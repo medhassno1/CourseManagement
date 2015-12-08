@@ -312,13 +312,12 @@ public class TaskListActivity extends AppCompatActivity
                 break;
             case R.id.nav_own_information:
                 startActivity(new Intent(TaskListActivity.this, TeacherDetailActivity.class));
+
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        Message msg = new Message();
-                        msg.what = CLOSE_NAV;
-                        mHandler.sendMessage(msg);
+                        closeNavigationView();
                     }
                 }, 200);
                 break;
@@ -326,6 +325,15 @@ public class TaskListActivity extends AppCompatActivity
                 break;
         }
         return false;
+    }
+
+    private void closeNavigationView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                onBackPressed();
+            }
+        });
     }
 
     // 添加标题栏上的按钮图标
@@ -409,20 +417,4 @@ public class TaskListActivity extends AppCompatActivity
             TextView taskName;
         }
     }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case CLOSE_NAV:
-                    onBackPressed();
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    };
-
 }

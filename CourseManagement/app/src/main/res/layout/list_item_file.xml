@@ -1,41 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    <TextView
-        android:id="@+id/tv_file_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:textColor="#0a0809"/>
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
     <LinearLayout
-        android:id="@+id/file_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/tv_file_size"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:textColor="#a618191b"
-            android:layout_weight="1"
-            android:textSize="18sp"/>
+        android:id="@+id/layout_img_type"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/imgv_file_type"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:paddingRight="5dp"
+            android:src="@drawable/other_file"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:gravity="left|center"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_file_type"
-            android:layout_width="0dip"
+            android:id="@+id/tv_file_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#a618191b"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:textSize="18sp"/>
-        <TextView
-            android:id="@+id/tv_file_date"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:textColor="#a618191b"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:textSize="18sp"/>
+            android:textColor="#0a0809"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:id="@+id/file_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_file_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#a618191b"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/imgv_spilt_one"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/spilt_line_vertical" />
+
+            <TextView
+                android:id="@+id/tv_file_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:textColor="#a618191b"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/imgv_spilt_two"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/spilt_line_vertical" />
+
+            <TextView
+                android:id="@+id/tv_file_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:textColor="#a618191b"
+                android:textSize="16sp" />
+        </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>

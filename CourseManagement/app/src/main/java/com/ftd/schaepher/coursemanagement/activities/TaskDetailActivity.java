@@ -3,11 +3,10 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -17,12 +16,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.rey.material.app.SimpleDialog;
 
 import java.io.File;
@@ -66,7 +68,10 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private String excelTitle;
     private String taskTerm;
     private String taskName;
-    private static final int EXPORT = 1;
+    private String workNumber;
+    private boolean isFinishCommitTask;
+
+    private SharedPreferences.Editor informationEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +83,10 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         mActionBar.setTitle("报课任务详情");
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
+        informationEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
+        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
         relativeTable = getIntent().getStringExtra("relativeTable");
-        Log.i("TAG","relativeTable"+relativeTable);
+        Log.i("TAG", "relativeTable" + relativeTable);
         dbHelper = new CourseDBHelper(this);
         initWidgetValue();
     }
@@ -139,9 +146,18 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                                 progress.setCancelable(false);
                                 progress.show();
-                                Message msg = new Message();
-                                msg.what = EXPORT;
-                                mHandler.sendMessage(msg);
+                                new Thread() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            exportFile();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        } finally {
+                                            closeProgress();
+                                        }
+                                    }
+                                }.start();
                             }
                         }).negativeAction("取消")
                         .negativeActionClickListener(new View.OnClickListener() {
@@ -154,10 +170,116 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
             case R.id.action_commit_task:
                 Log.d("TAG", "commit task");
                 //点击提交报课逻辑
+                isFinishCommitTask = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getBoolean("isFinishCommitTask", false);
+                if (isFinishCommitTask){
+                    showForbidCommitDialog();
+                }else {
+                    showCommitTaskDialog();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showCommitTaskDialog() {
+        final SimpleDialog commitTaskDialog = new SimpleDialog(TaskDetailActivity.this);
+        commitTaskDialog.message("一旦提交将不能再次修改报课信息！")
+                .title("是否提交报课")
+                .positiveAction("确定")
+                .positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                        progress = new ProgressDialog(TaskDetailActivity.this);
+                        progress.setMessage("提交中...");
+                        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progress.setCancelable(false);
+                        progress.show();
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    commitTask();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    closeProgress();
+                                }
+                            }
+                        }.start();
+                    }
+                }).negativeAction("取消")
+                .negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                    }
+                }).show();
+    }
+
+    private void showForbidCommitDialog() {
+        final SimpleDialog commitTaskDialog = new SimpleDialog(TaskDetailActivity.this);
+        commitTaskDialog.message("您已提交过报课，不能再次提交！")
+                .title("提示")
+                .positiveAction("确定")
+                .positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                    }
+                }).show();
+    }
+
+    private void commitTask() {
+        tableName = task.getRelativeTable();
+
+        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+        db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+
+        List<TableCourseMultiline> commitData = dbHelper.db.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber+"'");
+        Log.d("commitData", String.valueOf(commitData));
+        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
+        db.close();
+        Log.d("commitData",new JsonTools().getJsonString(commitData));
+        try {
+            NetworkManager.postJsonString(tableName,new JsonTools().getJsonString(commitData),ConstantTools.ACTION_INSERT_TABLE);
+            showCommitTaskSucceed();
+            informationEditor.putBoolean("isFinishCommitTask",true);
+            informationEditor.apply();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showCommitTaskError();
+        }
+
+    }
+
+    private void showCommitTaskError() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TaskDetailActivity.this, "提交失败，请重新提交", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showCommitTaskSucceed() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TaskDetailActivity.this, "提交成功", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void closeProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+            }
+        });
     }
 
     //导出文件
@@ -252,32 +374,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         wbook.close();
 
     }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case EXPORT:
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                exportFile();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            } finally {
-                                progress.cancel();
-                            }
-                        }
-                    }.start();
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    };
 
     // 点击查看文件跳转逻辑
     @Override

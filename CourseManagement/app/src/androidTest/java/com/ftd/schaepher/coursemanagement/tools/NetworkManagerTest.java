@@ -17,12 +17,5 @@ public class NetworkManagerTest extends InstrumentationTestCase {
     protected void runTest() throws Throwable {
         super.runTest();
 
-        try {
-            NetworkManager manager = new NetworkManager();
-            String jsonString = manager.getJsonString(ConstantTools.TABLE_DEPARTMENT_HEAD);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

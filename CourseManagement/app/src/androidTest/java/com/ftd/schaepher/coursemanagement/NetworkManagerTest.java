@@ -28,19 +28,6 @@ public class NetworkManagerTest extends InstrumentationTestCase {
 
     @Override
     protected void runTest() throws Throwable {
-        super.runTest();
-        NetworkManager manager = new NetworkManager();
-        try {
-            String response = manager.getJsonString(ConstantTools.TABLE_DEPARTMENT_HEAD);
 
-            JsonTools jsonTools = new JsonTools();
-            List list = jsonTools.getJsonList(response, TableUserDepartmentHead.class);
-            Log.w("jsonList", list.toString());
-
-            CourseDBHelper dbHelper= new CourseDBHelper(context);
-            dbHelper.insertAll(list);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

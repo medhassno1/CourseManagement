@@ -38,6 +38,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private String tableName;
     private String userName;
     private String workNumber;
+    private boolean isFinishCommitTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tableName = getIntent().getStringExtra("tableName");
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
 
+        isFinishCommitTask = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getBoolean("isFinishCommitTask", false);
         userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_NAME, "");
         workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
     }
@@ -109,68 +111,76 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
         initAlertDialogData(position, alertDialogView);
-        mBuilder.setView(alertDialogView)
-                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText edtTxDialogFromToEnd =
-                                (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
-                        EditText edtTxDialogNote =
-                                (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
+        mBuilder.setView(alertDialogView);
+        if (isFinishCommitTask) {
+            mBuilder.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
-                        try {
-                            db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-                            db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-                            db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+                }
+            });
+        } else {
+            mBuilder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    EditText edtTxDialogFromToEnd =
+                            (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
+                    EditText edtTxDialogNote =
+                            (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
 
-                            TableCourseMultiline courseModify = new TableCourseMultiline();
-                            courseModify.setCourseName(excelListData.get(position).getCourseName());
-                            courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
-                            courseModify.setRemark(edtTxDialogNote.getText().toString());
-                            courseModify.setTeacherName(userName);
-                            courseModify.setWorkNumber(workNumber);
-                            dbHelper.update(courseModify);
+                    try {
+                        db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+                        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+                        db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
 
-                            db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
-                            db.close();
+                        TableCourseMultiline courseModify = new TableCourseMultiline();
+                        courseModify.setCourseName(excelListData.get(position).getCourseName());
+                        courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
+                        courseModify.setRemark(edtTxDialogNote.getText().toString());
+                        courseModify.setTeacherName(userName);
+                        courseModify.setWorkNumber(workNumber);
+                        dbHelper.update(courseModify);
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
+                        db.close();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    onResume();
+                }
+            })
+                    .setNeutralButton("删除", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+                                db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
+                                db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+
+                                TableCourseMultiline courseModify = new TableCourseMultiline();
+                                courseModify.setCourseName(excelListData.get(position).getCourseName());
+                                courseModify.setTimePeriod("");
+                                courseModify.setRemark("");
+                                courseModify.setTeacherName("");
+                                courseModify.setWorkNumber("");
+                                dbHelper.update(courseModify);
+
+                                db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
+                                db.close();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            onResume();
                         }
-                        onResume();
-                    }
-                })
-                .setNeutralButton("删除", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-                            db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-                            db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
-
-                            TableCourseMultiline courseModify = new TableCourseMultiline();
-                            courseModify.setCourseName(excelListData.get(position).getCourseName());
-                            courseModify.setTimePeriod("");
-                            courseModify.setRemark("");
-                            courseModify.setTeacherName("");
-                            courseModify.setWorkNumber("");
-                            dbHelper.update(courseModify);
-
-                            db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
-                            db.close();
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                         }
-                        onResume();
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
+                    });
+        }
         return mBuilder.create();
     }
 
@@ -200,6 +210,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tvDialogComputerHour.setText(excelListData.get(position).getOnMachineHour());
         edtTxDialogFromtoEnd.setText(excelListData.get(position).getTimePeriod());
         edtTxDialogNote.setText(excelListData.get(position).getRemark());
+        if (isFinishCommitTask){
+            edtTxDialogFromtoEnd.setEnabled(false);
+            edtTxDialogNote.setEnabled(false);
+        }
     }
 
     @Override
