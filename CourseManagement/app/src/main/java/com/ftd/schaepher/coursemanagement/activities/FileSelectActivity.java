@@ -1,33 +1,27 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.adapter.FileListAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 
 import java.io.File;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,9 +138,9 @@ public class FileSelectActivity extends AppCompatActivity
                                 CourseDBHelper dbHelper = new CourseDBHelper();
                                 dbHelper.createDataBase(FileSelectActivity.this);
                                 TableUserTeacher teacher = teachersList.get(i);
-                                try{
+                                try {
                                     dbHelper.insert(teacher);
-                                }catch(Exception e){
+                                } catch (Exception e) {
                                 }
                             }
                             finish();
@@ -175,95 +169,4 @@ public class FileSelectActivity extends AppCompatActivity
                     }).show();
         }
     }
-
-    /**
-     * 文件选择的适配器
-     */
-    private class FileListAdapter extends BaseAdapter {
-
-        private Context context;
-        private ArrayList<File> files;
-        private boolean isRoot;
-        private LayoutInflater mInflater;
-
-        public FileListAdapter(Context context, ArrayList<File> files, boolean isRoot) {
-            this.context = context;
-            this.files = files;
-            this.isRoot = isRoot;
-            mInflater = LayoutInflater.from(context);
-        }
-
-        @Override
-        public int getCount() {
-            return files.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return files.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-            if (convertView == null) {
-                viewHolder = new ViewHolder();
-                convertView = mInflater.inflate(R.layout.list_item_file, null);
-                convertView.setTag(viewHolder);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.tv_file_title);
-                viewHolder.type = (TextView) convertView.findViewById(R.id.tv_file_type);
-                viewHolder.data = (TextView) convertView.findViewById(R.id.tv_file_date);
-                viewHolder.size = (TextView) convertView.findViewById(R.id.tv_file_size);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-
-            File file = (File) getItem(position);
-            if (position == 0 && !isRoot) {
-                viewHolder.title.setText("返回上一级");
-                viewHolder.data.setVisibility(View.GONE);
-                viewHolder.size.setVisibility(View.GONE);
-                viewHolder.type.setVisibility(View.GONE);
-            } else {
-                String fileName = file.getName();
-                viewHolder.title.setText(fileName);
-                if (file.isDirectory()) {
-                    viewHolder.size.setText("文件夹");
-                    viewHolder.size.setTextColor(Color.RED);
-                    viewHolder.type.setVisibility(View.GONE);
-                    viewHolder.data.setVisibility(View.GONE);
-                } else {
-                    long fileSize = file.length();
-                    if (fileSize > 1024 * 1024) {
-                        float size = fileSize / (1024f * 1024f);
-                        viewHolder.size.setText(new DecimalFormat("#.00").format(size) + "MB");
-                    } else if (fileSize >= 1024) {
-                        float size = fileSize / 1024;
-                        viewHolder.size.setText(new DecimalFormat("#.00").format(size) + "KB");
-                    } else {
-                        viewHolder.size.setText(fileSize + "B");
-                    }
-                    int dot = fileName.indexOf('.');
-                    if (dot > -1 && dot < (fileName.length() - 1)) {
-                        viewHolder.type.setText(fileName.substring(dot + 1) + "文件");
-                    }
-                    viewHolder.data.setText(new SimpleDateFormat("yyyy/MM/dd HH:mm").format(file.lastModified()));
-                }
-            }
-            return convertView;
-        }
-
-        class ViewHolder {
-            private TextView title;
-            private TextView type;
-            private TextView data;
-            private TextView size;
-        }
-    }
-
 }
