@@ -200,9 +200,9 @@ public class TaskCreationActivity extends AppCompatActivity
 
     // 建表
     private void createTable() {
-        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-        db.execSQL(CourseDBHelper.CREATE_TABLE_COURSE_MULTILINE);
+        String commonName = TableCourseMultiline.class.getSimpleName();
+        dbHelper.dropTable(commonName);
+        dbHelper.createNewCourseTable();
 
         // 解析Excel表格
         ExcelTools excelTools = new ExcelTools();
@@ -213,8 +213,7 @@ public class TaskCreationActivity extends AppCompatActivity
             dbHelper.insert(courseList.get(i));
         }
         // 改名
-        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableCourseName);
-        db.close();
+        dbHelper.changeTableName(commonName,tableCourseName);
     }
 
     // 获取即将发布的任务的信息,未完成（哪里未完成？发布到服务器？）

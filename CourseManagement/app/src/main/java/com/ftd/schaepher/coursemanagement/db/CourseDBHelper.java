@@ -20,66 +20,51 @@ import java.util.List;
 
 public class CourseDBHelper {
     private FinalDb db;
-    private Context context;
     private SQLiteDatabase database;
 
     public CourseDBHelper(Context context) {
-        this.context = context;
         db = FinalDb.create(context, "teacherclass.db");
+        database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        initTable();
     }
 
-    public static final String CREATE_TABLE_COURSE_MULTILINE = "CREATE TABLE TableCourseMultiline "
-            + "( insertTime text primary key, "
-            + "workNumber text, "
-            + "grade text, "
-            + "major text , "
-            + "people text, "
-            + "courseName text, "
-            + "courseType text, "
-            + "courseCredit text, "
-            + "courseHour text, "
-            + "practiceHour text, "
-            + "onMachineHour text, "
-            + "timePeriod text,"
-            + "teacherName text,"
-            + "remark text)";
-
-    // 创建数据库
-    public void createDataBase(Context context) {
-        db = FinalDb.create(context, "teacherclass.db");
-    }
-
-    public void createTableTeacher() {
+    private void initTable(){
         TableUserTeacher teacher = new TableUserTeacher();
         db.save(teacher);
-    }
 
-    public void createTableTeachingDepartment() {
         TableUserTeachingOffice tableTeachingDepartmentr = new TableUserTeachingOffice();
         db.save(tableTeachingDepartmentr);
-    }
 
-    public void createTableSystemLeader() {
         TableUserDepartmentHead tableUserDepartmentHead = new TableUserDepartmentHead();
         db.save(tableUserDepartmentHead);
-    }
 
-    public void createTableClass() {
-        TableCourseMultiline tableCourseMultiline = new TableCourseMultiline();
-        db.save(tableCourseMultiline);
-    }
-
-    public void createTableTask() {
         TableTaskInfo tableTaskInfo = new TableTaskInfo();
         db.save(tableTaskInfo);
-    }
 
-    public void createTableMajor() {
         TableManageMajor tableManageMajor = new TableManageMajor();
         db.save(tableManageMajor);
     }
 
-    // 插入数据
+    public void createNewCourseTable(){
+        String createTableCourseMultiline = "CREATE TABLE TableCourseMultiline "
+                + "( insertTime text primary key, "
+                + "workNumber text, "
+                + "grade text, "
+                + "major text , "
+                + "people text, "
+                + "courseName text, "
+                + "courseType text, "
+                + "courseCredit text, "
+                + "courseHour text, "
+                + "practiceHour text, "
+                + "onMachineHour text, "
+                + "timePeriod text,"
+                + "teacherName text,"
+                + "remark text)";
+        database.execSQL(createTableCourseMultiline);
+    }
+
+    // 增
     public void insert(Object entity) {
         db.save(entity);
     }
@@ -90,8 +75,8 @@ public class CourseDBHelper {
         }
     }
 
-    // 删除数据，class为id为表的主键
-    public void delete(Class<?> clazz, String id) {
+    // 删
+    public void deleteByID(Class<?> clazz, String id) {
         db.deleteById(clazz, id);
     }
 
@@ -113,19 +98,8 @@ public class CourseDBHelper {
         return db.findAll(clazz);
     }
 
-    public <T> List<T> findAllOrder(Class<T> clazz) {
-        return db.findAll(clazz, "year DESC,semester DESC");
-    }
-
     public <T> List<T> findAllByWhere(Class<T> clazz, String where) {
         return db.findAllByWhere(clazz, where);
-    }
-
-    public SQLiteDatabase getDb() {
-        if (database == null) {
-            database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-        }
-        return database;
     }
 
     public List<String> getSemesterList() {
@@ -133,15 +107,27 @@ public class CourseDBHelper {
                 "year", "semester"
         };
         String orderBy = "year DESC,semester DESC";
-        Cursor cursor = getDb()
+        Cursor cursor = database
                 .query(true, "TableTaskInfo", columns, null, null, null, null, orderBy, null);
         List<String> semester = new ArrayList<>();
         while (cursor.moveToNext()) {
             semester.add(cursor.getString(0) + cursor.getString(1));
         }
         cursor.close();
-        Loger.i("semester",semester.toString());
+        Loger.i("semester", semester.toString());
         return semester;
+    }
+
+    public void changeTableName(String from, String to) {
+        database.execSQL("ALTER TABLE " + from + " RENAME TO " + to);
+    }
+
+    public void dropTable(String tableName) {
+        database.execSQL("Drop table if exists " + tableName);
+    }
+
+    public void close(){
+        database.close();
     }
 
 }

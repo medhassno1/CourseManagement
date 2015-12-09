@@ -3,6 +3,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private String workNumber;
     private String identity;
 
+    private CourseDBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("用户信息");
+        dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
 
         edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_workNumber);
         edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_detail_password);
@@ -62,13 +66,14 @@ public class TeacherDetailActivity extends AppCompatActivity {
      */
     private void initTeacherData() {
         Intent intent = getIntent();
-        CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
-        identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_IDENTITY, "");
+
+        SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+        identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
         if (intent.getBooleanExtra("isQueryOwnInfomation", true)) {
-            workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORKNUMBER, "");
+            workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
             switch (identity) {
                 case ConstantStr.ID_TEACHER:
-                    TableUserTeacher teacher = (TableUserTeacher)
+                    TableUserTeacher teacher =
                             dbHelper.findById(workNumber, TableUserTeacher.class);
                     if (teacher != null) {
                         edtTxTeacherNumber.setText(teacher.getWorkNumber());
@@ -80,7 +85,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     break;
 
                 case ConstantStr.ID_DEPARTMENT_HEAD:
-                    TableUserDepartmentHead departmentHead = (TableUserDepartmentHead)
+                    TableUserDepartmentHead departmentHead =
                             dbHelper.findById(workNumber, TableUserDepartmentHead.class);
                     if (departmentHead != null) {
                         edtTxTeacherNumber.setText(departmentHead.getWorkNumber());
@@ -94,7 +99,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     break;
 
                 case ConstantStr.ID_TEACHING_OFFICE:
-                    TableUserTeachingOffice office = (TableUserTeachingOffice)
+                    TableUserTeachingOffice office =
                             dbHelper.findById(workNumber, TableUserTeachingOffice.class);
                     if (office != null) {
                         edtTxTeacherNumber.setText(office.getWorkNumber());
@@ -115,7 +120,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
             switch (queryIdentity) {
                 case ConstantStr.ID_TEACHING_OFFICE: {
-                    TableUserTeachingOffice Information = (TableUserTeachingOffice) dbHelper.findById(workNumber, TableUserTeachingOffice.class);
+                    TableUserTeachingOffice Information =
+                            dbHelper.findById(workNumber, TableUserTeachingOffice.class);
                     if (Information != null) {
                         edtTxTeacherNumber.setText(Information.getWorkNumber());
                         edtTxPassword.setText(Information.getPassword());
@@ -125,7 +131,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 }
                 break;
                 case ConstantStr.ID_DEPARTMENT_HEAD: {
-                    TableUserDepartmentHead Information = (TableUserDepartmentHead) dbHelper.findById(workNumber, TableUserDepartmentHead.class);
+                    TableUserDepartmentHead Information =
+                            dbHelper.findById(workNumber, TableUserDepartmentHead.class);
                     if (Information != null){
                         edtTxTeacherNumber.setText(Information.getWorkNumber());
                         edtTxPassword.setText(Information.getPassword());
@@ -137,7 +144,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 }
                 break;
                 case ConstantStr.ID_TEACHER: {
-                    TableUserTeacher Information = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
+                    TableUserTeacher Information =
+                            dbHelper.findById(workNumber, TableUserTeacher.class);
                     if (Information != null){
                         edtTxTeacherNumber.setText(Information.getWorkNumber());
                         edtTxPassword.setText(Information.getPassword());
@@ -192,7 +200,6 @@ public class TeacherDetailActivity extends AppCompatActivity {
                         (android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
                                 TableUserTeacher teacher = getTeacherData();
                                 dbHelper.update(teacher);
 
@@ -212,4 +219,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbHelper.close();
+    }
 }
