@@ -5,7 +5,7 @@ package com.ftd.schaepher.coursemanagement.tools;
  *
  * 这个类用来存储全局变量
  */
-public class Data {
+public class NetState {
     private static boolean isFirstNetConnect= true;
     private static boolean isFirstLoseNetConnect =true;
 
@@ -14,7 +14,7 @@ public class Data {
     }
 
     public static void setIsFirstLoseNetConnect(boolean isFirstLoseNetConnect) {
-        Data.isFirstLoseNetConnect = isFirstLoseNetConnect;
+        NetState.isFirstLoseNetConnect = isFirstLoseNetConnect;
     }
 
     public static boolean isFirstNetConnect() {
@@ -22,6 +22,6 @@ public class Data {
     }
 
     public static void setIsFirstNetConnect(boolean isFirstNetConnect) {
-        Data.isFirstNetConnect = isFirstNetConnect;
+        NetState.isFirstNetConnect = isFirstNetConnect;
     }
 }

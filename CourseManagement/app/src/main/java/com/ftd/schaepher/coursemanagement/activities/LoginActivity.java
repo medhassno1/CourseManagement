@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -89,15 +89,15 @@ public class LoginActivity extends AppCompatActivity
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (isFirstRun) {
-            Log.v("初始化数据库", "正在初始化");
+            Loger.v("初始化数据库", "正在初始化");
             editor.putBoolean("isFirstRun", false);
             editor.apply();
 
             Initialize initialize = new Initialize(); // 初始化数据库
             initialize.init(this);
-            Log.v("初始化数据库", "初始化完成");
+            Loger.v("初始化数据库", "初始化完成");
         } else {
-            Log.v("初始化数据库", "已初始化过");
+            Loger.v("初始化数据库", "已初始化过");
         }
     }
 
@@ -163,10 +163,11 @@ public class LoginActivity extends AppCompatActivity
                 @Override
                 public void onResponse(Response response) throws IOException {
                     String result = response.body().string();
-                    Log.d(TAG, result);
+                    Loger.d(TAG, result);
                     progress.cancel();
 
                     switch (result) {
+//                        这里应该改为获取服务器个人数据，并存储到数据库中
                         case "true":
                             informationEditor.putString(ConstantTools.USER_IDENTITY, identity);
                             informationEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
@@ -181,7 +182,6 @@ public class LoginActivity extends AppCompatActivity
                             sendToast("账号或密码错误");
                             break;
                         default:
-                            sendToast("请求服务器失败");
                             break;
                     }
 
@@ -189,7 +189,7 @@ public class LoginActivity extends AppCompatActivity
 
                 @Override
                 public void onFailure(Request request, IOException e) {
-
+                    sendToast("请求服务器失败");
                 }
             });
         } catch (IOException e) {

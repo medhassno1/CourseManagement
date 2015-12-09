@@ -186,7 +186,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     // 设置弹窗的数据
     private void initAlertDialogData(int position, View v) {
-        position = position;
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -196,7 +195,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         TextView tvDialogClassHour = (TextView) v.findViewById(R.id.tv_dialog_class_hour);
         TextView tvDialogExperimentHour = (TextView) v.findViewById(R.id.tv_dialog_experiment_hour);
         TextView tvDialogComputerHour = (TextView) v.findViewById(R.id.tv_dialog_computer_hour);
-        EditText edtTxDialogFromtoEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
+        EditText edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
         EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
 
         tvDialogGrade.setText(excelListData.get(position).getGrade());
@@ -208,10 +207,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tvDialogClassHour.setText(excelListData.get(position).getCourseHour());
         tvDialogExperimentHour.setText(excelListData.get(position).getPracticeHour());
         tvDialogComputerHour.setText(excelListData.get(position).getOnMachineHour());
-        edtTxDialogFromtoEnd.setText(excelListData.get(position).getTimePeriod());
+        edtTxDialogFromToEnd.setText(excelListData.get(position).getTimePeriod());
         edtTxDialogNote.setText(excelListData.get(position).getRemark());
         if (isFinishCommitTask){
-            edtTxDialogFromtoEnd.setEnabled(false);
+            edtTxDialogFromToEnd.setEnabled(false);
             edtTxDialogNote.setEnabled(false);
         }
     }

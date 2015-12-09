@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,13 +18,14 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 /**
  * Created by sxq on 2015/11/2.
  * 教师信息界面
  */
 public class TeacherDetailActivity extends AppCompatActivity {
-
+//  删除教师还没做
     private EditText edtTxTeacherNumber;
     private EditText edtTxPassword;
     private EditText edtTxTeacherName;
@@ -111,7 +111,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         } else {
             String queryIdentity = intent.getStringExtra("teacherIdentity");
             workNumber = intent.getStringExtra("teacherID");
-            Log.i("str2", "工号" + workNumber + "身份" + queryIdentity);
+            Loger.i("str2", "工号" + workNumber + "身份" + queryIdentity);
 
             switch (queryIdentity) {
                 case ConstantTools.ID_TEACHING_OFFICE: {

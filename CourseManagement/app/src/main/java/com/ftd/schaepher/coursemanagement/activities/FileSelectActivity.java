@@ -8,7 +8,7 @@ import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,6 +20,7 @@ import com.ftd.schaepher.coursemanagement.adapter.FileListAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,10 +32,10 @@ import java.util.List;
  */
 public class FileSelectActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener {
-
+//  尝试改成调用系统的文件管理器
     private ListView lvFileList;
     private TextView tvPath;
-    private FileListAdapter mFileAdpter;
+    private FileListAdapter mFileAdapter;
     private TextView tvItemCount;
 
     @Override
@@ -57,16 +58,16 @@ public class FileSelectActivity extends AppCompatActivity
         lvFileList.setOnItemClickListener(this);
 
         String sdCardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-        Log.i("path", sdCardRoot);
+        Loger.i("path", sdCardRoot);
         File folder = new File(sdCardRoot);
         initData(folder);
     }
 
 
     private void initData(File folder) {
-        boolean isRoot = (folder.getParent() == null);//是否为根目录
+        boolean isRoot = (folder.getParent() == null); // 是否为根目录
         tvPath.setText(folder.getAbsolutePath());
-        ArrayList<File> files = new ArrayList<File>();
+        ArrayList<File> files = new ArrayList<>();
         if (!isRoot) {
             files.add(folder.getParentFile());
         }
@@ -77,8 +78,8 @@ public class FileSelectActivity extends AppCompatActivity
                 files.add(file);
             }
         }
-        mFileAdpter = new FileListAdapter(this, files, isRoot);
-        lvFileList.setAdapter(mFileAdpter);
+        mFileAdapter = new FileListAdapter(this, files, isRoot);
+        lvFileList.setAdapter(mFileAdapter);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class FileSelectActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        File file = (File) mFileAdpter.getItem(position);
+        File file = (File) mFileAdapter.getItem(position);
         if (!file.canRead()) {
             new AlertDialog.Builder(this).setTitle("提示").setMessage("权限不足").setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 
@@ -114,7 +115,7 @@ public class FileSelectActivity extends AppCompatActivity
     private void importFile(File file) {
         final String path = file.getAbsolutePath();
         boolean isTeacherFile = getIntent().getBooleanExtra("isRequireImportTeacherFile", false);
-        Log.i("path", path);
+        Loger.i("path", path);
 
         if (!path.endsWith(".xls")) {   //直接调用excelTools.isTrueFileName()会出错，暂时无解
             new AlertDialog.Builder(this).setTitle("提示").setMessage("文件类型错误，请选择excel文件").setPositiveButton

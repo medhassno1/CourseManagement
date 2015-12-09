@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +22,7 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.rey.material.app.SimpleDialog;
@@ -86,7 +86,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         informationEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
         workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
         relativeTable = getIntent().getStringExtra("relativeTable");
-        Log.i("TAG", "relativeTable" + relativeTable);
+        Loger.i("TAG", "relativeTable" + relativeTable);
         dbHelper = new CourseDBHelper(this);
         initWidgetValue();
     }
@@ -102,9 +102,9 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cardvTaskDetail = (CardView) findViewById(R.id.cardv_task_detail);
         cardvTaskDetail.setOnClickListener(this);
 
-        Log.d("relativeTable", relativeTable);
+        Loger.d("relativeTable", relativeTable);
         task = (TableTaskInfo) dbHelper.findById(relativeTable, TableTaskInfo.class);
-        Log.d("TAG", task.toString());
+        Loger.d("TAG", task.toString());
         taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
@@ -168,7 +168,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                         }).show();
                 return true;
             case R.id.action_commit_task:
-                Log.d("TAG", "commit task");
+                Loger.d("TAG", "commit task");
                 //点击提交报课逻辑
                 isFinishCommitTask = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getBoolean("isFinishCommitTask", false);
                 if (isFinishCommitTask){
@@ -239,10 +239,10 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
 
         List<TableCourseMultiline> commitData = dbHelper.db.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber+"'");
-        Log.d("commitData", String.valueOf(commitData));
+        Loger.d("commitData", String.valueOf(commitData));
         db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
         db.close();
-        Log.d("commitData",new JsonTools().getJsonString(commitData));
+        Loger.d("commitData", new JsonTools().getJsonString(commitData));
         try {
             NetworkManager.postJsonString(tableName,new JsonTools().getJsonString(commitData),ConstantTools.ACTION_INSERT_TABLE);
             showCommitTaskSucceed();

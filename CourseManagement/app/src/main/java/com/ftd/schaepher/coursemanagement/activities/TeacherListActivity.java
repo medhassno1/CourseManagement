@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +32,7 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.widget.MoreListView;
 import com.squareup.okhttp.Request;
@@ -56,17 +56,17 @@ public class TeacherListActivity extends AppCompatActivity
 
     private Toolbar mToolbar;
     private EditText eSearch;
-    Runnable eChanged = new Runnable() {
+    private Runnable eChanged = new Runnable() {
         @Override
         public void run() {
+            // 搜索栏
             String data = eSearch.getText().toString();
-
         }
     };
     private ImageView ivDeleteText;
     private TextView tvOwnName;
     private boolean isSupportDoubleBackExit;
-    private long betweenDoubleBackTime;
+    private long doubleBackTime;
     private Handler myHandler = new Handler();
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeachingOffice> officeListData;
@@ -129,7 +129,7 @@ public class TeacherListActivity extends AppCompatActivity
                             CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
                             JsonTools jsonTools = new JsonTools();
                             List list = jsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
-                            Log.w("jsonList", list.toString());
+                            Loger.w("jsonList", list.toString());
 
                             dbHelper.deleteAll(TableUserTeacher.class);
                             dbHelper.insertAll(list);
@@ -166,13 +166,15 @@ public class TeacherListActivity extends AppCompatActivity
             mListView.setOnItemClickListener(this);
         }
         if (departmentListData != null) {
-            DepartmentHeadAdapter departmentAdapter = new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
+            DepartmentHeadAdapter departmentAdapter =
+                    new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
             ListView departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
             departmentListView.setAdapter(departmentAdapter);
             departmentListView.setOnItemClickListener(this);
         }
         if (officeListData != null) {
-            TeacherOfficeAdapter officeAdapter = new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
+            TeacherOfficeAdapter officeAdapter =
+                    new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
             ListView officeListView = (MoreListView) findViewById(R.id.lv_office_list);
             officeListView.setAdapter(officeAdapter);
             officeListView.setOnItemClickListener(this);
@@ -180,7 +182,8 @@ public class TeacherListActivity extends AppCompatActivity
     }
 
     private void initUserInformation() {
-        String ownName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_NAME, "");
+        String ownName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantTools.USER_NAME, "");
         tvOwnName.setText(ownName);
     }
 
@@ -190,8 +193,10 @@ public class TeacherListActivity extends AppCompatActivity
         if (identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
             getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
             MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
-            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input).setOnMenuItemClickListener(this);
-            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file).setOnMenuItemClickListener(this);
+            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input)
+                    .setOnMenuItemClickListener(this);
+            addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file)
+                    .setOnMenuItemClickListener(this);
         }
         return true;
     }
@@ -240,22 +245,22 @@ public class TeacherListActivity extends AppCompatActivity
         String queryIdentity;
         switch (parent.getId()) {
             case R.id.lv_office_list:
-                Log.i("parent", "教学办");
+                Loger.i("parent", "教学办");
                 queryWorkNumber = officeListData.get(position).getWorkNumber();
                 queryIdentity = ConstantTools.ID_TEACHING_OFFICE;
                 break;
             case R.id.lv_department_list:
-                Log.i("parent", "系负责人");
+                Loger.i("parent", "系负责人");
                 queryWorkNumber = departmentListData.get(position).getWorkNumber();
                 queryIdentity = ConstantTools.ID_DEPARTMENT_HEAD;
                 break;
             case R.id.lv_teacher_list:
                 queryWorkNumber = teacherListData.get(position).getWorkNumber();
                 queryIdentity = ConstantTools.ID_TEACHER;
-                Log.i("parent", "教师");
+                Loger.i("parent", "教师");
                 break;
             default:
-                Log.i("parent", "无" + parent.getCount());
+                Loger.i("parent", "无" + parent.getCount());
                 queryWorkNumber = "";
                 queryIdentity = "";
                 break;
@@ -265,9 +270,9 @@ public class TeacherListActivity extends AppCompatActivity
         intend.putExtra("isQueryOwnInfomation", false);
         startActivity(intend);
 
-        Log.i("str", String.valueOf(parent));
-        Log.i("str", position + "    " + id);
-        Log.i("str", queryWorkNumber + "  " + queryIdentity);
+        Loger.i("str", String.valueOf(parent));
+        Loger.i("str", position + "    " + id);
+        Loger.i("str", queryWorkNumber + "  " + queryIdentity);
     }
 
     // 点击标题栏的子菜单事件
@@ -345,9 +350,9 @@ public class TeacherListActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (isSupportDoubleBackExit) {
-            if ((System.currentTimeMillis() - betweenDoubleBackTime) > 2000) {
+            if ((System.currentTimeMillis() - doubleBackTime) > 2000) {
                 Toast.makeText(TeacherListActivity.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
-                betweenDoubleBackTime = System.currentTimeMillis();
+                doubleBackTime = System.currentTimeMillis();
             } else {
                 System.exit(0);
             }
