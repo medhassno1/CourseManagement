@@ -1,28 +1,23 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
-import android.support.design.widget.TabLayout;
-
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by Schaepher on 2015/11/20.
  */
 public class JsonToolsTest extends TestCase {
-    JsonTools jsonTools;
     String jsonString;
     List<TableUserTeacher> expectedList;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        jsonTools = new JsonTools();
         jsonString = "[{\"workNumber\":\"00001\",\"password\":\"00001\"," +
                 "\"name\":\"陈世发\",\"sex\":\"男\",\"birthday\":\"19941226\"," +
                 "\"department\":\"\",\"telephone\":\"\",\"email\":\"\"}," +
@@ -61,12 +56,12 @@ public class JsonToolsTest extends TestCase {
     }
 
     public void testGetJsonList(){
-        List<TableUserTeacher> actualList = jsonTools.getJsonList(jsonString, TableUserTeacher.class);
+        List<TableUserTeacher> actualList = JsonTools.getJsonList(jsonString, TableUserTeacher.class);
         Assert.assertEquals(expectedList.toString(), actualList.toString());
     }
 
     public void testGetJsonString(){
-        String string = jsonTools.getJsonString(expectedList);
+        String string = JsonTools.getJsonString(expectedList);
         assertSame(jsonString,string);
 
     }

@@ -136,8 +136,7 @@ public class FileSelectActivity extends AppCompatActivity
                             List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
                             //导入教师表
                             for (int i = 0; i < teachersList.size(); i++) {
-                                CourseDBHelper dbHelper = new CourseDBHelper();
-                                dbHelper.createDataBase(FileSelectActivity.this);
+                                CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
                                 TableUserTeacher teacher = teachersList.get(i);
                                 try {
                                     dbHelper.insert(teacher);

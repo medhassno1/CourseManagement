@@ -30,7 +30,7 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
-import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
@@ -81,8 +81,8 @@ public class TeacherListActivity extends AppCompatActivity
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
 
-        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE)
-                .getString(ConstantTools.USER_IDENTITY, null);
+        identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_IDENTITY, null);
 
         // 侧滑菜单
         setNavViewConfig();
@@ -121,14 +121,13 @@ public class TeacherListActivity extends AppCompatActivity
     // 初始化教师列表数据
     private void initTeacherListData() {
         try {
-            NetworkManager.getJsonString(ConstantTools.TABLE_USER_TEACHER,
+            NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHER,
                     new NetworkManager.ResponseCallback() {
                         @Override
                         public void onResponse(Response response) throws IOException {
                             //从服务器获取教师数据，并更新到本地数据库
                             CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
-                            JsonTools jsonTools = new JsonTools();
-                            List list = jsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
+                            List list = JsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
                             Loger.w("jsonList", list.toString());
 
                             dbHelper.deleteAll(TableUserTeacher.class);
@@ -182,15 +181,15 @@ public class TeacherListActivity extends AppCompatActivity
     }
 
     private void initUserInformation() {
-        String ownName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE)
-                .getString(ConstantTools.USER_NAME, "");
+        String ownName = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_NAME, "");
         tvOwnName.setText(ownName);
     }
 
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
             MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
             addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input)
@@ -247,16 +246,16 @@ public class TeacherListActivity extends AppCompatActivity
             case R.id.lv_office_list:
                 Loger.i("parent", "教学办");
                 queryWorkNumber = officeListData.get(position).getWorkNumber();
-                queryIdentity = ConstantTools.ID_TEACHING_OFFICE;
+                queryIdentity = ConstantStr.ID_TEACHING_OFFICE;
                 break;
             case R.id.lv_department_list:
                 Loger.i("parent", "系负责人");
                 queryWorkNumber = departmentListData.get(position).getWorkNumber();
-                queryIdentity = ConstantTools.ID_DEPARTMENT_HEAD;
+                queryIdentity = ConstantStr.ID_DEPARTMENT_HEAD;
                 break;
             case R.id.lv_teacher_list:
                 queryWorkNumber = teacherListData.get(position).getWorkNumber();
-                queryIdentity = ConstantTools.ID_TEACHER;
+                queryIdentity = ConstantStr.ID_TEACHER;
                 Loger.i("parent", "教师");
                 break;
             default:

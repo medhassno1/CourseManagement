@@ -77,8 +77,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                             setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    CourseDBHelper dbHelper = new CourseDBHelper();
-                                    dbHelper.createDataBase(TeacherCreationActivity.this);
+                                    CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
 //                                    这里判断要添加哪种身份
                                     TableUserTeacher teacher = getTeacherData();
                                     try {

@@ -9,11 +9,11 @@ import net.tsz.afinal.annotation.sqlite.Table;
  */
 @Table(name = "TableCourseCombine")
 public class TableCourseCombine {
-    @Id
     private String insertTime;
     private String grade;
     private String major;
     private String people;
+    @Id
     private String courseName;
     private String courseType;
     private String courseCredit;

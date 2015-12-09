@@ -1,6 +1,8 @@
 package com.ftd.schaepher.coursemanagement.db;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
@@ -8,20 +10,22 @@ import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 import net.tsz.afinal.FinalDb;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class CourseDBHelper {
-    public FinalDb db;
+    private FinalDb db;
+    private Context context;
+    private SQLiteDatabase database;
 
     public CourseDBHelper(Context context) {
+        this.context = context;
         db = FinalDb.create(context, "teacherclass.db");
-    }
-
-    public CourseDBHelper() {
     }
 
     public static final String CREATE_TABLE_COURSE_MULTILINE = "CREATE TABLE TableCourseMultiline "
@@ -101,16 +105,43 @@ public class CourseDBHelper {
     }
 
     // 查
-    public Object findById(String id, Class<?> clazz) {
+    public <T> T findById(String id, Class<T> clazz) {
         return db.findById(id, clazz);
     }
 
-    public List findAll(Class<?> clazz) {
+    public <T> List<T> findAll(Class<T> clazz) {
         return db.findAll(clazz);
     }
 
-    public FinalDb getDb() {
-        return db;
+    public <T> List<T> findAllOrder(Class<T> clazz) {
+        return db.findAll(clazz, "year DESC,semester DESC");
+    }
+
+    public <T> List<T> findAllByWhere(Class<T> clazz, String where) {
+        return db.findAllByWhere(clazz, where);
+    }
+
+    public SQLiteDatabase getDb() {
+        if (database == null) {
+            database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        }
+        return database;
+    }
+
+    public List<String> getSemesterList() {
+        String[] columns = new String[]{
+                "year", "semester"
+        };
+        String orderBy = "year DESC,semester DESC";
+        Cursor cursor = getDb()
+                .query(true, "TableTaskInfo", columns, null, null, null, null, orderBy, null);
+        List<String> semester = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            semester.add(cursor.getString(0) + cursor.getString(1));
+        }
+        cursor.close();
+        Loger.i("semester",semester.toString());
+        return semester;
     }
 
 }

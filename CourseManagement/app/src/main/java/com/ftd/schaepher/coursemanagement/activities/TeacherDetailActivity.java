@@ -17,7 +17,7 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
-import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 /**
@@ -63,11 +63,11 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private void initTeacherData() {
         Intent intent = getIntent();
         CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
-        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
+        identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_IDENTITY, "");
         if (intent.getBooleanExtra("isQueryOwnInfomation", true)) {
-            workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
+            workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORKNUMBER, "");
             switch (identity) {
-                case ConstantTools.ID_TEACHER:
+                case ConstantStr.ID_TEACHER:
                     TableUserTeacher teacher = (TableUserTeacher)
                             dbHelper.findById(workNumber, TableUserTeacher.class);
                     if (teacher != null) {
@@ -79,7 +79,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     }
                     break;
 
-                case ConstantTools.ID_DEPARTMENT_HEAD:
+                case ConstantStr.ID_DEPARTMENT_HEAD:
                     TableUserDepartmentHead departmentHead = (TableUserDepartmentHead)
                             dbHelper.findById(workNumber, TableUserDepartmentHead.class);
                     if (departmentHead != null) {
@@ -93,7 +93,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     }
                     break;
 
-                case ConstantTools.ID_TEACHING_OFFICE:
+                case ConstantStr.ID_TEACHING_OFFICE:
                     TableUserTeachingOffice office = (TableUserTeachingOffice)
                             dbHelper.findById(workNumber, TableUserTeachingOffice.class);
                     if (office != null) {
@@ -114,7 +114,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
             Loger.i("str2", "工号" + workNumber + "身份" + queryIdentity);
 
             switch (queryIdentity) {
-                case ConstantTools.ID_TEACHING_OFFICE: {
+                case ConstantStr.ID_TEACHING_OFFICE: {
                     TableUserTeachingOffice Information = (TableUserTeachingOffice) dbHelper.findById(workNumber, TableUserTeachingOffice.class);
                     if (Information != null) {
                         edtTxTeacherNumber.setText(Information.getWorkNumber());
@@ -124,7 +124,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     }
                 }
                 break;
-                case ConstantTools.ID_DEPARTMENT_HEAD: {
+                case ConstantStr.ID_DEPARTMENT_HEAD: {
                     TableUserDepartmentHead Information = (TableUserDepartmentHead) dbHelper.findById(workNumber, TableUserDepartmentHead.class);
                     if (Information != null){
                         edtTxTeacherNumber.setText(Information.getWorkNumber());
@@ -136,7 +136,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     }
                 }
                 break;
-                case ConstantTools.ID_TEACHER: {
+                case ConstantStr.ID_TEACHER: {
                     TableUserTeacher Information = (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
                     if (Information != null){
                         edtTxTeacherNumber.setText(Information.getWorkNumber());
@@ -154,7 +154,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     }
 
     private void initUserPermission() {
-        if (!identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
+        if (!identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             edtTxDepartment.setEnabled(false);
             edtTxMajor.setEnabled(false);
             edtTxTeacherNumber.setEnabled(false);
@@ -192,8 +192,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                         (android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                CourseDBHelper dbHelper = new CourseDBHelper();
-                                dbHelper.createDataBase(TeacherDetailActivity.this);
+                                CourseDBHelper dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
                                 TableUserTeacher teacher = getTeacherData();
                                 dbHelper.update(teacher);
 

@@ -13,8 +13,9 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
-import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.squareup.okhttp.Request;
@@ -60,7 +61,7 @@ public class LoginActivity extends AppCompatActivity
         layoutWorkNumber = (TextInputLayout) findViewById(R.id.inputLayout_login_workNumber);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
-        informationEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
+        informationEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
 
         edtTxWorkNumber.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
@@ -75,7 +76,7 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的账号
      */
     private void autoSetWorkNumber() {
-        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
+        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORKNUMBER, "");
         if (!workNumber.equals("")) {
             edtTxWorkNumber.setText(workNumber);
         }
@@ -109,13 +110,13 @@ public class LoginActivity extends AppCompatActivity
                 password = edtTxPassWord.getText().toString().trim();
                 switch (rdoGroup.getCheckedRadioButtonId()) {
                     case R.id.rdoBtn_teacher:
-                        identity = ConstantTools.ID_TEACHER;
+                        identity = ConstantStr.ID_TEACHER;
                         break;
                     case R.id.rdoBtn_department_head:
-                        identity = ConstantTools.ID_DEPARTMENT_HEAD;
+                        identity = ConstantStr.ID_DEPARTMENT_HEAD;
                         break;
                     case R.id.rdoBtn_teaching_office:
-                        identity = ConstantTools.ID_TEACHING_OFFICE;
+                        identity = ConstantStr.ID_TEACHING_OFFICE;
                         break;
                     default:
                         break;
@@ -169,8 +170,8 @@ public class LoginActivity extends AppCompatActivity
                     switch (result) {
 //                        这里应该改为获取服务器个人数据，并存储到数据库中
                         case "true":
-                            informationEditor.putString(ConstantTools.USER_IDENTITY, identity);
-                            informationEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
+                            informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
+                            informationEditor.putString(ConstantStr.USER_WORKNUMBER, workNumber);
                             informationEditor.apply();
 
                             Intent intend = new Intent();
@@ -189,6 +190,7 @@ public class LoginActivity extends AppCompatActivity
 
                 @Override
                 public void onFailure(Request request, IOException e) {
+                    progress.cancel();
                     sendToast("请求服务器失败");
                 }
             });
@@ -208,8 +210,8 @@ public class LoginActivity extends AppCompatActivity
     }
 
     public void loginOffLine() {
-        informationEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-        informationEditor.putString(ConstantTools.USER_WORKNUMBER, workNumber);
+        informationEditor.putString(ConstantStr.USER_IDENTITY, identity);//保存用户名、身份
+        informationEditor.putString(ConstantStr.USER_WORKNUMBER, workNumber);
         informationEditor.apply();
 
         Intent intend = new Intent();
