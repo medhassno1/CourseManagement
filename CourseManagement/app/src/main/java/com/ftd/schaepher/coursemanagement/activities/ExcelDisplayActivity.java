@@ -23,7 +23,6 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
-import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +35,11 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     private List<TableCourseMultiline> excelListData;
     private CourseDBHelper dbHelper;
-    private SQLiteDatabase db;
     private String tableName;
     private String userName;
     private String workNumber;
     private boolean isFinishCommitTask;
+    private String toTableName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +49,17 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        excelListData = new ArrayList<>();
+        dbHelper = new CourseDBHelper(this);
 
         tableName = getIntent().getStringExtra("tableName");
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
+        toTableName = TableCourseMultiline.class.getSimpleName();
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         isFinishCommitTask = sharedPre.getBoolean("isFinishCommitTask", false);
         userName = sharedPre.getString(ConstantStr.USER_NAME, "");
         workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
-
-        dbHelper = new CourseDBHelper(this);
-        excelListData = new ArrayList<>();
     }
 
     @Override
@@ -79,15 +78,11 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 "任课教师", "备注");
         excelListData.add(excelHeader);
 
-        db = dbHelper.getDb();
-        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-        db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
-
-        //根据表名查找数据库对应表数据
+        // 根据表名查找数据库对应表数据
+        dbHelper.dropTable(toTableName);
+        dbHelper.changeTableName(tableName, toTableName);
         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
-
-        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
-        db.close();
+        dbHelper.changeTableName(toTableName, tableName);
 
         ExcelAdapter mExcelAdapter = new
                 ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
@@ -129,9 +124,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
 
                     try {
-                        db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-                        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-                        db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+                        dbHelper.dropTable(toTableName);
+                        dbHelper.changeTableName(tableName, toTableName);
 
                         TableCourseMultiline courseModify = new TableCourseMultiline();
                         courseModify.setCourseName(excelListData.get(position).getCourseName());
@@ -141,9 +135,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         courseModify.setWorkNumber(workNumber);
                         dbHelper.update(courseModify);
 
-                        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
-                        db.close();
-
+                        dbHelper.changeTableName(toTableName, tableName);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -154,9 +146,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
-                                db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-                                db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-                                db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+                                dbHelper.dropTable(toTableName);
+                                dbHelper.changeTableName(tableName, toTableName);
 
                                 TableCourseMultiline courseModify = new TableCourseMultiline();
                                 courseModify.setCourseName(excelListData.get(position).getCourseName());
@@ -166,8 +157,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setWorkNumber("");
                                 dbHelper.update(courseModify);
 
-                                db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
-                                db.close();
+                                dbHelper.changeTableName(toTableName, tableName);
 
                             } catch (Exception e) {
                                 e.printStackTrace();

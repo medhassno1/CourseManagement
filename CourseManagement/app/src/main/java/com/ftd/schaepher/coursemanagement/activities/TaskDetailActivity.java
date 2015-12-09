@@ -70,6 +70,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private String taskName;
     private String workNumber;
     private boolean isFinishCommitTask;
+    private String toTableName;
 
     private SharedPreferences.Editor informationEditor;
 
@@ -82,6 +83,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle("报课任务详情");
         mActionBar.setDisplayHomeAsUpEnabled(true);
+        toTableName = TableCourseMultiline.class.getSimpleName();
 
         informationEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
         workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORKNUMBER, "");
@@ -170,7 +172,8 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
             case R.id.action_commit_task:
                 Loger.d("TAG", "commit task");
                 //点击提交报课逻辑
-                isFinishCommitTask = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getBoolean("isFinishCommitTask", false);
+                isFinishCommitTask = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                        .getBoolean("isFinishCommitTask", false);
                 if (isFinishCommitTask){
                     showForbidCommitDialog();
                 }else {
@@ -234,15 +237,13 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private void commitTask() {
         tableName = task.getRelativeTable();
 
-        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-        db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
-
-        List<TableCourseMultiline> commitData = dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber+"'");
+        dbHelper.dropTable(toTableName);
+        dbHelper.changeTableName(tableName, toTableName);
+        List<TableCourseMultiline> commitData = dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
         Loger.d("commitData", String.valueOf(commitData));
-        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
-        db.close();
+        dbHelper.changeTableName(toTableName, tableName);
         Loger.d("commitData", JsonTools.getJsonString(commitData));
+
         try {
             NetworkManager.postJsonString(tableName,JsonTools.getJsonString(commitData), ConstantStr.ACTION_INSERT_TABLE);
             showCommitTaskSucceed();
@@ -289,14 +290,12 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 + "/" + tvTaskName.getText().toString();
         tableName = task.getRelativeTable();
 
-        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-        db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
+        dbHelper.dropTable(toTableName);
+        dbHelper.changeTableName(tableName, toTableName);
 
         copyExcel(dbHelper.findAll(TableCourseMultiline.class));
 
-        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
-        db.close();
+        dbHelper.changeTableName(toTableName, tableName);
     }
 
     public void copyExcel(List<TableCourseMultiline> list) throws IOException, BiffException, WriteException {
@@ -381,5 +380,11 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Intent intent = new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class);
         intent.putExtra("tableName", task.getRelativeTable());
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbHelper.close();
     }
 }

@@ -8,7 +8,6 @@ import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,7 +31,7 @@ import java.util.List;
  */
 public class FileSelectActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener {
-//  尝试改成调用系统的文件管理器
+    //  尝试改成调用系统的文件管理器
     private ListView lvFileList;
     private TextView tvPath;
     private FileListAdapter mFileAdapter;
@@ -98,13 +97,15 @@ public class FileSelectActivity extends AppCompatActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         File file = (File) mFileAdapter.getItem(position);
         if (!file.canRead()) {
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("权限不足").setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            }).show();
+            new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("权限不足")
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .show();
         } else if (file.isDirectory()) {
             initData(file);
         } else {
@@ -117,56 +118,70 @@ public class FileSelectActivity extends AppCompatActivity
         boolean isTeacherFile = getIntent().getBooleanExtra("isRequireImportTeacherFile", false);
         Loger.i("path", path);
 
-        if (!path.endsWith(".xls")) {   //直接调用excelTools.isTrueFileName()会出错，暂时无解
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("文件类型错误，请选择excel文件").setPositiveButton
-                    (android.R.string.ok, new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    }).show();
+        // 直接调用excelTools.isTrueFileName()会出错，暂时无解
+        if (!path.endsWith(".xls")) {
+            new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("文件类型错误，请选择excel文件")
+                    .setPositiveButton
+                            (android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                    .show();
 
         } else if (isTeacherFile) {
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否导入教师表").setPositiveButton
-                    (android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ExcelTools excelTools = new ExcelTools();
-                            excelTools.setPath(path);
-                            List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
-                            //导入教师表
-                            for (int i = 0; i < teachersList.size(); i++) {
-                                CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
-                                TableUserTeacher teacher = teachersList.get(i);
-                                try {
-                                    dbHelper.insert(teacher);
-                                } catch (Exception e) {
+            new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("是否导入教师表")
+                    .setPositiveButton
+                            (android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ExcelTools excelTools = new ExcelTools();
+                                    excelTools.setPath(path);
+                                    List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
+                                    //导入教师表
+                                    for (int i = 0; i < teachersList.size(); i++) {
+                                        CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
+                                        TableUserTeacher teacher = teachersList.get(i);
+                                        try {
+                                            dbHelper.insert(teacher);
+                                        } catch (Exception e) {
+                                        }
+                                    }
+                                    finish();
                                 }
-                            }
-                            finish();
-                        }
-                    }).setNegativeButton
-                    (android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                            })
+                    .setNegativeButton
+                            (android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                        }
-                    }).show();
+                                }
+                            })
+                    .show();
         } else {
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否导入开课表").setPositiveButton
-                    (android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            setResult(RESULT_OK, new Intent().putExtra("fileName", path));
-                            finish();
-                        }
-                    }).setNegativeButton
-                    (android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+            new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("是否导入开课表")
+                    .setPositiveButton
+                            (android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    setResult(RESULT_OK, new Intent().putExtra("fileName", path));
+                                    finish();
+                                }
+                            })
+                    .setNegativeButton
+                            (android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                        }
-                    }).show();
+                                }
+                            })
+                    .show();
         }
     }
 }

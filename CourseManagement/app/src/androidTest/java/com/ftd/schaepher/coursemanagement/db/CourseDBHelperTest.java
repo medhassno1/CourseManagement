@@ -16,9 +16,7 @@ public class CourseDBHelperTest extends InstrumentationTestCase {
     public void setUp() throws Exception {
         super.setUp();
         context= getInstrumentation().getTargetContext();
-        dbHelper = new CourseDBHelper();
-        dbHelper.createDataBase(context);
-        dbHelper.createTableTeacher();
+        dbHelper = new CourseDBHelper(context);
 
     }
 
