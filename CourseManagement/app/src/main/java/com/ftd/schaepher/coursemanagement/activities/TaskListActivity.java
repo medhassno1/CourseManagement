@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,19 +29,17 @@ import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
-import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +49,7 @@ import java.util.regex.Pattern;
  */
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
+    //    删除任务还没做
     private static final String TAG = "TaskListActivity";
     private static final int CLOSE_NAV = 1;
     private Toolbar mToolbar;
@@ -66,19 +62,142 @@ public class TaskListActivity extends AppCompatActivity
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
-    private SharedPreferences.Editor ownInformationSaveEditor;
+    private SharedPreferences.Editor selfInforEditor;
     private TaskAdapter mTaskAdapter;
+    private ListView mListView;
+    private ArrayAdapter<String> spinnerAdapter;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_task_list);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_task_jxb);
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("报课任务列表");
+        setNavViewConfig();
+        setSupportDoubleBackExit(true);
+        mListView = (ListView) findViewById(R.id.lv_task_list);
+        dbHelper = new CourseDBHelper(TaskListActivity.this);
+        taskListData = dbHelper.findAll(TableTaskInfo.class);
+        spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
+        getServerData();
+        try {
+            initUserInformation();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setSpinnerData();
+    }
+
+    // 显示任务列表数据
+    private void displayTaskList() {
+        mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
+        mListView.setAdapter(mTaskAdapter);
+        mListView.setOnItemClickListener(this);
+        Loger.i("TAG", "显示数据");
+    }
+
+    // 初始化当前用户的数据
+    private void initUserInformation() throws ClassNotFoundException {
+        String selfName = "";
+        SharedPreferences sharedPre =
+                getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+
+        workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+        identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
+
+        switch (identity) {
+            case ConstantStr.ID_TEACHER:
+                TableUserTeacher teacher = dbHelper
+                        .findById(workNumber, TableUserTeacher.class);
+                selfName = teacher == null ? "" : teacher.getName();
+                break;
+            case ConstantStr.ID_TEACHING_OFFICE:
+                TableUserTeachingOffice office = dbHelper
+                        .findById(workNumber, TableUserTeachingOffice.class);
+                selfName = office == null ? "" : office.getName();
+                break;
+            case ConstantStr.ID_DEPARTMENT_HEAD:
+                TableUserDepartmentHead departmentHead = dbHelper
+                        .findById(workNumber, TableUserDepartmentHead.class);
+                selfName = departmentHead == null ? "" : departmentHead.getName();
+                break;
+            default:
+                break;
+        }
+        tvOwnName.setText(selfName);
+        selfInforEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
+        selfInforEditor.putString(ConstantStr.USER_NAME, selfName);
+        selfInforEditor.apply();
+    }
+
+    // 从服务器获取数据
+    private void getServerData() {
+        String tableName = ConstantStr.TABLE_TASK_INFO;
+        try {
+            NetworkManager.getJsonString(tableName, new NetworkManager.ResponseCallback() {
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    String responseStr = response.body().string();
+                    List list = JsonTools.getJsonList(responseStr, TableTaskInfo.class);
+                    Loger.w("jsonList", list.toString());
+
+                    dbHelper.deleteAll(TableTaskInfo.class);
+                    dbHelper.insertAll(list);
+
+                    if (mTaskAdapter != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshSpinner();
+                                mTaskAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshSpinner();
+                                displayTaskList();
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Request request, IOException e) {
+
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 点击任务列表项跳转操作
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(TaskListActivity.this, TaskDetailActivity.class);
+        intent.putExtra("relativeTable",
+                String.valueOf(taskListData.get(position).getRelativeTable()));
+        startActivity(intent);
+    }
 
     // 任务名映射
     public static String transferTableNameToChinese(String string) {
-        StringBuffer strTaskName = new StringBuffer();
+        StringBuilder strTaskName = new StringBuilder();
         Pattern pattern = Pattern.compile("[a-zA-Z_]*");
         Matcher matcher = pattern.matcher(string);
         if (matcher.find()) {
             strTaskName.append(matcher.group());
         }
-//        Log.d("TAG", strTaskName.toString());
+//        Loger.d("TAG", strTaskName.toString());
         switch (strTaskName.toString()) {
             case "tc_com_exc":
                 return "计算机（卓越班）";
@@ -118,77 +237,94 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_list);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar_task_jxb);
-        setSupportActionBar(mToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("报课任务列表");
-        setNavViewConfig();
-        setSupportDoubleBackExit(true);
-
-        dbHelper = new CourseDBHelper(TaskListActivity.this);
-        //dbHelper.deleteAll(TableTaskInfo.class);
-
-        initSpinner();
-        initTaskListData();
-
-        initUserInformation();
+    // 下拉选项框初始化
+    private void setSpinnerData() {
+        spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        refreshSpinner();
+        spinnerSelectTerm.setAdapter(spinnerAdapter);
+        spinnerSelectTerm.setSelection(0);
+        spinnerSelectTerm.setOnItemSelectedListener(onItemSelectedListener);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initSpinner();
-    }
-
-    private void initSpinner() {
-        spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
-        final ArrayAdapter<Set> mAdapter = new ArrayAdapter<Set>(this,R.layout.spinner_item);
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        Set termData = new HashSet();
-        final List<TableTaskInfo> taskInfo ;
-        taskInfo =  dbHelper.findAll(TableTaskInfo.class);
-
-        for (TableTaskInfo list:taskInfo){
-            termData.add(list.getYear()+list.getSemester());
+    // 下拉选项框数据刷新
+    public void refreshSpinner() {
+        List<String> semesterList = dbHelper.getSemesterList();
+        spinnerAdapter.clear();
+        spinnerAdapter.addAll(semesterList);
+        if (spinnerAdapter != null) {
+            spinnerAdapter.notifyDataSetChanged();
         }
-        TreeSet soredTermData = new TreeSet(termData);
-        soredTermData.comparator();
-        mAdapter.addAll(soredTermData);
-        spinnerSelectTerm.setAdapter(mAdapter);
-        spinnerSelectTerm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedTerm = (String) parent.getItemAtPosition(position);
-                try {
-                    taskListData.clear();
-                    for (TableTaskInfo task : taskInfo) {
-                        String term = task.getYear() + task.getSemester();
-                        if (term.equals(selectedTerm)) {
-                            Log.d("TAG", task.toString());
-                            taskListData.add(task);
-                        }
-                    }
+    }
 
-                    mTaskAdapter.notifyDataSetChanged();
-                }catch(Exception e){
-                }
+    private android.widget.AdapterView.OnItemSelectedListener
+            onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            selectedTerm = (String) parent.getItemAtPosition(position);
+            if (taskListData != null) { taskListData.clear(); }
+
+            String year = selectedTerm.substring(0, 4);
+            String semester = selectedTerm.substring(4, 6);
+            List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
+                    "year=\"" + year + "\" and semester=\"" + semester + "\"");
+            taskListData.addAll(list);
+
+            if (mTaskAdapter != null) {
+                mTaskAdapter.notifyDataSetChanged();
+            } else {
+                displayTaskList();
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    /**
+     * 任务列表的适配器
+     */
+    class TaskAdapter extends ArrayAdapter<TableTaskInfo> {
+        private int resourceId;
+
+        public TaskAdapter(Context context, int resource, List<TableTaskInfo> objects) {
+            super(context, resource, objects);
+            this.resourceId = resource;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TableTaskInfo task = getItem(position);
+            View view;
+            viewHolder viewHolder;
+            if (convertView == null) {
+                view = LayoutInflater.from(getContext()).inflate(resourceId, null);
+                viewHolder = new viewHolder();
+                viewHolder.taskState = (TextView) view.findViewById(R.id.tv_task_state);
+                viewHolder.taskName = (TextView) view.findViewById(R.id.tv_task_name);
+                view.setTag(viewHolder);
+            } else {
+                view = convertView;
+                viewHolder = (TaskAdapter.viewHolder) view.getTag();
             }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            viewHolder.taskState.setText(taskStateMap(task.getTaskState()));
+            viewHolder.taskName.setText(transferTableNameToChinese(task.getRelativeTable()));
+            return view;
+        }
 
-            }
-        });
+        class viewHolder {
+            TextView taskState;
+            TextView taskName;
+        }
     }
 
     // 左侧菜单的初始设置
     private void setNavViewConfig() {
-        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, null);
+        identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_IDENTITY, null);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_base);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -197,100 +333,13 @@ public class TaskListActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_base);
 
-        if (identity.equals(ConstantTools.ID_TEACHER)) {
+        if (identity.equals(ConstantStr.ID_TEACHER)) {
             navigationView.getMenu().removeItem(R.id.nav_teacher_list);
         }
         tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
                 .findViewById(R.id.nav_own_name);
         navigationView.getMenu().findItem(R.id.nav_task_list).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    public void setSupportDoubleBackExit(boolean isDoubleBackExit) {
-        this.isSupportDoubleBackExit = isDoubleBackExit;
-    }
-
-    private void initUserInformation() {
-        String ownName = "";
-        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
-        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, "");
-        switch (identity) {
-            case ConstantTools.ID_TEACHER:
-                TableUserTeacher teacher =
-                        (TableUserTeacher) dbHelper.findById(workNumber, TableUserTeacher.class);
-                ownName = teacher == null ? "" : teacher.getName();
-                break;
-            case ConstantTools.ID_TEACHING_OFFICE:
-                TableUserTeachingOffice office =
-                        (TableUserTeachingOffice) dbHelper.findById(workNumber, TableUserTeachingOffice.class);
-                ownName = office == null ? "" : office.getName();
-                break;
-            case ConstantTools.ID_DEPARTMENT_HEAD:
-                TableUserDepartmentHead departmentHead =
-                        (TableUserDepartmentHead) dbHelper.findById(workNumber, TableUserDepartmentHead.class);
-                ownName = departmentHead == null ? "" : departmentHead.getName();
-                break;
-            default:
-                break;
-        }
-        tvOwnName.setText(ownName);
-        ownInformationSaveEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
-        ownInformationSaveEditor.putString(ConstantTools.USER_NAME, ownName);
-        ownInformationSaveEditor.apply();
-    }
-
-    // 初始化数据，从数据库中获取当前页面所需的数据
-    private void initTaskListData() {
-        try {
-            NetworkManager.getJsonString(ConstantTools.TABLE_TASK_INFO,
-                    new NetworkManager.ResponseCallback() {
-                        @Override
-                        public void onResponse(Response response) throws IOException {
-                            //从服务器获取报课任务数据，并更新到本地数据库
-                            JsonTools jsonTools = new JsonTools();
-                            List list = jsonTools.getJsonList(response.body().string(), TableTaskInfo.class);
-                            Log.w("jsonList", list.toString());
-
-                            dbHelper.deleteAll(TableTaskInfo.class);
-                            Log.i("TAG1", "getJsonString中taskListData是否为空" + (taskListData == null));
-                            dbHelper.insertAll(list);
-                            //从本地数据库获取报课任务数据
-                            taskListData = dbHelper.findAll(TableTaskInfo.class);
-                            Log.i("TAG1", "getJsonString中taskListData是否为空" + (taskListData == null));
-                            TaskListActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    initTaskListView();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(Request request, IOException e) {
-
-                        }
-                    });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // 显示数据，控件与数据绑定
-    private void initTaskListView() {
-        mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
-        ListView mListView = (ListView) findViewById(R.id.lv_task_list);
-        mListView.setAdapter(mTaskAdapter);
-        mListView.setOnItemClickListener(this);
-        Log.i("TAG","显示数据");
-    }
-
-    // 点击任务列表项跳转操作
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //Log.d(TAG, String.valueOf(taskListData.get(position).getId()));
-        Intent intent = new Intent(TaskListActivity.this, TaskDetailActivity.class);
-        intent.putExtra("relativeTable", String.valueOf(taskListData.get(position).getRelativeTable()));
-        startActivity(intent);
     }
 
     // 左菜单点击事件
@@ -339,9 +388,10 @@ public class TaskListActivity extends AppCompatActivity
     // 添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        identity = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_IDENTITY, null);
+        identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_IDENTITY, null);
         getMenuInflater().inflate(R.menu.task_list_activity_actions, menu);
-        if (!identity.equals(ConstantTools.ID_TEACHING_OFFICE)) {
+        if (!identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             menu.removeItem(R.id.action_add_task);
         }
         return true;
@@ -353,13 +403,18 @@ public class TaskListActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.action_add_task:
-                Log.i(TAG, "click add icon");
+                Loger.i(TAG, "click add icon");
                 startActivity(new Intent(TaskListActivity.this, TaskCreationActivity.class));
                 break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    // 双击退出
+    public void setSupportDoubleBackExit(boolean isDoubleBackExit) {
+        this.isSupportDoubleBackExit = isDoubleBackExit;
     }
 
     // 系统返回键事件
@@ -377,44 +432,6 @@ public class TaskListActivity extends AppCompatActivity
             }
         } else {
             super.onBackPressed();
-        }
-    }
-
-    /**
-     * 任务列表的适配器
-     */
-    class TaskAdapter extends ArrayAdapter<TableTaskInfo> {
-        private int resourceId;
-
-        public TaskAdapter(Context context, int resource, List<TableTaskInfo> objects) {
-            super(context, resource, objects);
-            this.resourceId = resource;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TableTaskInfo task = getItem(position);
-            View view;
-            viewHolder viewHolder;
-            if (convertView == null) {
-                view = LayoutInflater.from(getContext()).inflate(resourceId, null);
-                viewHolder = new viewHolder();
-                viewHolder.taskState = (TextView) view.findViewById(R.id.tv_task_state);
-                viewHolder.taskName = (TextView) view.findViewById(R.id.tv_task_name);
-                view.setTag(viewHolder);
-            } else {
-                view = convertView;
-                viewHolder = (TaskAdapter.viewHolder) view.getTag();
-            }
-
-            viewHolder.taskState.setText(taskStateMap(task.getTaskState()));
-            viewHolder.taskName.setText(transferTableNameToChinese(task.getRelativeTable()));
-            return view;
-        }
-
-        class viewHolder {
-            TextView taskState;
-            TextView taskName;
         }
     }
 }

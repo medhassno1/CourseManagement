@@ -40,6 +40,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("添加用户");
 
+//        控件初始化最好封装到一个方法里面
         edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_workNumber);
         edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_creation_password);
         edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_creation_name);
@@ -47,7 +48,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_creation_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
 
-        edtTxTeacherNumber.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);//工号输入框的格式
+        edtTxTeacherNumber.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED); // 工号输入框的格式
         edtTxDepartment.setInputType(InputType.TYPE_NULL);
         edtTxMajor.setInputType(InputType.TYPE_NULL);
         edtTxDepartment.setOnClickListener(this);
@@ -76,14 +77,15 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                             setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    CourseDBHelper dbHelper = new CourseDBHelper();
-                                    dbHelper.createDataBase(TeacherCreationActivity.this);
+                                    CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
+//                                    这里判断要添加哪种身份
                                     TableUserTeacher teacher = getTeacherData();
                                     try {
+//                                        这里添加网络请求
                                         dbHelper.insert(teacher);
                                     } catch (Exception e) {
                                         Toast.makeText(TeacherCreationActivity.this,
-                                                "该工号已存在，添加失败", Toast.LENGTH_SHORT).show();
+                                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
                                     }
                                     finish();
                                 }
@@ -126,6 +128,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                 break;
 
             case R.id.edtTx_teacher_creation_major:
+//                这里尝试取消默认选择第一个
                 simpleDialog.multiChoiceItems(new String[]
                         {"计算机（实验班）", "计算机（卓越班）", "计算机专业", "软件工程专业",
                                 "数学类（实验班）", "数学类", "网络工程专业", "信息安全专业"}, 0)
@@ -138,6 +141,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     public void onClick(View v) {
                         CharSequence[] values = simpleDialog.getSelectedValues();
                         if (values != null) {
+//                            这里要调整，尝试通过序号来判断选了哪些。否则无法插入数据库
                             StringBuffer stringBuffer = new StringBuffer();
                             for (int i = 0; i < values.length; i++) {
                                 stringBuffer.append(values[i]).append(i == values.length - 1 ? "" : "\n");

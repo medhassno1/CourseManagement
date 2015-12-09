@@ -59,7 +59,7 @@
             android:name=".activities.TeacherDetailActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        <receiver android:name=".tools.ConnectionChangeReceiver">
+        <receiver android:name=".tools.NetChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

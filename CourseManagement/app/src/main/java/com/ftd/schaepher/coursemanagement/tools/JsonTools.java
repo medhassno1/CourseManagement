@@ -17,13 +17,9 @@ import java.util.List;
  * Created by Schaepher on 2015/11/9.
  */
 public class JsonTools {
-    Gson gson;
+    private static Gson gson = new GsonBuilder().serializeNulls().create();
 
-    public JsonTools() {
-        gson = new GsonBuilder().serializeNulls().create();
-    }
-
-    public <T> T getJsonList(String json,Class tableClass) {
+    public static  <T> T getJsonList(String json,Class tableClass) {
         Type type;
         switch(tableClass.getSimpleName()){
             case "TableUserTeacher":
@@ -50,7 +46,7 @@ public class JsonTools {
         return gson.fromJson(json,type);
     }
 
-    public String getJsonString(List<?> list) {
+    public static String getJsonString(List<?> list) {
         return gson.toJson(list);
     }
 

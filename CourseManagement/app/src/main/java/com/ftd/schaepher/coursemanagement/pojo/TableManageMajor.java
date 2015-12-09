@@ -10,6 +10,7 @@ import net.tsz.afinal.annotation.sqlite.Table;
 @Table(name = "TableManageMajor")
 public class TableManageMajor {
     @Id
+    private transient int id;
     private String workNumber;
     private String major;
 
@@ -20,6 +21,14 @@ public class TableManageMajor {
     public TableManageMajor(String major, String workNumber) {
         this.major = major;
         this.workNumber = workNumber;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getMajor() {

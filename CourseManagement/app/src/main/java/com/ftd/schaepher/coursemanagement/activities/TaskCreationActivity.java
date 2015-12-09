@@ -7,14 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +27,7 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.widget.WheelView;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
@@ -143,7 +141,7 @@ public class TaskCreationActivity extends AppCompatActivity
                         new Thread(){
                             @Override
                             public void run() {
-                                TableTaskInfo task = getNewTaskInformation();
+                                TableTaskInfo task = createTaskInformation();
                                 tableCourseName = task.getRelativeTable();
                                 try {
                                     createTable();
@@ -200,29 +198,27 @@ public class TaskCreationActivity extends AppCompatActivity
         return true;
     }
 
-    //建表
+    // 建表
     private void createTable() {
         SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
         db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
         db.execSQL(CourseDBHelper.CREATE_TABLE_COURSE_MULTILINE);
 
-        TableCourseMultiline course = new TableCourseMultiline();
-        //解析Excel表格
+        // 解析Excel表格
         ExcelTools excelTools = new ExcelTools();
         excelTools.setPath(filePath);
         List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
-        //数据存入数据库
+        // 数据存入数据库
         for (int i = 0; i < courseList.size(); i++) {
-            course = courseList.get(i);
-            dbHelper.insert(course);
+            dbHelper.insert(courseList.get(i));
         }
-        //改名
+        // 改名
         db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableCourseName);
         db.close();
     }
 
-    // 获取即将发布的任务的信息,未完成
-    private TableTaskInfo getNewTaskInformation() {
+    // 获取即将发布的任务的信息,未完成（哪里未完成？发布到服务器？）
+    private TableTaskInfo createTaskInformation() {
         TableTaskInfo newTask = new TableTaskInfo();
         newTask.setYear(year);
         newTask.setSemester(semester);
@@ -274,6 +270,7 @@ public class TaskCreationActivity extends AppCompatActivity
                 break;
 
             case R.id.edtTx_add_task_name:
+                // 这里数据尽可能分离
                 simpleDialog.items(new String[]{"计算机（实验班）", "计算机（卓越班）", "计算机专业",
                         "软件工程专业", "数学类（实验班）", "数学类", "网络工程专业", "信息安全专业"}, 0)
                         .title("选择专业")
@@ -305,13 +302,13 @@ public class TaskCreationActivity extends AppCompatActivity
     }
 
     private void selectTerm() {
-        //计算年份，给出近十年可供选择
+        // 计算年份，给出近十年可供选择
         Calendar mCalendar = Calendar.getInstance();
         mCalendar.setTimeInMillis(System.currentTimeMillis());
         int yearCur = mCalendar.get(Calendar.YEAR);
-//        Log.d("TaskCreationActivity", yearCur);
+//        Loger.d("TaskCreationActivity", yearCur);
         if (termYear == null) {
-            termYear = new ArrayList<String>();
+            termYear = new ArrayList<>();
             for (int i = yearCur - 5; i < yearCur + 5; i++) {
                 termYear.add(String.valueOf(i));
             }
@@ -334,7 +331,7 @@ public class TaskCreationActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int which) {
                         year = wvSelectTermYear.getSeletedItem();
                         semester = wvSelectTermDay.getSeletedItem();
-                        edtTxTaskTeam.setText(year+semester);
+                        edtTxTaskTeam.setText(year + semester);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -354,7 +351,7 @@ public class TaskCreationActivity extends AppCompatActivity
             filePath = data.getStringExtra("fileName");
             fileName = filePath.split("/")[filePath.split("/").length - 1];
             tvFileName.setText(fileName);
-            Log.d("filePath", filePath);
+            Loger.d("filePath", filePath);
         }
     }
 

@@ -2,6 +2,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -21,7 +22,8 @@ import android.widget.TextView;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
-import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,45 +54,43 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tableName = getIntent().getStringExtra("tableName");
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
 
-        isFinishCommitTask = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getBoolean("isFinishCommitTask", false);
-        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_NAME, "");
-        workNumber = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_WORKNUMBER, "");
+        SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+        isFinishCommitTask = sharedPre.getBoolean("isFinishCommitTask", false);
+        userName = sharedPre.getString(ConstantStr.USER_NAME, "");
+        workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+
+        dbHelper = new CourseDBHelper(this);
+        excelListData = new ArrayList<>();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         try {
-            initExcelData();
-            initExcelListView();
+            init();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void initExcelData() {
-        excelListData = new ArrayList<>();
+    private void init() {
         TableCourseMultiline excelHeader = new TableCourseMultiline("年级", "专业", "专业人数",
                 "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
                 "任课教师", "备注");
         excelListData.add(excelHeader);
 
-        //根据表名查找数据库对应表数据
-        dbHelper = new CourseDBHelper(this);
-        db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        db = dbHelper.getDb();
         db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
         db.execSQL("ALTER TABLE " + tableName + " RENAME TO TableCourseMultiline");
 
+        //根据表名查找数据库对应表数据
         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
 
         db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableName);
         db.close();
-    }
 
-    private void initExcelListView() {
         ExcelAdapter mExcelAdapter = new
                 ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
-
         ListView excelListView;
         excelListView = (ListView) findViewById(R.id.lv_excel_display);
         excelListView.setAdapter(mExcelAdapter);
@@ -186,7 +186,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     // 设置弹窗的数据
     private void initAlertDialogData(int position, View v) {
-        position = position;
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -196,7 +195,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         TextView tvDialogClassHour = (TextView) v.findViewById(R.id.tv_dialog_class_hour);
         TextView tvDialogExperimentHour = (TextView) v.findViewById(R.id.tv_dialog_experiment_hour);
         TextView tvDialogComputerHour = (TextView) v.findViewById(R.id.tv_dialog_computer_hour);
-        EditText edtTxDialogFromtoEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
+        EditText edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
         EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
 
         tvDialogGrade.setText(excelListData.get(position).getGrade());
@@ -208,10 +207,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tvDialogClassHour.setText(excelListData.get(position).getCourseHour());
         tvDialogExperimentHour.setText(excelListData.get(position).getPracticeHour());
         tvDialogComputerHour.setText(excelListData.get(position).getOnMachineHour());
-        edtTxDialogFromtoEnd.setText(excelListData.get(position).getTimePeriod());
+        edtTxDialogFromToEnd.setText(excelListData.get(position).getTimePeriod());
         edtTxDialogNote.setText(excelListData.get(position).getRemark());
-        if (isFinishCommitTask){
-            edtTxDialogFromtoEnd.setEnabled(false);
+        if (isFinishCommitTask) {
+            edtTxDialogFromToEnd.setEnabled(false);
             edtTxDialogNote.setEnabled(false);
         }
     }
