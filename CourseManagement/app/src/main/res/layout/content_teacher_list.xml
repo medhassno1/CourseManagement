@@ -31,7 +31,8 @@
         android:layout_height="match_parent"
         android:fillViewport="true">
 
-        <LinearLayout
+        <com.ftd.schaepher.coursemanagement.widget.RefreshableView
+            android:id="@+id/refreshable_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -92,6 +93,6 @@
                     android:background="#fff"
                     android:padding="8dp" />
             </LinearLayout>
-        </LinearLayout>
+        </com.ftd.schaepher.coursemanagement.widget.RefreshableView>
     </ScrollView>
 </LinearLayout>

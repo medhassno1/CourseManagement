@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,7 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.widget.RefreshableView;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -65,6 +67,7 @@ public class TaskListActivity extends AppCompatActivity
     private SharedPreferences.Editor selfInforEditor;
     private TaskAdapter mTaskAdapter;
     private ListView mListView;
+    private RefreshableView refreshableView;
     private ArrayAdapter<String> spinnerAdapter;
 
     @Override
@@ -78,15 +81,30 @@ public class TaskListActivity extends AppCompatActivity
         setNavViewConfig();
         setSupportDoubleBackExit(true);
         mListView = (ListView) findViewById(R.id.lv_task_list);
+        refreshableView = (RefreshableView) findViewById(R.id.refreshTask_view);
         dbHelper = new CourseDBHelper(TaskListActivity.this);
         taskListData = dbHelper.findAll(TableTaskInfo.class);
         spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
-        getServerData();
+
         try {
             initUserInformation();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        Log.i("TAG111", "开始setOnRefreshListener");
+        refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.i("TAG111", "开始onRefresh()");
+                try {
+                    getServerData();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                refreshableView.finishRefreshing();
+            }
+        }, 0);
     }
 
     @Override
@@ -151,6 +169,7 @@ public class TaskListActivity extends AppCompatActivity
                     dbHelper.deleteAll(TableTaskInfo.class);
                     dbHelper.insertAll(list);
 
+                    getSelectedTermTaskData(selectedTerm);
                     if (mTaskAdapter != null) {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -262,13 +281,7 @@ public class TaskListActivity extends AppCompatActivity
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedTerm = (String) parent.getItemAtPosition(position);
-            if (taskListData != null) { taskListData.clear(); }
-
-            String year = selectedTerm.substring(0, 4);
-            String semester = selectedTerm.substring(4, 6);
-            List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
-                    "year=\"" + year + "\" and semester=\"" + semester + "\"");
-            taskListData.addAll(list);
+            getSelectedTermTaskData(selectedTerm);
 
             if (mTaskAdapter != null) {
                 mTaskAdapter.notifyDataSetChanged();
@@ -276,12 +289,24 @@ public class TaskListActivity extends AppCompatActivity
                 displayTaskList();
             }
         }
-
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-
         }
     };
+    /**
+     * 获取对应学期的任务列表数据
+     * @param selectedTerm
+     */
+    private void getSelectedTermTaskData(String selectedTerm){
+        if (taskListData != null) {
+            taskListData.clear();
+        }
+        String year = selectedTerm.substring(0, 4);
+        String semester = selectedTerm.substring(4, 6);
+        List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
+                "year=\"" + year + "\" and semester=\"" + semester + "\"");
+        taskListData.addAll(list);
+    }
 
     /**
      * 任务列表的适配器

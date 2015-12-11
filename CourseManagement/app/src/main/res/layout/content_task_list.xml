@@ -32,11 +32,16 @@
         </android.support.design.widget.AppBarLayout>
     </android.support.design.widget.CoordinatorLayout>
 
-    <ListView
-        android:id="@+id/lv_task_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:background="#fff">
-    </ListView>
+    <com.ftd.schaepher.coursemanagement.widget.RefreshableView
+        android:id="@+id/refreshTask_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <ListView
+            android:id="@+id/lv_task_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="#fff">
+        </ListView>
+    </com.ftd.schaepher.coursemanagement.widget.RefreshableView>
 </LinearLayout>

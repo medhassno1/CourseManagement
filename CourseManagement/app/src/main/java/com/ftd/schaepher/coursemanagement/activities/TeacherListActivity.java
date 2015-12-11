@@ -35,6 +35,7 @@ import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.widget.MoreListView;
+import com.ftd.schaepher.coursemanagement.widget.RefreshableView;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -63,6 +64,7 @@ public class TeacherListActivity extends AppCompatActivity
             String data = eSearch.getText().toString();
         }
     };
+    private RefreshableView refreshableView;
     private ImageView ivDeleteText;
     private TextView tvOwnName;
     private boolean isSupportDoubleBackExit;
@@ -77,6 +79,7 @@ public class TeacherListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_list);
+        refreshableView = (RefreshableView) findViewById(R.id.refreshable_view);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
@@ -90,6 +93,18 @@ public class TeacherListActivity extends AppCompatActivity
 
         setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick(); // 设置叉叉的监听器
+
+        refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                refreshableView.finishRefreshing();
+            }
+        }, 0);
     }
 
     // 左滑菜单初始配置
