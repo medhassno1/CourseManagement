@@ -1,16 +1,18 @@
 <?php
+/**
+ * 根据workNUmber查询报课情况，先从任务列表中查询任务的taskState，如果已完成，就在单行表中查询，否则在多行表中查询
+ */
 error_reporting(0);
 
 
 $tableName = $_POST["tableName"];
 $workNumber = $_POST["workNumber"];
-//$tableName = 'tc_net_pro201502';
-//$workNumber = '10003';
+
 session_start();
 $ident = $_SESSION['id'];
 $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
 if (!$con) {
-    die('Could not connect: ' . mysql_error());
+    die('Could not connect: ' . mysqli_error());
 } else {
 
     mysqli_query($con, "SET NAMES utf8");
@@ -21,12 +23,11 @@ if (!$con) {
 
         $statement = "SELECT * FROM $tableName_cb";
         $result = mysqli_query($con, $statement);
-        print_r($result);
-        echo mysqli_num_rows($result);
+
         foreach ($result as $row) {
-            echo json_encode($row, JSON_UNESCAPED_UNICODE);
-            echo '<br>';
+            $output[]=$row;
         }
+        echo json_encode($output,JSON_UNESCAPED_UNICODE);
 
     } else {
         $result = mysqli_query($con, "SELECT * FROM $tableName WHERE workNumber = $workNumber");
@@ -35,15 +36,17 @@ if (!$con) {
             $search = mysqli_query($con, $sql);
 
             foreach ($search as $row) {
-                echo json_encode($row, JSON_UNESCAPED_UNICODE);
-                echo '<br>';
+                $output[]=$row;
             }
+            echo json_encode($output,JSON_UNESCAPED_UNICODE);
+
 
         } else {
             foreach ($result as $row) {
-                echo json_encode($row, JSON_UNESCAPED_UNICODE);
-                echo '<br>';
+                $output[]=$row;
             }
+            echo json_encode($output,JSON_UNESCAPED_UNICODE);
+
 
         }
     }

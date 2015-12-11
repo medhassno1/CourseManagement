@@ -1,4 +1,7 @@
 <?php
+/**
+ * 传入jsonData和tableName，更新多行表
+ */
 $jsonData = $_POST["jsonData"];
 $tableName = $_POST["tableName"];
 $con = mysqli_connect("localhost", "root", "", "teacher_class_system");

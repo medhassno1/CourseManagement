@@ -1,11 +1,13 @@
 <?php
+/*
+ * 更新系负责人所负责系表
+ */
 error_reporting(0);
 
 $jsonData = $_POST["jsonData"];
-//$jsonData = '[{"workNumber":"00001","major":"tc_inf_sec"},{"workNumber":"00001","major":"tc_math_nor"},{"workNumber":"00001","major":"tc_math_ope"},{"workNumber":"00001","major":"tc_net_pro"},{"workNumber":"00001","major":"tc_soft_pro"}]';
 $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
 if (!$con) {
-    die('Could not connect: ' . mysql_error());
+    die('Could not connect: ' . mysqli_error());
 } else {
     mysqli_query($con, "SET NAMES utf8");
     $jsonArry = json_decode($jsonData, true);
