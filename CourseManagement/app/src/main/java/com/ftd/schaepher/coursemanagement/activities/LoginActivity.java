@@ -15,7 +15,10 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.squareup.okhttp.Request;
@@ -68,7 +71,7 @@ public class LoginActivity extends AppCompatActivity
         btnLogin.setOnClickListener(this);
 
         autoSetWorkNumber();
-        initDatabaseData();
+//        initDatabaseData();
     }
 
 
@@ -166,24 +169,27 @@ public class LoginActivity extends AppCompatActivity
                     String result = response.body().string();
                     Loger.d(TAG, result);
                     progress.cancel();
-
-                    switch (result) {
+                    if (!result.equals("false")) {
 //                        这里应该改为获取服务器个人数据，并存储到数据库中
-                        case "true":
-                            informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
-                            informationEditor.putString(ConstantStr.USER_WORKNUMBER, workNumber);
-                            informationEditor.apply();
+                        informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
+                        informationEditor.putString(ConstantStr.USER_WORKNUMBER, workNumber);
+                        informationEditor.apply();
+                        CourseDBHelper dbHelper = new CourseDBHelper(LoginActivity.this);
+                        try {
+                            String pojoName = GlobalMap.get("pojo_package_name") + GlobalMap.get(identity);
+                            Class clazz = Class.forName(pojoName);
+                            Object user = JsonTools.getJsonObject(result, clazz);
+                            dbHelper.insertOrUpdate(user);
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
 
-                            Intent intend = new Intent();
-                            intend.setClass(LoginActivity.this, TaskListActivity.class);
-                            LoginActivity.this.finish();
-                            startActivity(intend);
-                            break;
-                        case "false":
-                            sendToast("账号或密码错误");
-                            break;
-                        default:
-                            break;
+                        Intent intend = new Intent();
+                        intend.setClass(LoginActivity.this, TaskListActivity.class);
+                        LoginActivity.this.finish();
+                        startActivity(intend);
+                    } else {
+                        sendToast("账号或密码错误");
                     }
 
                 }

@@ -70,7 +70,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
         tableName = getIntent().getStringExtra("tableName");
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
-        toTableName = TableCourseMultiline.class.getSimpleName();
+        commonTableName = TableCourseMultiline.class.getSimpleName();
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         userName = sharedPre.getString(ConstantStr.USER_NAME, "");
@@ -102,7 +102,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             dbHelper.createNewCourseTable();
         }
         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
-        dbHelper.changeTableName(toTableName, tableName);
+        dbHelper.changeTableName(commonTableName, tableName);
 
         mExcelAdapter = new
                 ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
@@ -180,58 +180,59 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position != 0) {
-            AlertDialog mAlertDialog = initAlertDialog(position);
+            AlertDialog mAlertDialog = initRowWindow(position);
             mAlertDialog.show();
         }
     }
 
-    public AlertDialog initAlertDialog(final int position) {
+    public AlertDialog initRowWindow(final int position) {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
-        initAlertDialogData(position, alertDialogView);
+        initRowWindowData(position, alertDialogView);
         mBuilder.setView(alertDialogView);
-        if (isFinishCommitTask) {
-            mBuilder.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+        if (hasCommitted) {
+            mBuilder.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
                 }
             });
         } else {
-            mBuilder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    EditText edtTxDialogFromToEnd =
-                            (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
-                    EditText edtTxDialogNote =
-                            (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
+            mBuilder
+                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            EditText edtTxDialogFromToEnd =
+                                    (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
+                            EditText edtTxDialogNote =
+                                    (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
 
-                    try {
-                        dbHelper.dropTable(toTableName);
-                        dbHelper.changeTableName(tableName, toTableName);
+                            try {
+                                dbHelper.dropTable(commonTableName);
+                                dbHelper.changeTableName(tableName, commonTableName);
 
-                        TableCourseMultiline courseModify = new TableCourseMultiline();
-                        courseModify.setCourseName(excelListData.get(position).getCourseName());
-                        courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
-                        courseModify.setRemark(edtTxDialogNote.getText().toString());
-                        courseModify.setTeacherName(userName);
-                        courseModify.setWorkNumber(workNumber);
-                        dbHelper.update(courseModify);
+                                TableCourseMultiline courseModify = new TableCourseMultiline();
+                                courseModify.setCourseName(excelListData.get(position).getCourseName());
+                                courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
+                                courseModify.setRemark(edtTxDialogNote.getText().toString());
+                                courseModify.setTeacherName(userName);
+                                courseModify.setWorkNumber(workNumber);
+                                dbHelper.update(courseModify);
 
-                        dbHelper.changeTableName(toTableName, tableName);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    onResume();
-                }
-            })
+                                dbHelper.changeTableName(commonTableName, tableName);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            onResume();
+                        }
+                    })
                     .setNeutralButton("删除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
-                                dbHelper.dropTable(toTableName);
-                                dbHelper.changeTableName(tableName, toTableName);
+                                dbHelper.dropTable(commonTableName);
+                                dbHelper.changeTableName(tableName, commonTableName);
 
                                 TableCourseMultiline courseModify = new TableCourseMultiline();
                                 courseModify.setCourseName(excelListData.get(position).getCourseName());
@@ -241,7 +242,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setWorkNumber("");
                                 dbHelper.update(courseModify);
 
-                                dbHelper.changeTableName(toTableName, tableName);
+                                dbHelper.changeTableName(commonTableName, tableName);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -259,7 +260,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     // 设置弹窗的数据
-    private void initAlertDialogData(int position, View v) {
+    private void initRowWindowData(int position, View v) {
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -272,18 +273,19 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         EditText edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
         EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
 
-        tvDialogGrade.setText(excelListData.get(position).getGrade());
-        tvDialogMajor.setText(excelListData.get(position).getMajor());
-        tvDialogNum.setText(excelListData.get(position).getPeople());
-        tvDialogCourseName.setText(excelListData.get(position).getCourseName());
-        tvDialogType.setText(excelListData.get(position).getCourseType());
-        tvDialogCredit.setText(excelListData.get(position).getCourseCredit());
-        tvDialogClassHour.setText(excelListData.get(position).getCourseHour());
-        tvDialogExperimentHour.setText(excelListData.get(position).getPracticeHour());
-        tvDialogComputerHour.setText(excelListData.get(position).getOnMachineHour());
-        edtTxDialogFromToEnd.setText(excelListData.get(position).getTimePeriod());
-        edtTxDialogNote.setText(excelListData.get(position).getRemark());
-        if (isFinishCommitTask) {
+        TableCourseMultiline rowData = excelListData.get(position);
+        tvDialogGrade.setText(rowData.getGrade());
+        tvDialogMajor.setText(rowData.getMajor());
+        tvDialogNum.setText(rowData.getPeople());
+        tvDialogCourseName.setText(rowData.getCourseName());
+        tvDialogType.setText(rowData.getCourseType());
+        tvDialogCredit.setText(rowData.getCourseCredit());
+        tvDialogClassHour.setText(rowData.getCourseHour());
+        tvDialogExperimentHour.setText(rowData.getPracticeHour());
+        tvDialogComputerHour.setText(rowData.getOnMachineHour());
+        edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
+        edtTxDialogNote.setText(rowData.getRemark());
+        if (hasCommitted) {
             edtTxDialogFromToEnd.setEnabled(false);
             edtTxDialogNote.setEnabled(false);
         }
