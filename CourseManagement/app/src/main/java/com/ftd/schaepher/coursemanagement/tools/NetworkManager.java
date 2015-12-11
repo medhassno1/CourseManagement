@@ -27,6 +27,8 @@ public class NetworkManager {
             "http://114.215.153.57/tcs/mobile-api/query-by-table-name.php";
     public static final String URL_POST_JSON =
             "http://114.215.153.57/tcs/mobile-api/post-table.php";
+    private static final String URL_GET_JSON_TC =
+            "http://114.215.153.57/tcs/mobile-api/post_select_teacher.php";
 
     public static final String UPDATE_CB_TABLE = "updateCbTable";
     public static final String UPDATE_TASK_TABLE = "updateTaskTable";
@@ -65,6 +67,19 @@ public class NetworkManager {
                 .build();
         Request request = new Request.Builder()
                 .url(URL_GET_JSON)
+                .post(formBody)
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public static void getJsonString(String tableName, String workNumber,
+                                     ResponseCallback callback) throws IOException {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("tableName", tableName)
+                .add("workNumber", workNumber)
+                .build();
+        Request request = new Request.Builder()
+                .url(URL_GET_JSON_TC)
                 .post(formBody)
                 .build();
         client.newCall(request).enqueue(callback);
