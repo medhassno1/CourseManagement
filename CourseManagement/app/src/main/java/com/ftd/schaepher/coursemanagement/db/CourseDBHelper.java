@@ -29,7 +29,7 @@ public class CourseDBHelper {
 //        initTable();
     }
 
-    private void initTable(){
+    private void initTable() {
         TableUserTeacher teacher = new TableUserTeacher();
         finalDb.save(teacher);
 
@@ -46,7 +46,7 @@ public class CourseDBHelper {
         finalDb.save(tableManageMajor);
     }
 
-    public void createNewCourseTable(){
+    public void createNewCourseTable() {
         String createTableCourseMultiline = "CREATE TABLE TableCourseMultiline "
                 + "( insertTime text primary key, "
                 + "workNumber text, "
@@ -140,7 +140,22 @@ public class CourseDBHelper {
         database.execSQL("Drop table if exists " + tableName);
     }
 
-    public void close(){
+    public void createTableName(){
+
+    }
+
+    public boolean getIsFinishCommit(String workNumber) {
+        List<TableCourseMultiline> list =
+        finalDb.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
+        Loger.d("isfinish", String.valueOf(list.size()));
+        if (list.size() > 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void close() {
         database.close();
     }
 
