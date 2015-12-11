@@ -1,10 +1,12 @@
 <?php
+/**
+ * （根据身份验证为user_teaching_office可用）创建任务列表（包括多行和单行）
+ */
 error_reporting(0);
 
 
 $tableName = $_POST["tableName"];
-$tableName = 'tc_com_exc201001';
-//$tableName = 'tc_net_pro201502';
+
 
 session_start();
 $ident = $_SESSION['id'];
@@ -33,14 +35,12 @@ if (!$con) {
   KEY   insertTime   (  insertTime  )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ";
-           if( mysqli_query($con, $sql)){
-               echo "true";
+            if (mysqli_query($con, $sql)) {
+                echo "true";
 
-           }else  {
-               echo "false";
+            } else {
+                echo "false";
             }
-
-
 
 
         } else {
@@ -62,15 +62,15 @@ if (!$con) {
   PRIMARY KEY ( workNumber , grade , major , people , courseName , courseType , courseCredit , courseHour , practiceHour , onMachineHour , timePeriod , teacherName , remark ),
   KEY  insertTime  ( insertTime )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
-            if( mysqli_query($con, $sql)){
+            if (mysqli_query($con, $sql)) {
                 echo "true";
 
-            }else  {
+            } else {
                 echo "false";
             }
 
         }
     } else {
-        echo "没又权限";
+        echo "没有权限";
     }
 }

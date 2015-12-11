@@ -1,10 +1,10 @@
 <?php
 error_reporting(0);
-
+/**
+ * （根据身份验证为user_teaching_office可用）传入jsonData和tableName，更新教学办用户表
+ */
 $jsonData = $_POST["jsonData"];
-//$jsonData = '[{"workNumber":"00001","password":"00002","name":"张栋栋","telephone":"18110120119","email":"18110120119@163.com"}]';
 $tableName = $_POST["tableName"];
-//$tableName = 'user_teaching_office';
 session_start();
 $ident = $_SESSION['id'];
 
