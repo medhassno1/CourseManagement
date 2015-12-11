@@ -1,10 +1,11 @@
 <?php
+/**
+ * 传入jsonData和tableName，根据身份验证更新教师和系负责人用户表，身份为user_teaching_office则有权利修改department，否则不能修改
+ */
 error_reporting(0);
 
 $jsonData = $_POST["jsonData"];
-//$jsonData = '[{"workNumber":"00001","password":"00002","name":"张栋","sex":"男","birthday":"19990125","department":"计算机系","telephone":"18110119120","email":"18110119120@163.com"},{"workNumber":"10003","password":"10003","name":"张大栋","sex":"男","birthday":"18891001","department":"","telephone":"","email":"18110119120@163.com"},{"workNumber":"10004","password":"10004","name":"张中栋","sex":"女","birthday":"","department":"","telephone":"18110119120","email":""},{"workNumber":"10005","password":"10005","name":"张小栋","sex":"男","birthday":"","department":"","telephone":"","email":""}]';
 $tableName = $_POST["tableName"];
-//$tableName = 'user_teacher';
 session_start();
 $ident = $_SESSION['id'];
 

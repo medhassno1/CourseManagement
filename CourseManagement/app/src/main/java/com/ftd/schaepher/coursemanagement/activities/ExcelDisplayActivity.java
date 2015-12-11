@@ -1,15 +1,16 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,20 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.rey.material.app.SimpleDialog;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +47,15 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private String tableName;
     private String userName;
     private String workNumber;
-    private boolean isFinishCommitTask;
-    private String toTableName;
+    private String identity;
+    private boolean hasCommitted = true;
+    private String commonTableName;
+    private ProgressDialog progress;
+    private ExcelAdapter mExcelAdapter;
+
+    private static final TableCourseMultiline EXCEL_HEADER = new TableCourseMultiline("年级", "专业", "专业人数",
+            "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
+            "任课教师", "备注");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +70,14 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
         tableName = getIntent().getStringExtra("tableName");
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
-        toTableName = TableCourseMultiline.class.getSimpleName();
+        commonTableName = TableCourseMultiline.class.getSimpleName();
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
-        isFinishCommitTask = sharedPre.getBoolean("isFinishCommitTask", false);
         userName = sharedPre.getString(ConstantStr.USER_NAME, "");
         workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+        identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
+
+        getServerData();
     }
 
     @Override
@@ -73,18 +91,23 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     private void init() {
-        TableCourseMultiline excelHeader = new TableCourseMultiline("年级", "专业", "专业人数",
-                "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
-                "任课教师", "备注");
-        excelListData.add(excelHeader);
+        if (excelListData != null) {
+            excelListData.clear();
+        }
+        excelListData.add(EXCEL_HEADER);
 
         // 根据表名查找数据库对应表数据
-        dbHelper.dropTable(toTableName);
-        dbHelper.changeTableName(tableName, toTableName);
+        dbHelper.dropTable(commonTableName);
+        try {
+            dbHelper.changeTableName(tableName, commonTableName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            dbHelper.createNewCourseTable();
+        }
         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
-        dbHelper.changeTableName(toTableName, tableName);
+        dbHelper.changeTableName(commonTableName, tableName);
 
-        ExcelAdapter mExcelAdapter = new
+        mExcelAdapter = new
                 ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
         ListView excelListView;
         excelListView = (ListView) findViewById(R.id.lv_excel_display);
@@ -92,62 +115,127 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         excelListView.setOnItemClickListener(this);
     }
 
+    private void getServerData() {
+        try {
+            NetworkManager.getJsonString(tableName, workNumber, new NetworkManager.ResponseCallback() {
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    String responseStr = response.body().string();
+//                    Loger.w("exceldata",responseStr);
+                    List list = JsonTools.getJsonList(responseStr, TableCourseMultiline.class);
+                    //有返回数据代表交互成功
+                    if (list != null) {
+                        Loger.d("exceldata", "list not null");
+                        TableCourseMultiline course = (TableCourseMultiline) list.get(0);
+                        if (course.getCourseName() == "") {
+                            Loger.d("exceldata", "过滤掉前三行无用信息");
+                            list.remove(0);
+                            list.remove(0);
+                            list.remove(0);
+                        }
+                        dbHelper.dropTable(commonTableName);
+                        try {
+                            dbHelper.changeTableName(tableName, commonTableName);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            dbHelper.createNewCourseTable();
+                        }
+                        dbHelper.deleteAll(TableCourseMultiline.class);
+                        dbHelper.insertAll(list);
+
+                        hasCommitted = dbHelper.getIsFinishCommit(workNumber);
+                        Loger.d("isfinish", String.valueOf(hasCommitted));
+                        excelListData.clear();
+                        excelListData.add(EXCEL_HEADER);
+                        excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
+                        dbHelper.changeTableName(commonTableName, tableName);
+                        Loger.w("exceldata", list.toString());
+                    }
+
+                    if (mExcelAdapter != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mExcelAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                init();
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Request request, IOException e) {
+
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // 点击弹出修改弹窗
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position != 0) {
-            AlertDialog mAlertDialog = initAlertDialog(position);
+            AlertDialog mAlertDialog = initRowWindow(position);
             mAlertDialog.show();
         }
     }
 
-    public AlertDialog initAlertDialog(final int position) {
+    public AlertDialog initRowWindow(final int position) {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
-        initAlertDialogData(position, alertDialogView);
+        initRowWindowData(position, alertDialogView);
         mBuilder.setView(alertDialogView);
-        if (isFinishCommitTask) {
-            mBuilder.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+        if (hasCommitted) {
+            mBuilder.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
                 }
             });
         } else {
-            mBuilder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    EditText edtTxDialogFromToEnd =
-                            (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
-                    EditText edtTxDialogNote =
-                            (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
+            mBuilder
+                    .setPositiveButton("确认选择", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            EditText edtTxDialogFromToEnd =
+                                    (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
+                            EditText edtTxDialogNote =
+                                    (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
 
-                    try {
-                        dbHelper.dropTable(toTableName);
-                        dbHelper.changeTableName(tableName, toTableName);
+                            try {
+                                dbHelper.dropTable(commonTableName);
+                                dbHelper.changeTableName(tableName, commonTableName);
 
-                        TableCourseMultiline courseModify = new TableCourseMultiline();
-                        courseModify.setCourseName(excelListData.get(position).getCourseName());
-                        courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
-                        courseModify.setRemark(edtTxDialogNote.getText().toString());
-                        courseModify.setTeacherName(userName);
-                        courseModify.setWorkNumber(workNumber);
-                        dbHelper.update(courseModify);
+                                TableCourseMultiline courseModify = new TableCourseMultiline();
+                                courseModify.setCourseName(excelListData.get(position).getCourseName());
+                                courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
+                                courseModify.setRemark(edtTxDialogNote.getText().toString());
+                                courseModify.setTeacherName(userName);
+                                courseModify.setWorkNumber(workNumber);
+                                dbHelper.update(courseModify);
 
-                        dbHelper.changeTableName(toTableName, tableName);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    onResume();
-                }
-            })
-                    .setNeutralButton("删除", new DialogInterface.OnClickListener() {
+                                dbHelper.changeTableName(commonTableName, tableName);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            onResume();
+                        }
+                    })
+                    .setNeutralButton("删除选课", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
-                                dbHelper.dropTable(toTableName);
-                                dbHelper.changeTableName(tableName, toTableName);
+                                dbHelper.dropTable(commonTableName);
+                                dbHelper.changeTableName(tableName, commonTableName);
 
                                 TableCourseMultiline courseModify = new TableCourseMultiline();
                                 courseModify.setCourseName(excelListData.get(position).getCourseName());
@@ -155,9 +243,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark("");
                                 courseModify.setTeacherName("");
                                 courseModify.setWorkNumber("");
+                                //表的主键已经设置成自增id，因此这里无法更新到数据库，怎么解决再讨论
                                 dbHelper.update(courseModify);
 
-                                dbHelper.changeTableName(toTableName, tableName);
+                                dbHelper.changeTableName(commonTableName, tableName);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -175,7 +264,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     // 设置弹窗的数据
-    private void initAlertDialogData(int position, View v) {
+    private void initRowWindowData(int position, View v) {
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -188,21 +277,41 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         EditText edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
         EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
 
-        tvDialogGrade.setText(excelListData.get(position).getGrade());
-        tvDialogMajor.setText(excelListData.get(position).getMajor());
-        tvDialogNum.setText(excelListData.get(position).getPeople());
-        tvDialogCourseName.setText(excelListData.get(position).getCourseName());
-        tvDialogType.setText(excelListData.get(position).getCourseType());
-        tvDialogCredit.setText(excelListData.get(position).getCourseCredit());
-        tvDialogClassHour.setText(excelListData.get(position).getCourseHour());
-        tvDialogExperimentHour.setText(excelListData.get(position).getPracticeHour());
-        tvDialogComputerHour.setText(excelListData.get(position).getOnMachineHour());
-        edtTxDialogFromToEnd.setText(excelListData.get(position).getTimePeriod());
-        edtTxDialogNote.setText(excelListData.get(position).getRemark());
-        if (isFinishCommitTask) {
+        TableCourseMultiline rowData = excelListData.get(position);
+        tvDialogGrade.setText(rowData.getGrade());
+        tvDialogMajor.setText(rowData.getMajor());
+        tvDialogNum.setText(rowData.getPeople());
+        tvDialogCourseName.setText(rowData.getCourseName());
+        tvDialogType.setText(rowData.getCourseType());
+        tvDialogCredit.setText(rowData.getCourseCredit());
+        tvDialogClassHour.setText(rowData.getCourseHour());
+        tvDialogExperimentHour.setText(rowData.getPracticeHour());
+        tvDialogComputerHour.setText(rowData.getOnMachineHour());
+        edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
+        edtTxDialogNote.setText(rowData.getRemark());
+        if (hasCommitted) {
             edtTxDialogFromToEnd.setEnabled(false);
             edtTxDialogNote.setEnabled(false);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.excel_display_activity_actons, menu);
+        switch (identity) {
+            case ConstantStr.ID_TEACHER:
+                menu.findItem(R.id.action_commit_task).setVisible(true);
+                break;
+            case ConstantStr.ID_DEPARTMENT_HEAD:
+                menu.findItem(R.id.action_commit_check).setVisible(true);
+                break;
+            case ConstantStr.ID_TEACHING_OFFICE:
+
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     @Override
@@ -211,9 +320,105 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.action_commit_task:
+                Loger.d("TAG", "commit task");
+                //点击提交报课逻辑
+                if (hasCommitted) {
+                    showForbidCommitDialog();
+                } else {
+                    showCommitTaskDialog();
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showCommitTaskDialog() {
+        final SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
+        commitTaskDialog.message("一旦提交将不能再次修改报课信息！")
+                .title("是否提交报课")
+                .positiveAction("确定")
+                .positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                        progress = new ProgressDialog(ExcelDisplayActivity.this);
+                        progress.setMessage("提交中...");
+                        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progress.setCancelable(false);
+                        progress.show();
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    commitTask();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    closeProgress();
+                                }
+                            }
+                        }.start();
+                    }
+                }).negativeAction("取消")
+                .negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                    }
+                }).show();
+    }
+
+    private void showForbidCommitDialog() {
+        final SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
+        commitTaskDialog.message("您已提交过报课，不能再次提交！")
+                .title("提示")
+                .positiveAction("确定")
+                .positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        commitTaskDialog.cancel();
+                    }
+                }).show();
+    }
+
+    private void commitTask() {
+        dbHelper.dropTable(commonTableName);
+        dbHelper.changeTableName(tableName, commonTableName);
+        List<TableCourseMultiline> commitData = dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
+        Loger.d("commitData", String.valueOf(commitData));
+        dbHelper.changeTableName(commonTableName, tableName);
+        Loger.d("commitData", JsonTools.getJsonString(commitData));
+
+        try {
+            NetworkManager.postJsonString(tableName, JsonTools.getJsonString(commitData));
+            sendToast("提交成功");
+            hasCommitted = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            sendToast("提交失败，请重新提交");
+        }
+
+    }
+
+    public void sendToast(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ExcelDisplayActivity.this, message,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void closeProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+            }
+        });
     }
 
     /**

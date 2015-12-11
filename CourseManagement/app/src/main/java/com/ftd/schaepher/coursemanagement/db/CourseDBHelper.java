@@ -3,6 +3,7 @@ package com.ftd.schaepher.coursemanagement.db;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
@@ -19,33 +20,33 @@ import java.util.List;
 
 
 public class CourseDBHelper {
-    private FinalDb db;
+    private FinalDb finalDb;
     private SQLiteDatabase database;
 
     public CourseDBHelper(Context context) {
-        db = FinalDb.create(context, "teacherclass.db");
+        finalDb = FinalDb.create(context, "teacherclass.db");
         database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-        initTable();
+//        initTable();
     }
 
-    private void initTable(){
+    private void initTable() {
         TableUserTeacher teacher = new TableUserTeacher();
-        db.save(teacher);
-
-        TableUserTeachingOffice tableTeachingDepartmentr = new TableUserTeachingOffice();
-        db.save(tableTeachingDepartmentr);
+        finalDb.save(teacher);
 
         TableUserDepartmentHead tableUserDepartmentHead = new TableUserDepartmentHead();
-        db.save(tableUserDepartmentHead);
+        finalDb.save(tableUserDepartmentHead);
+
+        TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
+        finalDb.save(teachingOffice);
 
         TableTaskInfo tableTaskInfo = new TableTaskInfo();
-        db.save(tableTaskInfo);
+        finalDb.save(tableTaskInfo);
 
         TableManageMajor tableManageMajor = new TableManageMajor();
-        db.save(tableManageMajor);
+        finalDb.save(tableManageMajor);
     }
 
-    public void createNewCourseTable(){
+    public void createNewCourseTable() {
         String createTableCourseMultiline = "CREATE TABLE TableCourseMultiline "
                 + "( insertTime text primary key, "
                 + "workNumber text, "
@@ -64,42 +65,55 @@ public class CourseDBHelper {
         database.execSQL(createTableCourseMultiline);
     }
 
+    public void createCourseTable(){
+        TableCourseMultiline courseMultiline = new TableCourseMultiline();
+        finalDb.save(courseMultiline);
+    }
+
     // 增
     public void insert(Object entity) {
-        db.save(entity);
+        finalDb.save(entity);
     }
 
     public void insertAll(List list) {
         for (Object obj : list) {
-            db.save(obj);
+            finalDb.save(obj);
+        }
+    }
+
+    public void insertOrUpdate(Object entity){
+        try{
+            finalDb.save(entity);
+        }catch (SQLiteException e){
+            finalDb.update(entity);
         }
     }
 
     // 删
     public void deleteByID(Class<?> clazz, String id) {
-        db.deleteById(clazz, id);
+        finalDb.deleteById(clazz, id);
     }
 
     public void deleteAll(Class<?> clazz) {
-        db.deleteByWhere(clazz, null);
+        finalDb.deleteByWhere(clazz, null);
     }
 
     // 改
     public void update(Object entity) {
-        db.update(entity);
+        finalDb.update(entity);
     }
 
     // 查
     public <T> T findById(String id, Class<T> clazz) {
-        return db.findById(id, clazz);
+        return finalDb.findById(id, clazz);
     }
 
     public <T> List<T> findAll(Class<T> clazz) {
-        return db.findAll(clazz);
+        return finalDb.findAll(clazz);
     }
 
     public <T> List<T> findAllByWhere(Class<T> clazz, String where) {
-        return db.findAllByWhere(clazz, where);
+        return finalDb.findAllByWhere(clazz, where);
     }
 
     public List<String> getSemesterList() {
@@ -126,7 +140,22 @@ public class CourseDBHelper {
         database.execSQL("Drop table if exists " + tableName);
     }
 
-    public void close(){
+    public void createTableName(){
+
+    }
+
+    public boolean getIsFinishCommit(String workNumber) {
+        List<TableCourseMultiline> list =
+        finalDb.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
+        Loger.d("isfinish", String.valueOf(list.size()));
+        if (list.size() > 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void close() {
         database.close();
     }
 
