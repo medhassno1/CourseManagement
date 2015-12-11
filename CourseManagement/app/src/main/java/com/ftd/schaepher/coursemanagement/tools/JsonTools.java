@@ -19,6 +19,12 @@ import java.util.List;
 public class JsonTools {
     private static Gson gson = new GsonBuilder().serializeNulls().create();
 
+    public static <T> T getJsonObject(String json,Class<T> tableClass){
+        return gson.fromJson(json,tableClass);
+    }
+
+
+
     public static  <T> T getJsonList(String json,Class tableClass) {
         Type type;
         switch(tableClass.getSimpleName()){
@@ -50,4 +56,12 @@ public class JsonTools {
         return gson.toJson(list);
     }
 
+
+//    public static <E> List<E> getJsonListTest(String json,Class<E> eClass){
+//        Type type = new TypeToken<List<E>>(){}.getType();
+//        List<E> list = gson.fromJson(json,type);
+//        Loger.w("size",String.valueOf(list.size()));
+//        Loger.w("JsonTools_list",list.toString());
+//        return list;
+//    }
 }

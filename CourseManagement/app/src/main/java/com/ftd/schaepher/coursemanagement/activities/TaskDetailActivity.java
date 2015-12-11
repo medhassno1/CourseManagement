@@ -245,7 +245,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Loger.d("commitData", JsonTools.getJsonString(commitData));
 
         try {
-            NetworkManager.postJsonString(tableName,JsonTools.getJsonString(commitData), ConstantStr.ACTION_INSERT_TABLE);
+            NetworkManager.postJsonString(tableName,JsonTools.getJsonString(commitData));
             showCommitTaskSucceed();
             informationEditor.putBoolean("isFinishCommitTask",true);
             informationEditor.apply();

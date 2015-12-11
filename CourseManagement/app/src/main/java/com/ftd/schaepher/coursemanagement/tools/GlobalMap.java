@@ -1,5 +1,7 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,9 +11,10 @@ import java.util.Map;
 public class GlobalMap {
     private static final Map<String,String> globalMap = new HashMap<>();
     static {
-        globalMap.put("idTeacher","user_teacher");
-        globalMap.put("idDepartmentHead","user_department_head");
-        globalMap.put("idTeachingOffice","user_teaching_office");
+        globalMap.put("user_teacher","TableUserTeacher");
+        globalMap.put("user_department_head","TableUserDepartmentHead");
+        globalMap.put("user_teaching_office","TableUserTeachingOffice");
+        globalMap.put("pojo_package_name",TableUserTeacher.class.getPackage().getName()+".");
 
     }
 
