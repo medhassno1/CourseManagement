@@ -10,7 +10,6 @@ import net.tsz.afinal.annotation.sqlite.Table;
 @Table(name = "TableCourseMultiline")
 public class TableCourseMultiline {
     @Id
-    private transient int id;
     private String courseName;
     private String insertTime;
     private String workNumber;
@@ -42,14 +41,6 @@ public class TableCourseMultiline {
         this.timePeriod = timePeriod;
         this.teacherName = teacherName;
         this.remark = remark;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getInsertTime() {

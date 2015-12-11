@@ -48,8 +48,7 @@ public class CourseDBHelper {
 
     public void createNewCourseTable() {
         String createTableCourseMultiline = "CREATE TABLE TableCourseMultiline "
-                + "( id int primary key , "
-                + "insertTime text , "
+                + "( insertTime text primary key, "
                 + "workNumber text, "
                 + "grade text, "
                 + "major text , "
@@ -147,7 +146,7 @@ public class CourseDBHelper {
 
     public boolean getIsFinishCommit(String workNumber) {
         List<TableCourseMultiline> list =
-        db.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
+        finalDb.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
         Loger.d("isfinish", String.valueOf(list.size()));
         if (list.size() > 1){
             return true;

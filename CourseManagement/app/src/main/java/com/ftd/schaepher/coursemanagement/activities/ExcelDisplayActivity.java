@@ -48,8 +48,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private String userName;
     private String workNumber;
     private String identity;
-    private boolean isFinishCommitTask = true;
-    private String toTableName;
+    private boolean hasCommitted = true;
+    private String commonTableName;
     private ProgressDialog progress;
     private ExcelAdapter mExcelAdapter;
 
@@ -91,12 +91,15 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     private void init() {
+        if (excelListData != null) {
+            excelListData.clear();
+        }
         excelListData.add(EXCEL_HEADER);
 
         // 根据表名查找数据库对应表数据
-        dbHelper.dropTable(toTableName);
+        dbHelper.dropTable(commonTableName);
         try {
-            dbHelper.changeTableName(tableName, toTableName);
+            dbHelper.changeTableName(tableName, commonTableName);
         } catch (Exception e) {
             e.printStackTrace();
             dbHelper.createNewCourseTable();
@@ -130,9 +133,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             list.remove(0);
                             list.remove(0);
                         }
-                        dbHelper.dropTable(toTableName);
+                        dbHelper.dropTable(commonTableName);
                         try {
-                            dbHelper.changeTableName(tableName, toTableName);
+                            dbHelper.changeTableName(tableName, commonTableName);
                         } catch (Exception e) {
                             e.printStackTrace();
                             dbHelper.createNewCourseTable();
@@ -140,12 +143,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         dbHelper.deleteAll(TableCourseMultiline.class);
                         dbHelper.insertAll(list);
 
-                        isFinishCommitTask = dbHelper.getIsFinishCommit(workNumber);
-                        Loger.d("isfinish", String.valueOf(isFinishCommitTask));
+                        hasCommitted = dbHelper.getIsFinishCommit(workNumber);
+                        Loger.d("isfinish", String.valueOf(hasCommitted));
                         excelListData.clear();
                         excelListData.add(EXCEL_HEADER);
                         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
-                        dbHelper.changeTableName(toTableName, tableName);
+                        dbHelper.changeTableName(commonTableName, tableName);
                         Loger.w("exceldata", list.toString());
                     }
 
@@ -200,7 +203,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             });
         } else {
             mBuilder
-                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("确认选择", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             EditText edtTxDialogFromToEnd =
@@ -227,7 +230,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             onResume();
                         }
                     })
-                    .setNeutralButton("删除", new DialogInterface.OnClickListener() {
+                    .setNeutralButton("删除选课", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
@@ -240,6 +243,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark("");
                                 courseModify.setTeacherName("");
                                 courseModify.setWorkNumber("");
+                                //表的主键已经设置成自增id，因此这里无法更新到数据库，怎么解决再讨论
                                 dbHelper.update(courseModify);
 
                                 dbHelper.changeTableName(commonTableName, tableName);
@@ -319,7 +323,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             case R.id.action_commit_task:
                 Loger.d("TAG", "commit task");
                 //点击提交报课逻辑
-                if (isFinishCommitTask) {
+                if (hasCommitted) {
                     showForbidCommitDialog();
                 } else {
                     showCommitTaskDialog();
@@ -380,19 +384,17 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     private void commitTask() {
-        dbHelper.dropTable(toTableName);
-        dbHelper.changeTableName(tableName, toTableName);
+        dbHelper.dropTable(commonTableName);
+        dbHelper.changeTableName(tableName, commonTableName);
         List<TableCourseMultiline> commitData = dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
         Loger.d("commitData", String.valueOf(commitData));
-        dbHelper.changeTableName(toTableName, tableName);
+        dbHelper.changeTableName(commonTableName, tableName);
         Loger.d("commitData", JsonTools.getJsonString(commitData));
 
         try {
-            NetworkManager.postJsonString(tableName, JsonTools.getJsonString(commitData), ConstantStr.ACTION_INSERT_TABLE);
+            NetworkManager.postJsonString(tableName, JsonTools.getJsonString(commitData));
             sendToast("提交成功");
-            isFinishCommitTask = true;
-//            informationEditor.putBoolean("isFinishCommitTask",true);
-//            informationEditor.apply();
+            hasCommitted = true;
         } catch (IOException e) {
             e.printStackTrace();
             sendToast("提交失败，请重新提交");
