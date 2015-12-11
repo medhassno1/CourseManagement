@@ -97,9 +97,16 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
 
     /**
      * 需要去下拉刷新的ListView
+     *
+     * 增加对LinearLayout的下拉刷新
      */
     private ListView listView;
+    private LinearLayout linearLayout;
 
+    /**
+     * 判断是否是ListView下拉刷新
+     */
+    private boolean isRefreshListView = true;
     /**
      * 刷新时显示的进度条
      */
@@ -201,11 +208,20 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
             hideHeaderHeight = -header.getHeight();
             headerLayoutParams = (MarginLayoutParams) header.getLayoutParams();
             headerLayoutParams.topMargin = hideHeaderHeight;
-            listView = (ListView) getChildAt(1);
             Log.i("TAG111","onLayout中getChildAt(0)"+getChildAt(0));
-            Log.i("TAG111","onLayout中getChildAt(1)"+getChildAt(1));
-           // listView = (ListView)findViewById(R.id.lv_task_list);
-            listView.setOnTouchListener(this);
+            Log.i("TAG111", "onLayout中getChildAt(1)" + getChildAt(1));
+            if(getChildAt(1).toString().contains("ListView")){
+                Log.i("TAG11","开始执行获得listView，设置setOnTouchListener");
+                isRefreshListView = true;
+                listView = (ListView) getChildAt(1);
+                listView.setOnTouchListener(this);
+            }else{
+                Log.i("TAG11", "开始执行获得linearLayout，设置setOnTouchListener");
+                isRefreshListView =false ;
+                linearLayout = (LinearLayout) getChildAt(1);
+                linearLayout.setOnTouchListener(this);
+            }
+
             loadOnce = true;
         }
     }
@@ -217,7 +233,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
         setIsAbleToPull(event);
         Log.i("TAG11", "ableToPull是：" + ableToPull);
-       // if (ableToPull) {
+        if (ableToPull) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     yDown = event.getRawY();
@@ -259,14 +275,20 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
                     || currentStatus == STATUS_RELEASE_TO_REFRESH) {
                 updateHeaderView();
                 // 当前正处于下拉或释放状态，要让ListView失去焦点，否则被点击的那一项会一直处于选中状态
-                listView.setPressed(false);
-                listView.setFocusable(false);
-                listView.setFocusableInTouchMode(false);
+               if(isRefreshListView){
+                   listView.setPressed(false);
+                   listView.setFocusable(false);
+                   listView.setFocusableInTouchMode(false);
+               }else{
+                   linearLayout.setPressed(false);
+                   linearLayout.setFocusable(false);
+                   linearLayout.setFocusableInTouchMode(false);
+               }
                 lastStatus = currentStatus;
                 // 当前正处于下拉或释放状态，通过返回true屏蔽掉ListView的滚动事件
                 return true;
             }
-        //}
+        }
         return false;
     }
 
@@ -299,13 +321,25 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
      * @param event
      */
     private void setIsAbleToPull(MotionEvent event) {
-        View firstChild = listView.getChildAt(0);
+        View firstChild;
+        if(isRefreshListView) {
+            firstChild = listView.getChildAt(0);
+        }else {
+            firstChild = linearLayout.getChildAt(0);
+        }
+
         Log.i("TAG112","firstChild是："+firstChild.toString());
         Log.i("TAG112","listView.getChildAt(1)："+listView.getChildAt(1));
         Log.i("TAG112","listView.getChildAt(2)："+listView.getChildAt(2));
         Log.i("TAG112","listView.getChildAt(3)："+listView.getChildAt(3));
         if (firstChild != null) {
-            int firstVisiblePos = listView.getFirstVisiblePosition();
+            int firstVisiblePos;
+            if(isRefreshListView){
+                firstVisiblePos = listView.getFirstVisiblePosition();
+            }else{
+                firstVisiblePos = listView.getFirstVisiblePosition();
+            }
+
             Log.i("TAG112","firstVisiblePos位置是："+firstVisiblePos);
             Log.i("TAG112","firstChild.getTop()是："+firstChild.getTop());
            // if (firstVisiblePos == 0 && firstChild.getTop() == 0) {

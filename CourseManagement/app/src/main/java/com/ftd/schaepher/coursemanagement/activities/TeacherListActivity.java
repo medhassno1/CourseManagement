@@ -73,16 +73,21 @@ public class TeacherListActivity extends AppCompatActivity
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeachingOffice> officeListData;
     private List<TableUserDepartmentHead> departmentListData;
+    private TeacherAdapter mTeacherAdapter;
+    private DepartmentHeadAdapter departmentAdapter;
+    private TeacherOfficeAdapter officeAdapter;
     private String identity;
+    private CourseDBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_list);
-        refreshableView = (RefreshableView) findViewById(R.id.refreshable_view);
+        refreshableView = (RefreshableView) findViewById(R.id.refreshTeacher_view);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
+        dbHelper = new CourseDBHelper(TeacherListActivity.this);
 
         identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
                 .getString(ConstantStr.USER_IDENTITY, null);
@@ -93,18 +98,6 @@ public class TeacherListActivity extends AppCompatActivity
 
         setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick(); // 设置叉叉的监听器
-
-        refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
-            @Override
-            public void onRefresh() {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                refreshableView.finishRefreshing();
-            }
-        }, 0);
     }
 
     // 左滑菜单初始配置
@@ -129,12 +122,46 @@ public class TeacherListActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        initTeacherListData();
         initUserInformation();
+        initTeacherListData();
+        initTeacherListView();
+        getServerTeacherData();
     }
 
     // 初始化教师列表数据
     private void initTeacherListData() {
+        //从本地数据库获取教师数据
+        teacherListData = dbHelper.findAll(TableUserTeacher.class);
+        officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+        departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+    }
+
+
+    // 初始化教师列表界面的控件
+    private void initTeacherListView() {
+        if (teacherListData != null) {
+            mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
+            ListView mListView = (MoreListView) findViewById(R.id.lv_teacher_list);
+            mListView.setAdapter(mTeacherAdapter);
+            mListView.setOnItemClickListener(this);
+        }
+        if (departmentListData != null) {
+            departmentAdapter =
+                    new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
+            ListView departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
+            departmentListView.setAdapter(departmentAdapter);
+            departmentListView.setOnItemClickListener(this);
+        }
+        if (officeListData != null) {
+            officeAdapter =
+                    new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
+            ListView officeListView = (MoreListView) findViewById(R.id.lv_office_list);
+            officeListView.setAdapter(officeAdapter);
+            officeListView.setOnItemClickListener(this);
+        }
+    }
+
+    private void getServerTeacherData(){
         try {
             NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHER,
                     new NetworkManager.ResponseCallback() {
@@ -147,15 +174,14 @@ public class TeacherListActivity extends AppCompatActivity
 
                             dbHelper.deleteAll(TableUserTeacher.class);
                             dbHelper.insertAll(list);
-                            //从本地数据库获取教师数据
-                            teacherListData = dbHelper.findAll(TableUserTeacher.class);
-                            officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
-                            departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
 
+                            initTeacherListData();
                             TeacherListActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    initTeacherListView();
+                                    mTeacherAdapter.notifyDataSetChanged();
+                                    departmentAdapter.notifyDataSetChanged();
+                                    officeAdapter.notifyDataSetChanged();
                                 }
                             });
                         }
@@ -167,31 +193,6 @@ public class TeacherListActivity extends AppCompatActivity
                     });
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-
-    // 初始化教师列表界面的控件
-    private void initTeacherListView() {
-        if (teacherListData != null) {
-            TeacherAdapter mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
-            ListView mListView = (MoreListView) findViewById(R.id.lv_teacher_list);
-            mListView.setAdapter(mTeacherAdapter);
-            mListView.setOnItemClickListener(this);
-        }
-        if (departmentListData != null) {
-            DepartmentHeadAdapter departmentAdapter =
-                    new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
-            ListView departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
-            departmentListView.setAdapter(departmentAdapter);
-            departmentListView.setOnItemClickListener(this);
-        }
-        if (officeListData != null) {
-            TeacherOfficeAdapter officeAdapter =
-                    new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
-            ListView officeListView = (MoreListView) findViewById(R.id.lv_office_list);
-            officeListView.setAdapter(officeAdapter);
-            officeListView.setOnItemClickListener(this);
         }
     }
 
