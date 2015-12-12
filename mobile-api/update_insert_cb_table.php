@@ -1,6 +1,6 @@
 <?php
 /**
- * 传入jsonData和tableName，更新多行表
+ * 传入jsonData和tableName，由系负责人和教学办更新单行表
  */
 $jsonData = $_POST["jsonData"];
 $tableName = $_POST["tableName"];

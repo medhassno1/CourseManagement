@@ -13,13 +13,13 @@ query_by_table_name：传入tableName，根据表名查询表中所有的信息
 
 query_teacher_select_courses:传入jsonData和workNumber,根据workNUmber查询报课情况，先从任务列表中查询任务的taskState，如果已完成，就在单行表中查询，否则在多行表中查询
 
-update_bc_table:传入jsonData和tableName,更新单行表
+insert_tc_update_bc: *传入tableName和jsonData，插入数据到多行表，并在单行表内进行更新
 
 
 update_manager_major:传入jsonData,更新系负责人所负责系表
 
 
-update_tc_table：传入jsonData和tableName，更新多行表
+update_insert_cb_table：传入jsonData和tableName，由系负责人和教学办更新单行表，已发送过来的数据为准更新整个字段
 
 update_user_office:传入jsonData和tableName，（根据身份验证为user_teaching_office可用）更新教学办用户表
 

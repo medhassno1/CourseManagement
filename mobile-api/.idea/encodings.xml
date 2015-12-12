@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/classes/class_create_table.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/classes/class_delete_task.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/classes/class_delete_user.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/classes/class_insert_table.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/classes/class_insert_tc_update_bc.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/insert_tc_update_bc.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/query_teacher_select_courses.php" charset="UTF-8" />
   </component>
 </project>
