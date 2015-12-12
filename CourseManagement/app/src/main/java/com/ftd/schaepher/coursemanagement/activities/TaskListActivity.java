@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,17 +85,13 @@ public class TaskListActivity extends AppCompatActivity
         taskListData = dbHelper.findAll(TableTaskInfo.class);
         spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
 
-        try {
-            initUserInformation();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        getServerData();
 
-        Log.i("TAG111", "开始setOnRefreshListener");
+        Loger.i("TAG111", "开始setOnRefreshListener");
         refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
             @Override
             public void onRefresh() {
-                Log.i("TAG111", "开始onRefresh()");
+                Loger.i("TAG111", "开始onRefresh()");
                 try {
                     getServerData();
                 } catch (Exception e) {
@@ -111,18 +106,11 @@ public class TaskListActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         setSpinnerData();
-    }
-
-    // 显示任务列表数据
-    private void displayTaskList() {
-        mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
-        mListView.setAdapter(mTaskAdapter);
-        mListView.setOnItemClickListener(this);
-        Loger.i("TAG", "显示数据");
+        initUserInformation();
     }
 
     // 初始化当前用户的数据
-    private void initUserInformation() throws ClassNotFoundException {
+    private void initUserInformation() {
         String selfName = "";
         SharedPreferences sharedPre =
                 getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
@@ -169,7 +157,6 @@ public class TaskListActivity extends AppCompatActivity
                     dbHelper.deleteAll(TableTaskInfo.class);
                     dbHelper.insertAll(list);
 
-                    getSelectedTermTaskData(selectedTerm);
                     if (mTaskAdapter != null) {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -197,6 +184,30 @@ public class TaskListActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取对应学期的任务列表数据
+     *
+     * @param selectedTerm
+     */
+    private void getDataByTerm(String selectedTerm) {
+        if (taskListData != null) {
+            taskListData.clear();
+        }
+        String year = selectedTerm.substring(0, 4);
+        String semester = selectedTerm.substring(4, 6);
+        List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
+                "year=\"" + year + "\" and semester=\"" + semester + "\"");
+        taskListData.addAll(list);
+    }
+
+    // 显示任务列表数据
+    private void displayTaskList() {
+        mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
+        mListView.setAdapter(mTaskAdapter);
+        mListView.setOnItemClickListener(this);
+        Loger.i("TAG", "显示数据");
     }
 
     // 点击任务列表项跳转操作
@@ -281,7 +292,7 @@ public class TaskListActivity extends AppCompatActivity
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedTerm = (String) parent.getItemAtPosition(position);
-            getSelectedTermTaskData(selectedTerm);
+            getDataByTerm(selectedTerm);
 
             if (mTaskAdapter != null) {
                 mTaskAdapter.notifyDataSetChanged();
@@ -289,24 +300,11 @@ public class TaskListActivity extends AppCompatActivity
                 displayTaskList();
             }
         }
+
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
         }
     };
-    /**
-     * 获取对应学期的任务列表数据
-     * @param selectedTerm
-     */
-    private void getSelectedTermTaskData(String selectedTerm){
-        if (taskListData != null) {
-            taskListData.clear();
-        }
-        String year = selectedTerm.substring(0, 4);
-        String semester = selectedTerm.substring(4, 6);
-        List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
-                "year=\"" + year + "\" and semester=\"" + semester + "\"");
-        taskListData.addAll(list);
-    }
 
     /**
      * 任务列表的适配器

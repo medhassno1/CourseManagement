@@ -94,10 +94,19 @@ public class TeacherListActivity extends AppCompatActivity
 
         // 侧滑菜单
         setNavViewConfig();
-        setSupportDoubleBackExit(true);
+        isSupportDoubleBackExit = true;
 
         setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick(); // 设置叉叉的监听器
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initUserInformation();
+        refreshTeacherListData();
+        initTeacherListView();
+        getServerTeacherData();
     }
 
     // 左滑菜单初始配置
@@ -115,21 +124,8 @@ public class TeacherListActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    public void setSupportDoubleBackExit(boolean isDoubleBackExit) {
-        this.isSupportDoubleBackExit = isDoubleBackExit;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initUserInformation();
-        initTeacherListData();
-        initTeacherListView();
-        getServerTeacherData();
-    }
-
     // 初始化教师列表数据
-    private void initTeacherListData() {
+    private void refreshTeacherListData() {
         //从本地数据库获取教师数据
         teacherListData = dbHelper.findAll(TableUserTeacher.class);
         officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
@@ -175,10 +171,10 @@ public class TeacherListActivity extends AppCompatActivity
                             dbHelper.deleteAll(TableUserTeacher.class);
                             dbHelper.insertAll(list);
 
-                            initTeacherListData();
                             TeacherListActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    refreshTeacherListData();
                                     mTeacherAdapter.notifyDataSetChanged();
                                     departmentAdapter.notifyDataSetChanged();
                                     officeAdapter.notifyDataSetChanged();
@@ -254,8 +250,6 @@ public class TeacherListActivity extends AppCompatActivity
     // 点击查看教师信息跳转逻辑
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intend = new Intent();
-        intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
         String queryWorkNumber;
         String queryIdentity;
         switch (parent.getId()) {
@@ -280,9 +274,11 @@ public class TeacherListActivity extends AppCompatActivity
                 queryIdentity = "";
                 break;
         }
+        Intent intend = new Intent();
+        intend.setClass(TeacherListActivity.this, TeacherDetailActivity.class);
         intend.putExtra("teacherID", queryWorkNumber);
         intend.putExtra("teacherIdentity", queryIdentity);
-        intend.putExtra("isQueryOwnInfomation", false);
+        intend.putExtra("isQueryingSelf", false);
         startActivity(intend);
 
         Loger.i("str", String.valueOf(parent));

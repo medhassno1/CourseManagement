@@ -35,8 +35,6 @@ public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, View.OnFocusChangeListener {
 
     private static final String TAG = "LoginActivity";
-    private static final int RESULT_OTHER = 1;
-    private static final int RESULT_FALSE = 0;
 
     private Button btnLogin;
     private EditText edtTxWorkNumber;
@@ -176,8 +174,8 @@ public class LoginActivity extends AppCompatActivity
                         informationEditor.apply();
                         CourseDBHelper dbHelper = new CourseDBHelper(LoginActivity.this);
                         try {
-                            String pojoName = GlobalMap.get("pojo_package_name") + GlobalMap.get(identity);
-                            Class clazz = Class.forName(pojoName);
+                            String pojoClassName = GlobalMap.get(identity);
+                            Class clazz = Class.forName(pojoClassName);
                             Object user = JsonTools.getJsonObject(result, clazz);
                             dbHelper.insertOrUpdate(user);
                         } catch (ClassNotFoundException e) {
