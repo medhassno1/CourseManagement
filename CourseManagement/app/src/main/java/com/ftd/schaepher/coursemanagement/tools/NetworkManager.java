@@ -14,21 +14,32 @@ import java.util.concurrent.TimeUnit;
  * Created by Schaepher on 2015/10/27.
  */
 public class NetworkManager {
-
-    /*  public static final String URL_LOGIN =
-              "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/login.php";
-      public static final String URL_GET_JSON =
-              "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/query-by-table-name.php";
-      public static final String URL_POST_JSON =
-              "http://schaepher.imwork.net:22817/Teacher_class_syetemDemo1.1/php/post-table.php";*/
-    public static final String URL_LOGIN =
-            "http://114.215.153.57/tcs/mobile-api/login_new.php";
-    public static final String URL_GET_JSON =
-            "http://114.215.153.57/tcs/mobile-api/query-by-table-name.php";
-    public static final String URL_POST_JSON =
-            "http://114.215.153.57/tcs/mobile-api/post-table.php";
-    private static final String URL_GET_JSON_TC =
-            "http://114.215.153.57/tcs/mobile-api/post_select_teacher.php";
+    // 服务器基础地址，指向存放api的文件夹
+    private static final String URL_BASE = "http://114.215.153.57/tcs/mobile-api/";
+    // 创建创建表格并且插入数据（发布新任务）
+    public static final String CREATE_TABLE = URL_BASE + "create_table.php";
+    // 删除任务
+    public static final String DELETE_TASK = URL_BASE + "delete_task.php";
+    // 删除用户
+    public static final String DELETE_USER = URL_BASE + "delete_user.php";
+    // 插入任意一张表
+    public static final String INSERT_TABLE = URL_BASE + "insert_table.php";
+    // 登陆
+    public static final String LOGIN = URL_BASE + "login.php";
+    // 获取任意表的数据
+    public static final String GET_ANY_TABLE = URL_BASE + "query_table_name.php";
+    // 获取教师某张表的选课情况
+    public static final String GET_TABLE_SELECT = URL_BASE + "query_teacher_select_courses.php";
+    // 插入或者更新（如果已存在）合一表
+    public static final String INSERT_OR_UPDATE_CB_TABLE = URL_BASE + "update_insert_cb_table.php";
+    // 更新系负责人所负责的专业
+    public static final String UPDATE_MANAGER_MAJOR = URL_BASE + "update_manager_major.php";
+    // 更新教学办用户信息
+    public static final String UPDATE_USER_OFFICE = URL_BASE + "update_user_office.php";
+    // 更新教师用户信息
+    public static final String UPDATE_USER_TEACHER = URL_BASE + "update_user_teacher_department.php";
+    // 更新系负责人用户信息
+    public static final String UPDATE_USER_DEPARTMENT = URL_BASE + "update_user_teacher_department.php";
 
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -38,13 +49,27 @@ public class NetworkManager {
         client.setReadTimeout(30, TimeUnit.SECONDS);
     }
 
-    public static String postJsonString(String tableName, String jsonData) throws IOException {
+    // 异步的post
+    public static void postToServerAsync(String tableName, String jsonData, String actionURL, ResponseCallback callback) {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .add("jsonData", jsonData)
                 .build();
         Request request = new Request.Builder()
-                .url(URL_POST_JSON)
+                .url(actionURL)
+                .post(formBody)
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    // 同步的post
+    public static String postToServerSync(String tableName, String jsonData, String actionURL) throws IOException {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("tableName", tableName)
+                .add("jsonData", jsonData)
+                .build();
+        Request request = new Request.Builder()
+                .url(actionURL)
                 .post(formBody)
                 .build();
         Response response = client.newCall(request).execute();
@@ -55,18 +80,20 @@ public class NetworkManager {
         }
     }
 
+    // 获取任意表的数据
     public static void getJsonString(String tableName,
                                      ResponseCallback callback) throws IOException {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .build();
         Request request = new Request.Builder()
-                .url(URL_GET_JSON)
+                .url(GET_ANY_TABLE)
                 .post(formBody)
                 .build();
         client.newCall(request).enqueue(callback);
     }
 
+    // 获取教师选课信息
     public static void getJsonString(String tableName, String workNumber,
                                      ResponseCallback callback) throws IOException {
         RequestBody formBody = new FormEncodingBuilder()
@@ -74,12 +101,13 @@ public class NetworkManager {
                 .add("workNumber", workNumber)
                 .build();
         Request request = new Request.Builder()
-                .url(URL_GET_JSON_TC)
+                .url(GET_TABLE_SELECT)
                 .post(formBody)
                 .build();
         client.newCall(request).enqueue(callback);
     }
 
+    // 登陆
     public static void login(String userName, String password, String identity,
                              ResponseCallback callback) throws IOException {
         RequestBody formBody = new FormEncodingBuilder()
@@ -89,13 +117,14 @@ public class NetworkManager {
                 .build();
 
         Request request = new Request.Builder()
-                .url(URL_LOGIN)
+                .url(LOGIN)
                 .post(formBody)
                 .build();
 
         client.newCall(request).enqueue(callback);
     }
 
+    // 回调接口
     public interface ResponseCallback extends Callback {
         @Override
         void onResponse(Response response) throws IOException;

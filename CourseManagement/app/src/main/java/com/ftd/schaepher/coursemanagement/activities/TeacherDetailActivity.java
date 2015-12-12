@@ -26,18 +26,18 @@ import com.ftd.schaepher.coursemanagement.tools.Loger;
  * 教师信息界面
  */
 public class TeacherDetailActivity extends AppCompatActivity {
-//  删除教师还没做
+    //  删除教师还没做
     private EditText edtTxTeacherNumber;
     private EditText edtTxPassword;
     private EditText edtTxTeacherName;
     private EditText edtTxPhoneNumber;
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
-
-    private String workNumber;
-    private String identity;
+    private String userIdentity;
 
     private CourseDBHelper dbHelper;
+    private String queryWorkNumber;
+    private String queryIdentity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,107 +62,73 @@ public class TeacherDetailActivity extends AppCompatActivity {
     }
 
     /**
-     * 初始化界面数据
+     * 初始化教师数据
      */
     private void initTeacherData() {
-        Intent intent = getIntent();
-
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
-        identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
-        if (intent.getBooleanExtra("isQueryOwnInfomation", true)) {
-            workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
-            switch (identity) {
-                case ConstantStr.ID_TEACHER:
-                    TableUserTeacher teacher =
-                            dbHelper.findById(workNumber, TableUserTeacher.class);
-                    if (teacher != null) {
-                        edtTxTeacherNumber.setText(teacher.getWorkNumber());
-                        edtTxPassword.setText(teacher.getPassword());
-                        edtTxTeacherName.setText(teacher.getName());
-                        edtTxPhoneNumber.setText(teacher.getTelephone());
-                        edtTxDepartment.setText(teacher.getDepartment());
-                    }
-                    break;
+        userIdentity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
 
-                case ConstantStr.ID_DEPARTMENT_HEAD:
-                    TableUserDepartmentHead departmentHead =
-                            dbHelper.findById(workNumber, TableUserDepartmentHead.class);
-                    if (departmentHead != null) {
-                        edtTxTeacherNumber.setText(departmentHead.getWorkNumber());
-                        edtTxPassword.setText(departmentHead.getPassword());
-                        edtTxTeacherName.setText(departmentHead.getName());
-                        edtTxPhoneNumber.setText(departmentHead.getTelephone());
-                        edtTxDepartment.setText(departmentHead.getDepartment());
-                        edtTxMajor.setVisibility(View.VISIBLE);
-//                        edtTxMajor.setText(departmentHead.getManagedMajor());
-                    }
-                    break;
+        Intent intent = getIntent();
+        boolean isQueryingSelf = intent.getBooleanExtra("isQueryingSelf", true);
 
-                case ConstantStr.ID_TEACHING_OFFICE:
-                    TableUserTeachingOffice office =
-                            dbHelper.findById(workNumber, TableUserTeachingOffice.class);
-                    if (office != null) {
-                        edtTxTeacherNumber.setText(office.getWorkNumber());
-                        edtTxPassword.setText(office.getPassword());
-                        edtTxTeacherName.setText(office.getName());
-                        edtTxPhoneNumber.setText(office.getTelephone());
-                        edtTxDepartment.setVisibility(View.GONE);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
+        if (isQueryingSelf) {
+            queryIdentity = userIdentity;
+            queryWorkNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
         } else {
-            String queryIdentity = intent.getStringExtra("teacherIdentity");
-            workNumber = intent.getStringExtra("teacherID");
-            Loger.i("str2", "工号" + workNumber + "身份" + queryIdentity);
+            queryIdentity = intent.getStringExtra("teacherIdentity");
+            queryWorkNumber = intent.getStringExtra("teacherID");
+            Loger.i("str2", "工号" + queryWorkNumber + "身份" + queryIdentity);
+        }
 
-            switch (queryIdentity) {
-                case ConstantStr.ID_TEACHING_OFFICE: {
-                    TableUserTeachingOffice Information =
-                            dbHelper.findById(workNumber, TableUserTeachingOffice.class);
-                    if (Information != null) {
-                        edtTxTeacherNumber.setText(Information.getWorkNumber());
-                        edtTxPassword.setText(Information.getPassword());
-                        edtTxTeacherName.setText(Information.getName());
-                        edtTxPhoneNumber.setText(Information.getTelephone());
-                    }
+        setUserData(queryIdentity, queryWorkNumber);
+    }
+
+    private void setUserData(String queryIdentity, String queryWorkNumber) {
+        switch (queryIdentity) {
+            case ConstantStr.ID_TEACHING_OFFICE: {
+                TableUserTeachingOffice Information =
+                        dbHelper.findById(queryWorkNumber, TableUserTeachingOffice.class);
+                if (Information != null) {
+                    edtTxTeacherNumber.setText(Information.getWorkNumber());
+                    edtTxPassword.setText(Information.getPassword());
+                    edtTxTeacherName.setText(Information.getName());
+                    edtTxPhoneNumber.setText(Information.getTelephone());
+                    edtTxDepartment.setVisibility(View.GONE);
                 }
-                break;
-                case ConstantStr.ID_DEPARTMENT_HEAD: {
-                    TableUserDepartmentHead Information =
-                            dbHelper.findById(workNumber, TableUserDepartmentHead.class);
-                    if (Information != null){
-                        edtTxTeacherNumber.setText(Information.getWorkNumber());
-                        edtTxPassword.setText(Information.getPassword());
-                        edtTxTeacherName.setText(Information.getName());
-                        edtTxPhoneNumber.setText(Information.getTelephone());
-                        edtTxDepartment.setText(Information.getDepartment());
-                        edtTxMajor.setVisibility(View.VISIBLE);
-                    }
-                }
-                break;
-                case ConstantStr.ID_TEACHER: {
-                    TableUserTeacher Information =
-                            dbHelper.findById(workNumber, TableUserTeacher.class);
-                    if (Information != null){
-                        edtTxTeacherNumber.setText(Information.getWorkNumber());
-                        edtTxPassword.setText(Information.getPassword());
-                        edtTxTeacherName.setText(Information.getName());
-                        edtTxPhoneNumber.setText(Information.getTelephone());
-                        edtTxDepartment.setText(Information.getDepartment());
-                    }
-                }
-                break;
-                default:
-                    break;
             }
+            break;
+            case ConstantStr.ID_DEPARTMENT_HEAD: {
+                TableUserDepartmentHead Information =
+                        dbHelper.findById(queryWorkNumber, TableUserDepartmentHead.class);
+                if (Information != null) {
+                    edtTxTeacherNumber.setText(Information.getWorkNumber());
+                    edtTxPassword.setText(Information.getPassword());
+                    edtTxTeacherName.setText(Information.getName());
+                    edtTxPhoneNumber.setText(Information.getTelephone());
+                    edtTxDepartment.setText(Information.getDepartment());
+                    edtTxMajor.setVisibility(View.VISIBLE);
+                }
+            }
+            break;
+            case ConstantStr.ID_TEACHER: {
+                TableUserTeacher Information =
+                        dbHelper.findById(queryWorkNumber, TableUserTeacher.class);
+                if (Information != null) {
+                    edtTxTeacherNumber.setText(Information.getWorkNumber());
+                    edtTxPassword.setText(Information.getPassword());
+                    edtTxTeacherName.setText(Information.getName());
+                    edtTxPhoneNumber.setText(Information.getTelephone());
+                    edtTxDepartment.setText(Information.getDepartment());
+                }
+            }
+            break;
+            default:
+                break;
         }
     }
 
     private void initUserPermission() {
-        if (!identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
+        if (!userIdentity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             edtTxDepartment.setEnabled(false);
             edtTxMajor.setEnabled(false);
             edtTxTeacherNumber.setEnabled(false);
@@ -170,17 +136,40 @@ public class TeacherDetailActivity extends AppCompatActivity {
     }
 
     /**
-     * 获得界面数据
+     * 从界面获取数据
      */
-    private TableUserTeacher getTeacherData() {
-        TableUserTeacher teacher = new TableUserTeacher();
-        teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        teacher.setPassword(edtTxPassword.getText().toString().trim());
-        teacher.setName(edtTxTeacherName.getText().toString().trim());
-        teacher.setDepartment(edtTxDepartment.getText().toString().trim());
-        teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+    private Object getUserData() {
 
-        return teacher;
+        switch (queryIdentity) {
+            case ConstantStr.ID_TEACHING_OFFICE: {
+                TableUserTeachingOffice office = new TableUserTeachingOffice();
+                office.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+                office.setPassword(edtTxPassword.getText().toString().trim());
+                office.setName(edtTxTeacherName.getText().toString().trim());
+                office.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                return office;
+            }
+            case ConstantStr.ID_DEPARTMENT_HEAD: {
+                TableUserDepartmentHead department = new TableUserDepartmentHead();
+                department.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+                department.setPassword(edtTxPassword.getText().toString().trim());
+                department.setName(edtTxTeacherName.getText().toString().trim());
+                department.setDepartment(edtTxDepartment.getText().toString().trim());
+                department.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                return department;
+            }
+            case ConstantStr.ID_TEACHER: {
+                TableUserTeacher teacher = new TableUserTeacher();
+                teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+                teacher.setPassword(edtTxPassword.getText().toString().trim());
+                teacher.setName(edtTxTeacherName.getText().toString().trim());
+                teacher.setDepartment(edtTxDepartment.getText().toString().trim());
+                teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                return teacher;
+            }
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -196,22 +185,40 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.action_modify_infomation:
-                new AlertDialog.Builder(this).setTitle("提示").setMessage("是否确认修改").setPositiveButton
-                        (android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                TableUserTeacher teacher = getTeacherData();
-                                dbHelper.update(teacher);
+                new AlertDialog.Builder(this)
+                        .setTitle("提示")
+                        .setMessage("是否确认修改")
+                        .setPositiveButton
+                                (android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                                finish();
-                            }
-                        }).setNegativeButton
-                        (android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                                        if (queryIdentity.equals(userIdentity)) {
+                                            String tvName =
+                                                    edtTxTeacherName.getText().toString().trim();
 
-                            }
-                        }).show();
+                                            SharedPreferences.Editor editor =
+                                                    getSharedPreferences(ConstantStr.USER_INFORMATION,
+                                                            MODE_PRIVATE).edit();
+                                            editor.putString(ConstantStr.USER_NAME,tvName);
+                                            editor.apply();
+                                        }
+
+                                        Object user = getUserData();
+
+                                        dbHelper.update(user);
+//                              这里需要发送更新到服务器
+                                        finish();
+                                    }
+                                })
+                        .setNegativeButton
+                                (android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                        .show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
