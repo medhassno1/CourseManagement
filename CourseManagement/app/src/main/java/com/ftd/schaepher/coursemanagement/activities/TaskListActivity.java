@@ -92,6 +92,9 @@ public class TaskListActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        if(taskListData==null||taskListData.size()==0){
+            getServerData();
+        }
         Log.i("TAG111", "开始setOnRefreshListener");
         refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
             @Override
@@ -111,6 +114,7 @@ public class TaskListActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         setSpinnerData();
+
     }
 
     // 显示任务列表数据
@@ -169,8 +173,8 @@ public class TaskListActivity extends AppCompatActivity
                     dbHelper.deleteAll(TableTaskInfo.class);
                     dbHelper.insertAll(list);
 
-                    getSelectedTermTaskData(selectedTerm);
                     if (mTaskAdapter != null) {
+                        getSelectedTermTaskData(selectedTerm);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -199,6 +203,9 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
+    private void updateListView(){
+
+    }
     // 点击任务列表项跳转操作
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
