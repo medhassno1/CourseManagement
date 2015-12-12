@@ -22,122 +22,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="query_teacher_select_courses.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/query_teacher_select_courses.php">
+      <file leaf-file-name="insert_tc_update_bc.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/insert_tc_update_bc.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="25.464285">
-              <caret line="2" column="68" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="68" />
+            <state vertical-scroll-proportion="-1.4285715">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
               <folding>
-                <marker date="1449831462285" expanded="true" signature="438:502" placeholder="SELECT taskS..task_info..." />
-                <marker date="1449831462285" expanded="true" signature="664:678" placeholder="SELECT * FRO..." />
-                <marker date="1449831462285" expanded="true" signature="929:973" placeholder="SELECT * FRO..." />
-                <marker date="1449831462285" expanded="true" signature="1052:1118" placeholder="SELECT * FRO..." />
+                <marker date="1449899675151" expanded="true" signature="539:618" placeholder="INSERT INTO ..." />
+                <marker date="1449899675151" expanded="true" signature="789:853" placeholder="select * fro..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="update_bc_table.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/update_bc_table.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="3.0357144">
-              <caret line="5" column="28" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="28" />
-              <folding>
-                <marker date="1449831462282" expanded="true" signature="326:388" placeholder="select * fro..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="query_by_table_name.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/query_by_table_name.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.2857144">
-              <caret line="4" column="25" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="25" />
-              <folding>
-                <marker date="1449831241401" expanded="true" signature="280:294" placeholder="SELECT * FRO..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="update_manager_major.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/update_manager_major.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.4642856">
-              <caret line="6" column="28" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="28" />
-              <folding>
-                <marker date="1449832471697" expanded="true" signature="371:429" placeholder="DELETE FROM ..." />
-                <marker date="1449832471697" expanded="true" signature="529:634" placeholder="INSERT INTO ..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="update_tc_table.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/update_tc_table.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.5714285">
-              <caret line="2" column="29" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="update_user_office.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/update_user_office.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.2857143">
-              <caret line="3" column="63" selection-start-line="3" selection-start-column="3" selection-end-line="3" selection-end-column="63" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="update_user_teacher_department.php" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/update_user_teacher_department.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.035185184">
-              <caret line="2" column="89" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="89" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="delete_user.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/delete_user.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-4.357143">
-              <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
-              <folding>
-                <marker date="1449829695740" expanded="true" signature="522:589" placeholder="DELETE FROM ..." />
-                <marker date="1449829695740" expanded="true" signature="655:710" placeholder="DELETE FROM ..." />
-                <marker date="1449829695740" expanded="true" signature="789:843" placeholder="DELETE FROM ..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="insert_table.php" pinned="false" current-in-tab="false">
+      <file leaf-file-name="insert_table.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/insert_table.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.3571428">
-              <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="29" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="21" selection-end-column="2" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="delete_task.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/delete_task.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="3.9285715">
-              <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-              <folding>
-                <marker date="1449833460607" expanded="true" signature="385:439" placeholder="DELETE FROM ..." />
-                <marker date="1449833460607" expanded="true" signature="508:529" placeholder="DROP TABLE I..." />
-                <marker date="1449833460607" expanded="true" signature="650:671" placeholder="DROP TABLE I..." />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -153,15 +56,16 @@
         <option value="$PROJECT_DIR$/post_table.php" />
         <option value="$PROJECT_DIR$/query_by_table_name.php" />
         <option value="$PROJECT_DIR$/query_teacher_select_courses.php" />
-        <option value="$PROJECT_DIR$/update_bc_table.php" />
         <option value="$PROJECT_DIR$/update_manager_major.php" />
-        <option value="$PROJECT_DIR$/update_tc_table.php" />
         <option value="$PROJECT_DIR$/update_user_office.php" />
         <option value="$PROJECT_DIR$/update_user_teacher_depertment.php" />
         <option value="$PROJECT_DIR$/delete_user.php" />
         <option value="$PROJECT_DIR$/insert_table.php" />
         <option value="$PROJECT_DIR$/delete_task.php" />
         <option value="$PROJECT_DIR$/creat_table.php" />
+        <option value="$PROJECT_DIR$/update_tc_table.php" />
+        <option value="$PROJECT_DIR$/update_bc_table.php" />
+        <option value="$PROJECT_DIR$/update_cb_table.php" />
       </list>
     </option>
   </component>
@@ -204,7 +108,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -225,12 +128,14 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FullScreen" value="false" />
+    <property name="last_opened_file_path" value="C:/xampp/htdocs" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
@@ -275,11 +180,10 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="0" width="1378" height="728" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24203338" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24962063" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="PHP-CGI Server" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -289,6 +193,7 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="PHP-CGI Server" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -317,23 +222,23 @@
     <entry file="file://$PROJECT_DIR$/query_teacher_select_courses.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="2" column="68" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="68" />
           <folding>
-            <marker date="1449831462285" expanded="true" signature="438:502" placeholder="SELECT taskS..task_info..." />
-            <marker date="1449831462285" expanded="true" signature="664:678" placeholder="SELECT * FRO..." />
-            <marker date="1449831462285" expanded="true" signature="929:973" placeholder="SELECT * FRO..." />
-            <marker date="1449831462285" expanded="true" signature="1052:1118" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT taskS..task_info..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/creat_table.php">
+    <entry file="file://$PROJECT_DIR$/insert_tc_update_bc.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="73" column="16" selection-start-line="73" selection-start-column="16" selection-end-line="73" selection-end-column="16" />
+          <caret line="2" column="19" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="19" />
           <folding>
-            <marker date="1449833488649" expanded="true" signature="-1:-1" placeholder="CREATE TABLE..IF..." />
-            <marker date="1449833488649" expanded="true" signature="-1:-1" placeholder="CREATE TABLE..IF..." />
+            <marker date="1449899675151" expanded="true" signature="539:618" placeholder="INSERT INTO ..." />
+            <marker date="1449899675151" expanded="true" signature="789:853" placeholder="select * fro..." />
           </folding>
         </state>
       </provider>
@@ -341,9 +246,165 @@
     <entry file="file://$PROJECT_DIR$/query_by_table_name.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <caret line="4" column="25" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="25" />
           <folding>
-            <marker date="1449831241401" expanded="true" signature="280:294" placeholder="SELECT * FRO..." />
+            <marker date="1449831241401" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_manager_major.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="6" column="28" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="28" />
+          <folding>
+            <marker date="1449832471697" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449832471697" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_insert_cb_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="38" selection-start-line="2" selection-start-column="24" selection-end-line="2" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_user_office.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="3" column="63" selection-start-line="3" selection-start-column="3" selection-end-line="3" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_user_teacher_department.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="89" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="89" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/delete_user.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
+          <folding>
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/insert_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/query_teacher_select_courses.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="68" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="68" />
+          <folding>
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT taskS..task_info..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/insert_tc_update_bc.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="5" column="28" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="28" />
+          <folding>
+            <marker date="1449899675151" expanded="true" signature="539:618" placeholder="INSERT INTO ..." />
+            <marker date="1449899675151" expanded="true" signature="789:853" placeholder="select * fro..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/query_by_table_name.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="25" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="25" />
+          <folding>
+            <marker date="1449831241401" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_manager_major.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="6" column="28" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="28" />
+          <folding>
+            <marker date="1449832471697" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449832471697" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_insert_cb_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="29" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_user_office.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="3" column="63" selection-start-line="3" selection-start-column="3" selection-end-line="3" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_user_teacher_department.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/delete_user.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
+          <folding>
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/insert_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/delete_task.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
+          <folding>
+            <marker date="1449833460607" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449833460607" expanded="true" signature="-1:-1" placeholder="DROP TABLE I..." />
+            <marker date="1449833460607" expanded="true" signature="-1:-1" placeholder="DROP TABLE I..." />
           </folding>
         </state>
       </provider>
@@ -353,10 +414,10 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1449831462285" expanded="true" signature="438:502" placeholder="SELECT taskS..task_info..." />
-            <marker date="1449831462285" expanded="true" signature="664:678" placeholder="SELECT * FRO..." />
-            <marker date="1449831462285" expanded="true" signature="929:973" placeholder="SELECT * FRO..." />
-            <marker date="1449831462285" expanded="true" signature="1052:1118" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT taskS..task_info..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
           </folding>
         </state>
       </provider>
@@ -365,10 +426,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="73" column="16" selection-start-line="73" selection-start-column="16" selection-end-line="73" selection-end-column="16" />
-          <folding>
-            <marker date="1449833488649" expanded="true" signature="-1:-1" placeholder="CREATE TABLE..IF..." />
-            <marker date="1449833488649" expanded="true" signature="-1:-1" placeholder="CREATE TABLE..IF..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -377,7 +434,37 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
           <folding>
-            <marker date="1449831241401" expanded="true" signature="280:294" placeholder="SELECT * FRO..." />
+            <marker date="1449831241401" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/query_teacher_select_courses.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT taskS..task_info..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/creat_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="73" column="16" selection-start-line="73" selection-start-column="16" selection-end-line="73" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/query_by_table_name.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding>
+            <marker date="1449831241401" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
           </folding>
         </state>
       </provider>
@@ -386,9 +473,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1449490439202" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -396,7 +480,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.071429">
           <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -404,109 +487,106 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.214286">
           <caret line="11" column="25" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
-          <folding>
-            <marker date="1449833488649" expanded="true" signature="-1:-1" placeholder="CREATE TABLE..IF..." />
-            <marker date="1449833488649" expanded="true" signature="-1:-1" placeholder="CREATE TABLE..IF..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/delete_task.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.9285715">
-          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-          <folding>
-            <marker date="1449833460607" expanded="true" signature="385:439" placeholder="DELETE FROM ..." />
-            <marker date="1449833460607" expanded="true" signature="508:529" placeholder="DROP TABLE I..." />
-            <marker date="1449833460607" expanded="true" signature="650:671" placeholder="DROP TABLE I..." />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/delete_user.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.357143">
+        <state vertical-scroll-proportion="0.0">
           <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
           <folding>
-            <marker date="1449829695740" expanded="true" signature="522:589" placeholder="DELETE FROM ..." />
-            <marker date="1449829695740" expanded="true" signature="655:710" placeholder="DELETE FROM ..." />
-            <marker date="1449829695740" expanded="true" signature="789:843" placeholder="DELETE FROM ..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/insert_table.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.3571428">
-          <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/query_by_table_name.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.2857144">
-          <caret line="4" column="25" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="25" />
-          <folding>
-            <marker date="1449831241401" expanded="true" signature="280:294" placeholder="SELECT * FRO..." />
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449829695740" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/query_teacher_select_courses.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="25.464285">
+        <state vertical-scroll-proportion="0.0">
           <caret line="2" column="68" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="68" />
           <folding>
-            <marker date="1449831462285" expanded="true" signature="438:502" placeholder="SELECT taskS..task_info..." />
-            <marker date="1449831462285" expanded="true" signature="664:678" placeholder="SELECT * FRO..." />
-            <marker date="1449831462285" expanded="true" signature="929:973" placeholder="SELECT * FRO..." />
-            <marker date="1449831462285" expanded="true" signature="1052:1118" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT taskS..task_info..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+            <marker date="1449831462285" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/update_bc_table.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.0357144">
-          <caret line="5" column="28" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="28" />
-          <folding>
-            <marker date="1449831462282" expanded="true" signature="326:388" placeholder="select * fro..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/update_manager_major.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.4642856">
-          <caret line="6" column="28" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="28" />
-          <folding>
-            <marker date="1449832471697" expanded="true" signature="371:429" placeholder="DELETE FROM ..." />
-            <marker date="1449832471697" expanded="true" signature="529:634" placeholder="INSERT INTO ..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/update_tc_table.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.5714285">
-          <caret line="2" column="29" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/update_user_office.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.2857143">
-          <caret line="3" column="63" selection-start-line="3" selection-start-column="3" selection-end-line="3" selection-end-column="63" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/update_user_teacher_department.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.035185184">
+        <state vertical-scroll-proportion="-0.0">
           <caret line="2" column="89" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="89" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/delete_task.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.12037037">
+          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
+          <folding>
+            <marker date="1449833460607" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449833460607" expanded="true" signature="-1:-1" placeholder="DROP TABLE I..." />
+            <marker date="1449833460607" expanded="true" signature="-1:-1" placeholder="DROP TABLE I..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_user_office.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.014814815">
+          <caret line="3" column="63" selection-start-line="3" selection-start-column="3" selection-end-line="3" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_insert_cb_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.25925925">
+          <caret line="6" column="52" selection-start-line="6" selection-start-column="52" selection-end-line="6" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_manager_major.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.15555556">
+          <caret line="6" column="28" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="28" />
+          <folding>
+            <marker date="1449832471697" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1449832471697" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/query_by_table_name.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.14074074">
+          <caret line="4" column="25" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="25" />
+          <folding>
+            <marker date="1449831241401" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/insert_tc_update_bc.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.4285715">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding>
+            <marker date="1449899675151" expanded="true" signature="539:618" placeholder="INSERT INTO ..." />
+            <marker date="1449899675151" expanded="true" signature="789:853" placeholder="select * fro..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/insert_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="21" selection-end-column="2" />
           <folding />
         </state>
       </provider>

@@ -146,6 +146,7 @@ public class TaskCreationActivity extends AppCompatActivity
                                 try {
                                     createTable();
                                     dbHelper.insert(task);
+                                    postToServer();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     showError();
@@ -166,6 +167,10 @@ public class TaskCreationActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void postToServer(){
+
     }
 
     private void showError() {
