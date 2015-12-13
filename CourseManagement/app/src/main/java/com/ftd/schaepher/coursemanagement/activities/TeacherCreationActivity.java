@@ -310,7 +310,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     TableManageMajor ManageMajor = getUIManageMajorData();
                     try {
                         //系负责人表
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_DEPARTMENT_HEAD,
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
                                 JsonTools.getJsonString(departmentHead), NetworkManager.INSERT_TABLE);
                         dbHelper.insert(departmentHead);
                         //系负责人专业表
@@ -327,7 +327,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     TableUserTeachingOffice teachingOffice = getUITeachingOfficeData();
                     Loger.w("TeacherCreationActivity",teachingOffice.toString());
                     try {
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                 JsonTools.getJsonString(teachingOffice), NetworkManager.INSERT_TABLE);
                         dbHelper.insert(teachingOffice);
                     } catch (Exception e) {

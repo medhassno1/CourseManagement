@@ -157,6 +157,7 @@ public class FileSelectActivity extends AppCompatActivity
                                                     dbHelper.insert(teacher);
                                                     finish();
                                                 } catch (Exception e) {
+                                                    e.printStackTrace();
                                                 }
                                             }
                                         }

@@ -2,7 +2,6 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
@@ -13,16 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
-import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
-import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.rey.material.app.SimpleDialog;
 
 import java.io.File;
@@ -79,7 +75,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         mActionBar.setDisplayHomeAsUpEnabled(true);
         toTableName = TableCourseMultiline.class.getSimpleName();
 
-        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORKNUMBER, "");
+        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
         relativeTable = getIntent().getStringExtra("relativeTable");
         Loger.i("TAG", "relativeTable" + relativeTable);
         dbHelper = new CourseDBHelper(this);

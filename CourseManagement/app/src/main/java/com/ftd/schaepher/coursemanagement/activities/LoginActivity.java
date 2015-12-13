@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.db.Initialize;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
@@ -77,7 +76,7 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的账号
      */
     private void autoSetWorkNumber() {
-        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORKNUMBER, "");
+        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
         if (!workNumber.equals("")) {
             edtTxWorkNumber.setText(workNumber);
         }
@@ -170,7 +169,7 @@ public class LoginActivity extends AppCompatActivity
                     if (!result.equals("false")) {
 //                        这里应该改为获取服务器个人数据，并存储到数据库中
                         informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
-                        informationEditor.putString(ConstantStr.USER_WORKNUMBER, workNumber);
+                        informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);
                         informationEditor.apply();
                         CourseDBHelper dbHelper = new CourseDBHelper(LoginActivity.this);
                         try {
@@ -215,7 +214,7 @@ public class LoginActivity extends AppCompatActivity
 
     public void loginOffLine() {
         informationEditor.putString(ConstantStr.USER_IDENTITY, identity);//保存用户名、身份
-        informationEditor.putString(ConstantStr.USER_WORKNUMBER, workNumber);
+        informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);
         informationEditor.apply();
 
         Intent intend = new Intent();
