@@ -2,7 +2,7 @@
 
 class CreateTable
 {
-    public function creatTable($tableName = "", $ident = "")
+    public function creatTable($tableName = "", $ident = "",$jsonData="")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {
@@ -62,9 +62,16 @@ class CreateTable
             if (mysqli_query($con, $sql)) {
                 echo "true";
 
+                $jsonArry = json_decode($jsonData, true);
+                    foreach ($jsonArry as $row) {
+                        $statement = "INSERT INTO $cbTableName (insertTime,grade,major,people,courseName,courseType,courseCredit,courseHour,practiceHour,onMachineHour,timePeriod,teacherName,remark) VALUES('$row[insertTime]','$row[grade]','$row[major]','$row[people]','$row[courseName]','$row[courseType]','$row[courseCredit]','$row[courseHour]','$row[practiceHour]','$row[onMachineHour]','$row[timePeriod]','$row[teacherName]','$row[remark]') ";
+
+                        $sql = mysqli_query($con, $statement);
+                    }
             } else {
                 echo "false";
             }
+
 
 
         }
