@@ -465,7 +465,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
                     break;
                 }
                 publishProgress(topMargin);
-                sleep(10);
+//                sleep(10);
             }
             currentStatus = STATUS_REFRESHING;
             publishProgress(0);
@@ -501,7 +501,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
                     break;
                 }
                 publishProgress(topMargin);
-                sleep(10);
+//                sleep(10);
             }
             return topMargin;
         }

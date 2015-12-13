@@ -178,7 +178,7 @@ public class LoginActivity extends AppCompatActivity
                             Class clazz = Class.forName(pojoClassName);
                             Object user = JsonTools.getJsonObject(result, clazz);
                             dbHelper.insertOrUpdate(user);
-                        } catch (ClassNotFoundException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
 

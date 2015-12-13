@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class InsertTcUpdateBc
 {
@@ -15,7 +15,13 @@ class InsertTcUpdateBc
             $tableList = '(' . implode($keys, ',') . ')';
             foreach ($jsonArry as $row) {
                 $statement = "INSERT INTO $tableName $tableList VALUES " . ' ("' . implode($row, '","') . '")';
+		echo $statement;
                 $sql = mysqli_query($con, $statement);
+                if ($sql) {
+                    echo " true \n ";
+                } else {
+                    echo "false";
+                }
             }
             foreach ($jsonArry as $row) {
                 $cbTableName = 'cb_' . $tableName;

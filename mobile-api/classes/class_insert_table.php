@@ -1,8 +1,8 @@
-<?php
+﻿<?php
 
 class InsertTable
 {
-    public function InsertTable($tableName = "", $jsonData = "")
+    public function insertTable($tableName = "", $jsonData = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {
