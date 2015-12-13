@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +49,7 @@ public class TaskCreationActivity extends AppCompatActivity
     private EditText edtTxTeacherDeadline;
     private EditText edtTxTaskName;
     private EditText edtTxTaskTeam;
-    private EditText edtTxTaskRemark;
+    //    private EditText edtTxTaskRemark;
     private ImageView imgvFileImg;
     private TextView tvFileName;
     private Button btnImportFile;
@@ -62,8 +61,6 @@ public class TaskCreationActivity extends AppCompatActivity
     private String year;
     private String semester;
 
-    private static final int RELEASE = 1;
-    private static final int RELEASE_FAILURE = 2;
     private static final String[] SEMESTER = new String[]{"01", "02", "03", "04"};
 
     private List<String> termYear;
@@ -151,19 +148,17 @@ public class TaskCreationActivity extends AppCompatActivity
                                     String result = NetworkManager
                                             .postToServerSync(ConstantStr.TABLE_TASK_INFO,
                                                     json, NetworkManager.INSERT_TABLE);
-                                    Loger.w("resultTask",result);
+                                    Loger.w("resultTask", result);
+
                                     List<TableCourseMultiline> courseTable = readExcelToDB();
-                                    Loger.w("行数",String.valueOf(courseTable.size()));
                                     String tableJson = JsonTools.getJsonString(courseTable);
-//                                    Loger.w("resultTask",tableJson);
                                     String result2 = NetworkManager
                                             .postToServerSync(tableCourseName, tableJson, NetworkManager.CREATE_TABLE);
-                                    Loger.w("resultTable",result2);
+                                    Loger.w("resultTable", result2);
+                                    closeProgress();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     showError();
-                                } finally {
-                                    closeProgress();
                                 }
                             }
                         }.start();
@@ -195,6 +190,7 @@ public class TaskCreationActivity extends AppCompatActivity
             @Override
             public void run() {
                 progress.cancel();
+                Toast.makeText(TaskCreationActivity.this, "发布成功！", Toast.LENGTH_SHORT).show();
             }
         });
     }

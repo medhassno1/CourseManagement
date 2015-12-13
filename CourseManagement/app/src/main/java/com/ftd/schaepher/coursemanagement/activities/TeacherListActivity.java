@@ -1,6 +1,8 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,10 +17,12 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +35,7 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
@@ -50,7 +55,8 @@ import java.util.TimerTask;
  */
 public class TeacherListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        AdapterView.OnItemClickListener, MenuItem.OnMenuItemClickListener {
+        AdapterView.OnItemClickListener, MenuItem.OnMenuItemClickListener,
+        View.OnClickListener, AdapterView.OnItemLongClickListener {
 
     private static final String TAG = "TeacherListActivity";
     private static final int CLOSE_NAV = 1;
@@ -67,13 +73,19 @@ public class TeacherListActivity extends AppCompatActivity
     private RefreshableView refreshableView;
     private ImageView ivDeleteText;
     private TextView tvOwnName;
+    private TextView tvDelete;
+    private ListView teacherListView;
+    private ListView departmentListView;
+    private ListView officeListView;
+    private PopupWindow popupWindow;
+    private ProgressDialog mProgress;
     private boolean isSupportDoubleBackExit;
     private long doubleBackTime;
     private Handler myHandler = new Handler();
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeachingOffice> officeListData;
     private List<TableUserDepartmentHead> departmentListData;
-    private TeacherAdapter mTeacherAdapter;
+    private TeacherAdapter teacherAdapter;
     private DepartmentHeadAdapter departmentAdapter;
     private TeacherOfficeAdapter officeAdapter;
     private String identity;
@@ -95,6 +107,7 @@ public class TeacherListActivity extends AppCompatActivity
         // 侧滑菜单
         setNavViewConfig();
         isSupportDoubleBackExit = true;
+        mProgress = new ProgressDialog(TeacherListActivity.this);
 
         setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick(); // 设置叉叉的监听器
@@ -136,47 +149,102 @@ public class TeacherListActivity extends AppCompatActivity
     // 初始化教师列表界面的控件
     private void initTeacherListView() {
         if (teacherListData != null) {
-            mTeacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
-            ListView mListView = (MoreListView) findViewById(R.id.lv_teacher_list);
-            mListView.setAdapter(mTeacherAdapter);
-            mListView.setOnItemClickListener(this);
+            teacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
+            teacherListView = (MoreListView) findViewById(R.id.lv_teacher_list);
+            teacherListView.setAdapter(teacherAdapter);
+            teacherListView.setOnItemClickListener(this);
         }
         if (departmentListData != null) {
             departmentAdapter =
                     new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
-            ListView departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
+            departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
             departmentListView.setAdapter(departmentAdapter);
             departmentListView.setOnItemClickListener(this);
         }
         if (officeListData != null) {
             officeAdapter =
                     new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
-            ListView officeListView = (MoreListView) findViewById(R.id.lv_office_list);
+            officeListView = (MoreListView) findViewById(R.id.lv_office_list);
             officeListView.setAdapter(officeAdapter);
             officeListView.setOnItemClickListener(this);
         }
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
+            teacherListView.setOnItemLongClickListener(this);
+            departmentListView.setOnItemLongClickListener(this);
+            officeListView.setOnItemLongClickListener(this);
+        }
     }
 
-    private void getServerTeacherData(){
+    private void getServerTeacherData() {
         try {
             NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHER,
                     new NetworkManager.ResponseCallback() {
                         @Override
                         public void onResponse(Response response) throws IOException {
                             //从服务器获取教师数据，并更新到本地数据库
-                            CourseDBHelper dbHelper = new CourseDBHelper(TeacherListActivity.this);
                             List list = JsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
                             Loger.w("jsonList", list.toString());
-
-                            dbHelper.deleteAll(TableUserTeacher.class);
                             dbHelper.insertAll(list);
 
                             TeacherListActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    refreshTeacherListData();
-                                    mTeacherAdapter.notifyDataSetChanged();
+                                    //从本地数据库获取教师数据
+                                    teacherListData = dbHelper.findAll(TableUserTeacher.class);
+                                    teacherAdapter.clear();
+                                    teacherAdapter.addAll(teacherListData);
+                                    teacherAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Request request, IOException e) {
+
+                        }
+                    });
+
+            NetworkManager.getJsonString(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                    new NetworkManager.ResponseCallback() {
+                        @Override
+                        public void onResponse(Response response) throws IOException {
+                            //从服务器获取教师数据，并更新到本地数据库
+                            List list = JsonTools.getJsonList(response.body().string(), TableUserDepartmentHead.class);
+                            Loger.w("jsonList", list.toString());
+                            dbHelper.insertAll(list);
+
+                            TeacherListActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+                                    departmentAdapter.clear();
+                                    departmentAdapter.addAll(departmentListData);
                                     departmentAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Request request, IOException e) {
+
+                        }
+                    });
+
+            NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                    new NetworkManager.ResponseCallback() {
+                        @Override
+                        public void onResponse(Response response) throws IOException {
+                            //从服务器获取教师数据，并更新到本地数据库
+                            List list = JsonTools.getJsonList(response.body().string(), TableUserTeachingOffice.class);
+                            Loger.w("jsonList", list.toString());
+                            dbHelper.insertAll(list);
+
+                            TeacherListActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+                                    officeAdapter.clear();
+                                    officeAdapter.addAll(officeListData);
                                     officeAdapter.notifyDataSetChanged();
                                 }
                             });
@@ -187,6 +255,7 @@ public class TeacherListActivity extends AppCompatActivity
 
                         }
                     });
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -386,4 +455,138 @@ public class TeacherListActivity extends AppCompatActivity
             }
         }
     };
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.tv_popup_delete:
+                popupWindow.dismiss();
+                mProgress.setMessage("删除用户中...");
+                mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                mProgress.setCancelable(false);
+                mProgress.show();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            Bundle bundle = (Bundle) tvDelete.getTag();
+                            String tableName = bundle.getString("tableName");
+                            String workNumber = bundle.getString("workNumber");
+                            NetworkManager.deleteServerUser(tableName, workNumber,
+                                    new MyRespons(tableName, workNumber));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Loger.d("delete", "程序崩溃");
+                            clossProcess();
+                        }
+                    }
+                }.start();
+                break;
+            default:
+                break;
+        }
+    }
+
+    class MyRespons implements NetworkManager.ResponseCallback {
+        private String tableName;
+        private String workNumber;
+
+        public MyRespons(String tableName, String workNumber) {
+            super();
+            this.tableName = tableName;
+            this.workNumber = workNumber;
+        }
+
+        @Override
+        public void onResponse(Response response) throws IOException {
+            String result = response.body().string();
+            if (result.equals("没有权限")) {
+                sendToast("没有权限");
+
+            } else {
+                clossProcess();
+                sendToast("删除成功！");
+                try {
+                    Loger.d("delete", "tableName:" + tableName + "|||workNumber:" + workNumber);
+                    dbHelper.deleteByID(Class.forName(GlobalMap.get(tableName)), workNumber);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                refreshListView();
+            }
+        }
+
+        @Override
+        public void onFailure(Request request, IOException e) {
+
+        }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        if (refreshableView.getCurrentStatus() == RefreshableView.STATUS_REFRESH_FINISHED) {
+            View v = this.getLayoutInflater().inflate(R.layout.popup_dialog_delete, null);
+            popupWindow = new PopupWindow(v, ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            popupWindow.setFocusable(true);
+            popupWindow.setOutsideTouchable(true);
+            popupWindow.setBackgroundDrawable(new BitmapDrawable());
+            popupWindow.showAsDropDown(view, ((getWindowManager()
+                    .getDefaultDisplay().getWidth() / 3)), -(3 * view.getHeight() / 2));
+
+            Bundle bundle = new Bundle();
+            switch (parent.getId()) {
+                case R.id.lv_office_list:
+                    bundle.putString("tableName", ConstantStr.ID_TEACHING_OFFICE);
+                    bundle.putString("workNumber", officeListData.get(position).getWorkNumber());
+                    break;
+                case R.id.lv_department_list:
+                    bundle.putString("tableName", ConstantStr.ID_DEPARTMENT_HEAD);
+                    bundle.putString("workNumber", departmentListData.get(position).getWorkNumber());
+                    break;
+                case R.id.lv_teacher_list:
+                    bundle.putString("tableName", ConstantStr.ID_TEACHER);
+                    bundle.putString("workNumber", teacherListData.get(position).getWorkNumber());
+                    break;
+                default:
+                    break;
+            }
+            tvDelete = (TextView) v.findViewById(R.id.tv_popup_delete);
+            tvDelete.setOnClickListener(this);
+            tvDelete.setTag(bundle);
+        }
+        return true;
+    }
+
+    private void clossProcess() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgress.isShowing()) {
+                    mProgress.cancel();
+                }
+            }
+        });
+    }
+
+    public void sendToast(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TeacherListActivity.this, message,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void refreshListView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                officeAdapter.notifyDataSetChanged();
+                departmentAdapter.notifyDataSetChanged();
+                teacherAdapter.notifyDataSetChanged();
+            }
+        });
+    }
 }

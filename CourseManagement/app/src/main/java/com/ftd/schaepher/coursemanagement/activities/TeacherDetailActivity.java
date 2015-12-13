@@ -15,11 +15,14 @@ import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
 /**
  * Created by sxq on 2015/11/2.
@@ -33,6 +36,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private EditText edtTxPhoneNumber;
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
+    private EditText edtTxEmail;
     private String userIdentity;
 
     private CourseDBHelper dbHelper;
@@ -73,7 +77,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
         if (isQueryingSelf) {
             queryIdentity = userIdentity;
-            queryWorkNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+            queryWorkNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         } else {
             queryIdentity = intent.getStringExtra("teacherIdentity");
             queryWorkNumber = intent.getStringExtra("teacherID");
@@ -147,6 +151,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 office.setPassword(edtTxPassword.getText().toString().trim());
                 office.setName(edtTxTeacherName.getText().toString().trim());
                 office.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                office.setEmail(edtTxEmail.getText().toString().trim());
                 return office;
             }
             case ConstantStr.ID_DEPARTMENT_HEAD: {
@@ -156,6 +161,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 department.setName(edtTxTeacherName.getText().toString().trim());
                 department.setDepartment(edtTxDepartment.getText().toString().trim());
                 department.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                department.setEmail(edtTxEmail.getText().toString().trim());
                 return department;
             }
             case ConstantStr.ID_TEACHER: {
@@ -165,11 +171,23 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 teacher.setName(edtTxTeacherName.getText().toString().trim());
                 teacher.setDepartment(edtTxDepartment.getText().toString().trim());
                 teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                teacher.setEmail(edtTxEmail.getText().toString().trim());
                 return teacher;
             }
             default:
                 return null;
         }
+    }
+
+    /**
+     * 从界面获取系负责人专业表数据
+     */
+    private TableManageMajor getManageMajorData(){
+        TableManageMajor manageMajor = new TableManageMajor();
+        manageMajor.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+        manageMajor.setMajor(edtTxMajor.getText().toString().trim());
+        return manageMajor;
+
     }
 
     @Override
@@ -200,15 +218,11 @@ public class TeacherDetailActivity extends AppCompatActivity {
                                             SharedPreferences.Editor editor =
                                                     getSharedPreferences(ConstantStr.USER_INFORMATION,
                                                             MODE_PRIVATE).edit();
-                                            editor.putString(ConstantStr.USER_NAME,tvName);
+                                            editor.putString(ConstantStr.USER_NAME, tvName);
                                             editor.apply();
                                         }
 
-                                        Object user = getUserData();
-
-                                        dbHelper.update(user);
-//                              这里需要发送更新到服务器
-                                        finish();
+                                        submitToServer();
                                     }
                                 })
                         .setNegativeButton
@@ -224,6 +238,53 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    /**
+     * 提交数据到服务器
+     */
+    private void submitToServer(){
+        new Thread() {
+            @Override
+            public void run() {
+                Object user = getUserData();
+                if(queryIdentity.equals(ConstantStr.ID_TEACHER)){
+                    try {
+                        Loger.i("updateteacher","开始发送服务器");
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_TEACHER);
+                        Loger.i("updateteacher", "发送服务器结束，开始插入本地数据库");
+                        dbHelper.update(user);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else if(queryIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+                    TableManageMajor manageMajor = getManageMajorData();
+                    try {
+                        //系负责人表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_DEPARTMENT);
+                        dbHelper.update(user);
+                        //系负责人专业表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
+                                JsonTools.getJsonString(manageMajor), NetworkManager.UPDATE_MANAGER_MAJOR);
+                        dbHelper.update(manageMajor);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //教学办
+                }else{
+                    try {
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_OFFICE);
+                        dbHelper.update(user);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                finish();
+            }
+        }.start();
     }
 
     @Override

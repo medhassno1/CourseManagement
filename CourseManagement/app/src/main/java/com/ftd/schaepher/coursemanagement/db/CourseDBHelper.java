@@ -77,7 +77,7 @@ public class CourseDBHelper {
 
     public void insertAll(List list) {
         for (Object obj : list) {
-            finalDb.save(obj);
+            insertOrUpdate(obj);
         }
     }
 

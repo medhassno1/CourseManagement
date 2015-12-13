@@ -70,20 +70,18 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         dbHelper = new CourseDBHelper(this);
 
         tableName = getIntent().getStringExtra("tableName");
+        commonTableName = TableCourseMultiline.class.getSimpleName();
+
         // 判断是否已有数据
         dbHelper.dropTable(commonTableName);
-        try {
-            dbHelper.changeTableName(tableName, commonTableName);
-        } catch (Exception e) {
-
-        }
+        dbHelper.changeTableName(tableName, commonTableName);
 
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
-        commonTableName = TableCourseMultiline.class.getSimpleName();
+
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         userName = sharedPre.getString(ConstantStr.USER_NAME, "");
-        workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+        workNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
 
         getServerData();
@@ -405,7 +403,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
         try {
             String result = NetworkManager.postToServerSync(tableName,
-                    JsonTools.getJsonString(commitData), NetworkManager.INSERT_TABLE);
+                    JsonTools.getJsonString(commitData), NetworkManager.SUBMIT_SELECTED_COURSE);
 
             sendToast("提交成功");
             hasCommitted = true;

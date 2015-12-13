@@ -18,8 +18,11 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.adapter.FileListAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -118,7 +121,6 @@ public class FileSelectActivity extends AppCompatActivity
         boolean isTeacherFile = getIntent().getBooleanExtra("isRequireImportTeacherFile", false);
         Loger.i("path", path);
 
-        // 直接调用excelTools.isTrueFileName()会出错，暂时无解
         if (!path.endsWith(".xls")) {
             new AlertDialog.Builder(this)
                     .setTitle("提示")
@@ -139,19 +141,27 @@ public class FileSelectActivity extends AppCompatActivity
                             (android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    ExcelTools excelTools = new ExcelTools();
-                                    excelTools.setPath(path);
-                                    List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
-                                    //导入教师表
-                                    for (int i = 0; i < teachersList.size(); i++) {
-                                        CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
-                                        TableUserTeacher teacher = teachersList.get(i);
-                                        try {
-                                            dbHelper.insert(teacher);
-                                        } catch (Exception e) {
+                                    new Thread() {
+                                        @Override
+                                        public void run() {
+                                            ExcelTools excelTools = new ExcelTools();
+                                            excelTools.setPath(path);
+                                            List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
+                                            //导入教师表
+                                            for (int i = 0; i < teachersList.size(); i++) {
+                                                CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
+                                                TableUserTeacher teacher = teachersList.get(i);
+                                                try {
+                                                    NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                                            JsonTools.getJsonString(teacher), NetworkManager.INSERT_TABLE);
+                                                    dbHelper.insert(teacher);
+                                                    finish();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
                                         }
-                                    }
-                                    finish();
+                                    }.start();
                                 }
                             })
                     .setNegativeButton

@@ -178,6 +178,10 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
      */
     private boolean ableToPull;
 
+    public int getCurrentStatus() {
+        return currentStatus;
+    }
+
     /**
      * 下拉刷新控件的构造函数，会在运行时动态添加一个下拉头的布局。
      *
@@ -328,10 +332,10 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
             firstChild = linearLayout.getChildAt(0);
         }
 
-        Log.i("TAG112","firstChild是："+firstChild.toString());
-        Log.i("TAG112","listView.getChildAt(1)："+listView.getChildAt(1));
-        Log.i("TAG112","listView.getChildAt(2)："+listView.getChildAt(2));
-        Log.i("TAG112","listView.getChildAt(3)："+listView.getChildAt(3));
+//        Log.i("TAG112","firstChild是："+firstChild.toString());
+//        Log.i("TAG112","listView.getChildAt(1)："+listView.getChildAt(1));
+//        Log.i("TAG112","listView.getChildAt(2)："+listView.getChildAt(2));
+//        Log.i("TAG112","listView.getChildAt(3)："+listView.getChildAt(3));
         if (firstChild != null) {
             int firstVisiblePos;
             if(isRefreshListView){
