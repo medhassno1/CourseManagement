@@ -39,6 +39,7 @@ import java.util.List;
 /**
  * Created by sxq on 2015/10/30.
  * 文件查看界面以及点击弹出修改弹窗
+ * 还需改进：如果已经有数据，且状态不为3，则不发送网络请求
  */
 public class ExcelDisplayActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -69,6 +70,14 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         dbHelper = new CourseDBHelper(this);
 
         tableName = getIntent().getStringExtra("tableName");
+        // 判断是否已有数据
+        dbHelper.dropTable(commonTableName);
+        try {
+            dbHelper.changeTableName(tableName, commonTableName);
+        } catch (Exception e) {
+
+        }
+
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
         commonTableName = TableCourseMultiline.class.getSimpleName();
 
@@ -117,7 +126,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     private void getServerData() {
         try {
-            NetworkManager.getJsonString(tableName, workNumber, new NetworkManager.ResponseCallback() {
+            NetworkManager.getTeacherSelect(tableName, workNumber, new NetworkManager.ResponseCallback() {
                 @Override
                 public void onResponse(Response response) throws IOException {
                     String responseStr = response.body().string();
@@ -127,7 +136,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     if (list != null) {
                         Loger.d("exceldata", "list not null");
                         TableCourseMultiline course = (TableCourseMultiline) list.get(0);
-                        if (course.getCourseName() == "") {
+                        if (course.getCourseName().equals("")) {
                             Loger.d("exceldata", "过滤掉前三行无用信息");
                             list.remove(0);
                             list.remove(0);
@@ -188,6 +197,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         }
     }
 
+    // 初始化一行数据的窗口
     public AlertDialog initRowWindow(final int position) {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
@@ -352,7 +362,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             @Override
                             public void run() {
                                 try {
-                                    commitTask();
+                                    postToServer();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 } finally {
@@ -383,16 +393,20 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 }).show();
     }
 
-    private void commitTask() {
+    // 提交报课信息到服务器
+    private void postToServer() {
         dbHelper.dropTable(commonTableName);
         dbHelper.changeTableName(tableName, commonTableName);
-        List<TableCourseMultiline> commitData = dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
+        List<TableCourseMultiline> commitData =
+                dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
         Loger.d("commitData", String.valueOf(commitData));
         dbHelper.changeTableName(commonTableName, tableName);
         Loger.d("commitData", JsonTools.getJsonString(commitData));
 
         try {
-            NetworkManager.postJsonString(tableName, JsonTools.getJsonString(commitData));
+            String result = NetworkManager.postToServerSync(tableName,
+                    JsonTools.getJsonString(commitData), NetworkManager.INSERT_TABLE);
+
             sendToast("提交成功");
             hasCommitted = true;
         } catch (IOException e) {
@@ -488,4 +502,19 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!hasCommitted) {
+            SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
+            commitTaskDialog.message("退出将清除所有修改")
+                    .title("提示")
+                    .positiveAction("确定")
+                    .positiveActionClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ExcelDisplayActivity.super.onBackPressed();
+                        }
+                    }).show();
+        }
+    }
 }

@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,8 +23,6 @@ public class JsonTools {
     public static <T> T getJsonObject(String json,Class<T> tableClass){
         return gson.fromJson(json,tableClass);
     }
-
-
 
     public static  <T> T getJsonList(String json,Class tableClass) {
         Type type;
@@ -53,6 +52,12 @@ public class JsonTools {
     }
 
     public static String getJsonString(List<?> list) {
+        return gson.toJson(list);
+    }
+
+    public static String getJsonString(Object o) {
+        List list = new ArrayList();
+        list.add(o);
         return gson.toJson(list);
     }
 

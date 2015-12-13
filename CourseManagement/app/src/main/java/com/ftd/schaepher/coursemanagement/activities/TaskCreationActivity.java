@@ -2,16 +2,15 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,8 +25,11 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.widget.WheelView;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
@@ -86,7 +88,7 @@ public class TaskCreationActivity extends AppCompatActivity
         edtTxTeacherDeadline = (EditText) findViewById(R.id.edtTx_add_task_teacher_deadline);
         edtTxTaskName = (EditText) findViewById(R.id.edtTx_add_task_name);
         edtTxTaskTeam = (EditText) findViewById(R.id.edtTx_add_task_team);
-        edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
+//        edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
         btnImportFile = (Button) findViewById(R.id.btn_add_task_import_file);
         imgvFileImg = (ImageView) findViewById(R.id.imgv_add_task_file_img);
         tvFileName = (TextView) findViewById(R.id.tv_add_task_file_name);
@@ -138,15 +140,25 @@ public class TaskCreationActivity extends AppCompatActivity
                         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                         progress.setCancelable(false);
                         progress.show();
-                        new Thread(){
+                        new Thread() {
                             @Override
                             public void run() {
                                 TableTaskInfo task = createTaskInformation();
                                 tableCourseName = task.getRelativeTable();
+                                dbHelper.insert(task);
+                                String json = JsonTools.getJsonString(task);
                                 try {
-                                    createTable();
-                                    dbHelper.insert(task);
-                                    postToServer();
+                                    String result = NetworkManager
+                                            .postToServerSync(ConstantStr.TABLE_TASK_INFO,
+                                                    json, NetworkManager.INSERT_TABLE);
+                                    Loger.w("resultTask",result);
+                                    List<TableCourseMultiline> courseTable = readExcelToDB();
+                                    Loger.w("行数",String.valueOf(courseTable.size()));
+                                    String tableJson = JsonTools.getJsonString(courseTable);
+//                                    Loger.w("resultTask",tableJson);
+                                    String result2 = NetworkManager
+                                            .postToServerSync(tableCourseName, tableJson, NetworkManager.CREATE_TABLE);
+                                    Loger.w("resultTable",result2);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     showError();
@@ -169,10 +181,6 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 
-    private void postToServer(){
-
-    }
-
     private void showError() {
         runOnUiThread(new Runnable() {
             @Override
@@ -187,7 +195,6 @@ public class TaskCreationActivity extends AppCompatActivity
             @Override
             public void run() {
                 progress.cancel();
-                finish();
             }
         });
     }
@@ -203,22 +210,20 @@ public class TaskCreationActivity extends AppCompatActivity
         return true;
     }
 
-    // 建表
-    private void createTable() {
+    // 从Excel表获取数据，并存入数据库
+    private List<TableCourseMultiline> readExcelToDB() {
         String commonName = TableCourseMultiline.class.getSimpleName();
         dbHelper.dropTable(commonName);
+        dbHelper.dropTable(tableCourseName);
         dbHelper.createNewCourseTable();
 
-        // 解析Excel表格
         ExcelTools excelTools = new ExcelTools();
         excelTools.setPath(filePath);
         List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
-        // 数据存入数据库
-        for (int i = 0; i < courseList.size(); i++) {
-            dbHelper.insert(courseList.get(i));
-        }
-        // 改名
-        dbHelper.changeTableName(commonName,tableCourseName);
+
+        dbHelper.insertAll(courseList);
+        dbHelper.changeTableName(commonName, tableCourseName);
+        return courseList;
     }
 
     // 获取即将发布的任务的信息,未完成（哪里未完成？发布到服务器？）
@@ -229,7 +234,7 @@ public class TaskCreationActivity extends AppCompatActivity
         newTask.setTaskState("0");
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
-        newTask.setRemark(edtTxTaskRemark.getText().toString());
+//        newTask.setRemark(edtTxTaskRemark.getText().toString());
         newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + year + semester);
         return newTask;
     }
