@@ -280,6 +280,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         return  false;
     }
 
+    //提交数据到服务器
     private void submitToServer(){
         CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
 
