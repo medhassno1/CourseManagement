@@ -81,7 +81,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         userName = sharedPre.getString(ConstantStr.USER_NAME, "");
-        workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+        workNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
 
         getServerData();

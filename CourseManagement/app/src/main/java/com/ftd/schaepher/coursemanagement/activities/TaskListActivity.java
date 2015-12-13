@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,7 +13,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +33,6 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
-import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
@@ -59,7 +56,6 @@ public class TaskListActivity extends AppCompatActivity
         AdapterView.OnItemLongClickListener, View.OnClickListener {
     //    删除任务还没做
     private static final String TAG = "TaskListActivity";
-    private static final int CLOSE_NAV = 1;
     private Toolbar mToolbar;
     private TextView tvOwnName;
     private Spinner spinnerSelectTerm;
@@ -130,7 +126,7 @@ public class TaskListActivity extends AppCompatActivity
         SharedPreferences sharedPre =
                 getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
 
-        workNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+        workNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
 
         switch (identity) {

@@ -77,7 +77,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
         if (isQueryingSelf) {
             queryIdentity = userIdentity;
-            queryWorkNumber = sharedPre.getString(ConstantStr.USER_WORKNUMBER, "");
+            queryWorkNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         } else {
             queryIdentity = intent.getStringExtra("teacherIdentity");
             queryWorkNumber = intent.getStringExtra("teacherID");
@@ -262,7 +262,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     TableManageMajor manageMajor = getManageMajorData();
                     try {
                         //系负责人表
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_DEPARTMENT_HEAD,
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
                                 JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_DEPARTMENT);
                         dbHelper.update(user);
                         //系负责人专业表
@@ -275,7 +275,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     //教学办
                 }else{
                     try {
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                 JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_OFFICE);
                         dbHelper.update(user);
                     } catch (Exception e) {
