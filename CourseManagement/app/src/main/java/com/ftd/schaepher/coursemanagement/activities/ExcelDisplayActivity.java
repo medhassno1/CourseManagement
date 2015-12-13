@@ -126,7 +126,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     private void getServerData() {
         try {
-            NetworkManager.getJsonString(tableName, workNumber, new NetworkManager.ResponseCallback() {
+            NetworkManager.getTeacherSelect(tableName, workNumber, new NetworkManager.ResponseCallback() {
                 @Override
                 public void onResponse(Response response) throws IOException {
                     String responseStr = response.body().string();

@@ -91,7 +91,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTaskTerm = (TextView) findViewById(R.id.tv_task_detail_term);
         tvTeacherDeadline = (TextView) findViewById(R.id.tv_task_detail_teacher_deadline);
         tvDepartmentDeadline = (TextView) findViewById(R.id.tv_task_detail_department_deadline);
-        tvTaskRemark = (TextView) findViewById(R.id.tv_task_detail_remark);
+//        tvTaskRemark = (TextView) findViewById(R.id.tv_task_detail_remark);
         tvTaskState = (TextView) findViewById(R.id.tv_task_detail_state);
         tvTaskName = (TextView) findViewById(R.id.tv_task_detail_name);
         cardvTaskDetail = (CardView) findViewById(R.id.cardv_task_detail);
@@ -104,7 +104,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTaskTerm.setText(taskTerm);
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
         tvTeacherDeadline.setText(task.getTeacherDeadline());
-        tvTaskRemark.setText(task.getRemark());
         tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
         taskName = TaskListActivity.transferTableNameToChinese(task.getRelativeTable());
         tvTaskName.setText(taskName);

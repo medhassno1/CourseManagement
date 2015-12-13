@@ -8,6 +8,8 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class NetworkManager {
     // 服务器基础地址，指向存放api的文件夹
     private static final String URL_BASE = "http://114.215.153.57/tcs/mobile-api/";
+//    private static final String URL_BASE = "http://schaepher.imwork.net:22817/mobile-api/";
     // 创建创建表格并且插入数据（发布新任务）
     public static final String CREATE_TABLE = URL_BASE + "create_table.php";
     // 删除任务
@@ -44,6 +47,7 @@ public class NetworkManager {
     private static final OkHttpClient client = new OkHttpClient();
 
     static {
+        client.setCookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER));
         client.setConnectTimeout(10, TimeUnit.SECONDS);
         client.setWriteTimeout(10, TimeUnit.SECONDS);
         client.setReadTimeout(30, TimeUnit.SECONDS);
@@ -68,6 +72,7 @@ public class NetworkManager {
                 .add("tableName", tableName)
                 .add("jsonData", jsonData)
                 .build();
+//        Loger.w("JsonData",jsonData);
         Request request = new Request.Builder()
                 .url(actionURL)
                 .post(formBody)
@@ -94,8 +99,8 @@ public class NetworkManager {
     }
 
     // 获取教师选课信息
-    public static void getJsonString(String tableName, String workNumber,
-                                     ResponseCallback callback) throws IOException {
+    public static void getTeacherSelect(String tableName, String workNumber,
+                                        ResponseCallback callback) throws IOException {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .add("workNumber", workNumber)

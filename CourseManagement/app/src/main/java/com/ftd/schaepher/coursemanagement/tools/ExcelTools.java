@@ -61,7 +61,7 @@ public class ExcelTools {
     // 读取course表格的所有数据
     public List<TableCourseMultiline> readCourseExcel() {
         int rows;
-        int beginRows = 4;
+        int beginRows = 1;
         ArrayList<TableCourseMultiline> list = new ArrayList<>();
         Log.i("Data", "目录是否可读");
 
@@ -73,13 +73,13 @@ public class ExcelTools {
 
                 Log.i("Data", "行数" + rows);
 
-                for (int i = 1; i <= rows; i++) {       //判断从第几行导入数据
-                    Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
-                    if (getCellValue(i, 1).matches("^[0-9]+$")) {    //匹配数字
-                        beginRows = i;
-                        break;
-                    }
-                }
+//                for (int i = 1; i <= rows; i++) {       //判断从第几行导入数据
+//                    Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
+//                    if (getCellValue(i, 1).matches("^[0-9]+$")) {    //匹配数字
+//                        beginRows = i;
+//                        break;
+//                    }
+//                }
 
                 for (int i = beginRows; i <= rows; i++) {
                     TableCourseMultiline course = new TableCourseMultiline();
@@ -95,7 +95,7 @@ public class ExcelTools {
                     course.setTimePeriod(getCellValue(i, 10));
                     course.setTeacherName(getCellValue(i, 11));
                     course.setRemark(getCellValue(i, 12));
-
+                    course.setInsertTime(String.valueOf(i));
                     Log.i("Data", getCellValue(i, 9));
                     list.add(course);
                 }

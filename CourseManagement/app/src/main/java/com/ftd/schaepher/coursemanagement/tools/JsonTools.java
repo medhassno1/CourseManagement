@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +56,9 @@ public class JsonTools {
     }
 
     public static String getJsonString(Object o) {
-        return gson.toJson(o);
+        List list = new ArrayList();
+        list.add(o);
+        return gson.toJson(list);
     }
 
 

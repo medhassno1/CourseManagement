@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // 关闭错误报告
 error_reporting(0);
 
@@ -10,8 +10,7 @@ $tableName = $_POST["ident"];
 
 $log = new Login;
 $response = $log->login($workNumber,$password,$tableName);
-
-if($response != "false"){
+if(response!="false"){
     session_start();
     $_SESSION['id']=$tableName;
 }
