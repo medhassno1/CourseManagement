@@ -23,10 +23,6 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
-import java.io.IOException;
 
 /**
  * Created by sxq on 2015/11/2.
@@ -244,52 +240,47 @@ public class TeacherDetailActivity extends AppCompatActivity {
      * 提交数据到服务器
      */
     private void submitToServer(){
-        Object user = getUserData();
-        if(queryIdentity.equals(ConstantStr.ID_TEACHER)){
-            try {
-                Loger.i("updateteacher","开始发送服务器");
-                NetworkManager.postToServerAsync(ConstantStr.TABLE_USER_TEACHER,
-                        JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_TEACHER,
-                        new NetworkManager.ResponseCallback(){
-                            @Override
-                            public void onResponse(Response response) throws IOException {
-
-                            }
-                            @Override
-                            public void onFailure(Request request, IOException e) {
-
-                            }
-                        });
-                Loger.i("updateteacher", "发送服务器结束，开始插入本地数据库");
-                dbHelper.update(user);
-            } catch (Exception e) {
-                e.printStackTrace();
+        new Thread() {
+            @Override
+            public void run() {
+                Object user = getUserData();
+                if(queryIdentity.equals(ConstantStr.ID_TEACHER)){
+                    try {
+                        Loger.i("updateteacher","开始发送服务器");
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_TEACHER);
+                        Loger.i("updateteacher", "发送服务器结束，开始插入本地数据库");
+                        dbHelper.update(user);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else if(queryIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+                    TableManageMajor manageMajor = getManageMajorData();
+                    try {
+                        //系负责人表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_DEPARTMENT_HEAD,
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_DEPARTMENT);
+                        dbHelper.update(user);
+                        //系负责人专业表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
+                                JsonTools.getJsonString(manageMajor), NetworkManager.UPDATE_MANAGER_MAJOR);
+                        dbHelper.update(manageMajor);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //教学办
+                }else{
+                    try {
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_OFFICE);
+                        dbHelper.update(user);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                finish();
             }
-        }else if(queryIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
-            TableManageMajor manageMajor = getManageMajorData();
-            try {
-                //系负责人表
-                NetworkManager.postToServerSync(ConstantStr.TABLE_DEPARTMENT_HEAD,
-                        JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_DEPARTMENT);
-                dbHelper.update(user);
-                //系负责人专业表
-                NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
-                        JsonTools.getJsonString(manageMajor), NetworkManager.UPDATE_MANAGER_MAJOR);
-                dbHelper.update(manageMajor);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            //教学办
-        }else{
-            try {
-                NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
-                        JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_OFFICE);
-                dbHelper.update(user);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        finish();
+        }.start();
     }
 
     @Override

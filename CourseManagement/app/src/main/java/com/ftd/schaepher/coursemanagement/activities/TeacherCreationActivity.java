@@ -282,57 +282,57 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
 
     //提交数据到服务器
     private void submitToServer(){
-        CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
-
-        //判别身份
-        Loger.i("identity",selectedIdentity+" 后一个是："+ConstantStr.ID_TEACHER);
+        new Thread(){
+            @Override
+            public void run(){
+                CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
+                if(selectedIdentity.equals(ConstantStr.ID_TEACHER)){
+                    TableUserTeacher teacher = getUITeacherData();
+                    try {
+                        Loger.i("createteacher", "开始发送服务器");
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                JsonTools.getJsonString(teacher), NetworkManager.INSERT_TABLE);
+                        Loger.i("createteacher", "发送服务器结束，开始插入本地数据库");
+                        dbHelper.insert(teacher);
+                        Loger.i("createteacher", "插入本地数据库结束");
+                    } catch (Exception e) {
+                        Toast.makeText(TeacherCreationActivity.this,
+                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
+                    //系负责人
+                }else if(selectedIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+                    TableUserDepartmentHead departmentHead = getUIDepartmentHeadData();
+                    TableManageMajor ManageMajor = getUIManageMajorData();
+                    try {
+                        //系负责人表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_DEPARTMENT_HEAD,
+                                JsonTools.getJsonString(departmentHead), NetworkManager.INSERT_TABLE);
+                        dbHelper.insert(departmentHead);
+                        //系负责人专业表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
+                                JsonTools.getJsonString(ManageMajor), NetworkManager.INSERT_TABLE);
+                        dbHelper.insert(ManageMajor);
+                    } catch (Exception e) {
+                        Toast.makeText(TeacherCreationActivity.this,
+                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
+                    //教学办
+                }else{
+                    TableUserTeachingOffice teachingOffice = getUITeachingOfficeData();
+                    try {
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
+                                JsonTools.getJsonString(teachingOffice), NetworkManager.INSERT_TABLE);
+                        dbHelper.insert(teachingOffice);
+                    } catch (Exception e) {
+                        Toast.makeText(TeacherCreationActivity.this,
+                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
+                }
+            }
+        }.start();
         //教师
-        if(selectedIdentity.equals(ConstantStr.ID_TEACHER)){
-            TableUserTeacher Teacher = getUITeacherData();
-            try {
-                Loger.i("createteacher","开始发送服务器");
-                NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
-                        JsonTools.getJsonString(Teacher), NetworkManager.INSERT_OR_UPDATE_CB_TABLE);
-                Loger.i("createteacher", "发送服务器结束，开始插入本地数据库");
-                dbHelper.insert(Teacher);
-                Loger.i("createteacher", "插入本地数据库结束");
-            } catch (Exception e) {
-                Toast.makeText(TeacherCreationActivity.this,
-                        "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
-            }
-            finish();
-        //系负责人
-        }else if(selectedIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
-            TableUserDepartmentHead DepartmentHead = getUIDepartmentHeadData();
-            TableManageMajor ManageMajor = getUIManageMajorData();
-            try {
-                //系负责人表
-                NetworkManager.postToServerSync(ConstantStr.TABLE_DEPARTMENT_HEAD,
-                        JsonTools.getJsonString(DepartmentHead), NetworkManager.INSERT_TABLE);
-                dbHelper.insert(DepartmentHead);
-                //系负责人专业表
-                NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
-                        JsonTools.getJsonString(ManageMajor), NetworkManager.INSERT_TABLE);
-                dbHelper.insert(ManageMajor);
-            } catch (Exception e) {
-                Toast.makeText(TeacherCreationActivity.this,
-                        "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
-            }
-            finish();
-        //教学办
-        }else{
-            TableUserTeachingOffice TeachingOffice = getUITeachingOfficeData();
-            try {
-                NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
-                        JsonTools.getJsonString(TeachingOffice), NetworkManager.INSERT_TABLE);
-                dbHelper.insert(TeachingOffice);
-            } catch (Exception e) {
-                Toast.makeText(TeacherCreationActivity.this,
-                        "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
-            }
-            finish();
-        }
-
     }
-
 }
