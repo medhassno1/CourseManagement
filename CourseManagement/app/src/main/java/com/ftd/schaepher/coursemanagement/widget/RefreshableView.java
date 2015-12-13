@@ -178,6 +178,10 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
      */
     private boolean ableToPull;
 
+    public int getCurrentStatus() {
+        return currentStatus;
+    }
+
     /**
      * 下拉刷新控件的构造函数，会在运行时动态添加一个下拉头的布局。
      *
