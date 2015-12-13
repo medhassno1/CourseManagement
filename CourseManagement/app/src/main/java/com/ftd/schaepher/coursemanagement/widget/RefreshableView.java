@@ -328,10 +328,10 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
             firstChild = linearLayout.getChildAt(0);
         }
 
-        Log.i("TAG112","firstChild是："+firstChild.toString());
-        Log.i("TAG112","listView.getChildAt(1)："+listView.getChildAt(1));
-        Log.i("TAG112","listView.getChildAt(2)："+listView.getChildAt(2));
-        Log.i("TAG112","listView.getChildAt(3)："+listView.getChildAt(3));
+//        Log.i("TAG112","firstChild是："+firstChild.toString());
+//        Log.i("TAG112","listView.getChildAt(1)："+listView.getChildAt(1));
+//        Log.i("TAG112","listView.getChildAt(2)："+listView.getChildAt(2));
+//        Log.i("TAG112","listView.getChildAt(3)："+listView.getChildAt(3));
         if (firstChild != null) {
             int firstVisiblePos;
             if(isRefreshListView){

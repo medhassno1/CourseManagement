@@ -70,16 +70,14 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         dbHelper = new CourseDBHelper(this);
 
         tableName = getIntent().getStringExtra("tableName");
+        commonTableName = TableCourseMultiline.class.getSimpleName();
+
         // 判断是否已有数据
         dbHelper.dropTable(commonTableName);
-        try {
-            dbHelper.changeTableName(tableName, commonTableName);
-        } catch (Exception e) {
-
-        }
+        dbHelper.changeTableName(tableName, commonTableName);
 
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
-        commonTableName = TableCourseMultiline.class.getSimpleName();
+
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         userName = sharedPre.getString(ConstantStr.USER_NAME, "");

@@ -37,6 +37,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     private EditText edtTxTeacherName;
     private EditText edtTxPhoneNumber;
     private EditText edtTxDepartment;
+    private EditText edtTxEmail;
     private EditText edtTxMajor;
     private RadioGroup rdoGroup;
     private String selectedIdentity;
@@ -86,6 +87,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_phone_number);
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_creation_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
+        edtTxEmail = (EditText) findViewById(R.id.edtTx_teacher_creation_email);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_create_identity);
         rdoBtnTeacher = (RadioButton)findViewById(R.id.rdoBtn_create_teacher);
         rdoBtnDepartment = (RadioButton)findViewById(R.id.rdoBtn_create_department_head);
@@ -228,7 +230,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         teacher.setName(edtTxTeacherName.getText().toString().trim());
         teacher.setDepartment(edtTxDepartment.getText().toString().trim());
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
-
+        teacher.setEmail(edtTxEmail.getText().toString().trim());
         return teacher;
     }
 
@@ -242,6 +244,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         departmentHead.setName(edtTxTeacherName.getText().toString().trim());
         departmentHead.setDepartment(edtTxDepartment.getText().toString().trim());
         departmentHead.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+        departmentHead.setEmail(edtTxEmail.getText().toString().trim());
         return  departmentHead;
     }
 
@@ -264,6 +267,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         teachingOffice.setPassword(edtTxPassword.getText().toString().trim());
         teachingOffice.setName(edtTxTeacherName.getText().toString().trim());
         teachingOffice.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+        teachingOffice.setEmail(edtTxEmail.getText().toString().trim());
         return teachingOffice;
     }
 
@@ -321,6 +325,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     //教学办
                 }else{
                     TableUserTeachingOffice teachingOffice = getUITeachingOfficeData();
+                    Loger.w("TeacherCreationActivity",teachingOffice.toString());
                     try {
                         NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
                                 JsonTools.getJsonString(teachingOffice), NetworkManager.INSERT_TABLE);
