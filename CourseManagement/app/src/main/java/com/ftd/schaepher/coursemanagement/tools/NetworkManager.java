@@ -27,6 +27,8 @@ public class NetworkManager {
     public static final String DELETE_USER = URL_BASE + "delete_user.php";
     // 插入任意一张表
     public static final String INSERT_TABLE = URL_BASE + "insert_table.php";
+    // 提交报课
+    public static final String SUBMIT_SELECTED_COURSE = URL_BASE + "insert_tc_update_bc.php";
     // 登陆
     public static final String LOGIN = URL_BASE + "login.php";
     // 获取任意表的数据

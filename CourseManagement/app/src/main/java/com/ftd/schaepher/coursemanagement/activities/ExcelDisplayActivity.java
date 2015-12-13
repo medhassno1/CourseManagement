@@ -403,7 +403,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
         try {
             String result = NetworkManager.postToServerSync(tableName,
-                    JsonTools.getJsonString(commitData), NetworkManager.INSERT_TABLE);
+                    JsonTools.getJsonString(commitData), NetworkManager.SUBMIT_SELECTED_COURSE);
 
             sendToast("提交成功");
             hasCommitted = true;

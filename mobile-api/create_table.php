@@ -11,9 +11,8 @@ session_start();
 $ident = $_SESSION['id'];
 
 $createNewTable =new CreateTable();
-$createNewTable->creatTable($tableName,$ident);
+$createNewTable->creatTable($tableName,$ident,$jsonData);
 $insert = new InsertTable();
 $insert->insertTable($tableName,$jsonData);
-$insert->insertTable("cb_".$tableName,$jsonData);
 
 
