@@ -1,8 +1,10 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -21,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +35,7 @@ import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
@@ -51,7 +55,8 @@ import java.util.regex.Pattern;
  * 教学办登录默认主界面---任务主界面
  */
 public class TaskListActivity extends AppCompatActivity
-        implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
+        implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener,
+        AdapterView.OnItemLongClickListener, View.OnClickListener {
     //    删除任务还没做
     private static final String TAG = "TaskListActivity";
     private static final int CLOSE_NAV = 1;
@@ -68,7 +73,10 @@ public class TaskListActivity extends AppCompatActivity
     private SharedPreferences.Editor selfInforEditor;
     private TaskAdapter mTaskAdapter;
     private ListView mListView;
+    private TextView tvDelete;
     private RefreshableView refreshableView;
+    private PopupWindow popupWindow;
+    private ProgressDialog mProgress;
     private ArrayAdapter<String> spinnerAdapter;
 
     @Override
@@ -86,6 +94,7 @@ public class TaskListActivity extends AppCompatActivity
         dbHelper = new CourseDBHelper(TaskListActivity.this);
         taskListData = dbHelper.findAll(TableTaskInfo.class);
         spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
+        mProgress = new ProgressDialog(TaskListActivity.this);
 
         try {
             getServerData();
@@ -212,6 +221,9 @@ public class TaskListActivity extends AppCompatActivity
         mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
         mListView.setAdapter(mTaskAdapter);
         mListView.setOnItemClickListener(this);
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)){
+            mListView.setOnItemLongClickListener(this);
+        }
         Loger.i("TAG", "显示数据");
     }
 
@@ -222,6 +234,29 @@ public class TaskListActivity extends AppCompatActivity
         intent.putExtra("relativeTable",
                 String.valueOf(taskListData.get(position).getRelativeTable()));
         startActivity(intent);
+    }
+
+    //长按任务列表项
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        Loger.d("longclick", String.valueOf(refreshableView.getCurrentStatus()));
+        if (refreshableView.getCurrentStatus() == RefreshableView.STATUS_REFRESH_FINISHED) {
+            String taskName = taskListData.get(position).getRelativeTable();
+            Loger.d("longclick", taskName);
+
+            View v = this.getLayoutInflater().inflate(R.layout.popup_dialog_delete, null);
+            popupWindow = new PopupWindow(v, ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            tvDelete = (TextView) v.findViewById(R.id.tv_popup_delete);
+            tvDelete.setOnClickListener(this);
+            tvDelete.setTag(taskName);
+            popupWindow.setFocusable(true);
+            popupWindow.setOutsideTouchable(true);
+            popupWindow.setBackgroundDrawable(new BitmapDrawable());
+            popupWindow.showAsDropDown(view, ((getWindowManager()
+                    .getDefaultDisplay().getWidth() / 3)), -(3 * view.getHeight() / 2));
+        }
+        return true;
     }
 
     // 任务名映射
@@ -310,6 +345,58 @@ public class TaskListActivity extends AppCompatActivity
         public void onNothingSelected(AdapterView<?> parent) {
         }
     };
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.tv_popup_delete:
+                popupWindow.dismiss();
+                mProgress.setMessage("删除任务中...");
+                mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                mProgress.setCancelable(false);
+                mProgress.show();
+                new Thread(){
+                    @Override
+                    public void run() {
+                        try {
+                            String taskName = tvDelete.getTag().toString();
+                            Loger.d("taskName", "tvDelete" + taskName);
+//                            NetworkManager.postToServerSync(taskName, "", NetworkManager.DELETE_TASK);
+                            dbHelper.deleteByID(TableTaskInfo.class, taskName);
+                            dbHelper.dropTable(taskName);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshSpinner();
+                                    mTaskAdapter.notifyDataSetChanged();
+                                    if (mProgress.isShowing()){
+                                        mProgress.cancel();
+                                    }
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Loger.d("delete","程序崩溃");
+                            clossProcess();
+                        }
+                    }
+                }.start();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void clossProcess() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgress.isShowing()){
+                    mProgress.cancel();
+                }
+            }
+        });
+    }
 
     /**
      * 任务列表的适配器
