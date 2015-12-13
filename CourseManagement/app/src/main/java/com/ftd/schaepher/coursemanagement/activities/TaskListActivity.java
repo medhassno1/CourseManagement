@@ -361,14 +361,14 @@ public class TaskListActivity extends AppCompatActivity
                         try {
                             String taskName = tvDelete.getTag().toString();
                             Loger.d("taskName", "tvDelete" + taskName);
-//                            NetworkManager.postToServerSync(taskName, "", NetworkManager.DELETE_TASK);
+                            NetworkManager.postToServerSync(taskName, "", NetworkManager.DELETE_TASK);
                             dbHelper.deleteByID(TableTaskInfo.class, taskName);
                             dbHelper.dropTable(taskName);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     refreshSpinner();
-                                    mTaskAdapter.notifyDataSetChanged();
+                                    setSpinnerData();
                                     if (mProgress.isShowing()){
                                         mProgress.cancel();
                                     }
