@@ -57,8 +57,8 @@ public class JsonTools {
 
     public static String getJsonString(Object o) {
         List list = new ArrayList();
-        list.add(0);
-        return gson.toJson(o);
+        list.add(o);
+        return gson.toJson(list);
     }
 
 

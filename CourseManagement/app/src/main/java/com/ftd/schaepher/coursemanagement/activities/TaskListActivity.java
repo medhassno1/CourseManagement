@@ -3,6 +3,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,9 +87,12 @@ public class TaskListActivity extends AppCompatActivity
         taskListData = dbHelper.findAll(TableTaskInfo.class);
         spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
 
-        getServerData();
+        try {
+            getServerData();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        Loger.i("TAG111", "开始setOnRefreshListener");
         refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
             @Override
             public void onRefresh() {
@@ -145,16 +150,15 @@ public class TaskListActivity extends AppCompatActivity
     }
 
     // 从服务器获取数据
-    private void getServerData() {
+    private void getServerData() throws IOException {
         String tableName = ConstantStr.TABLE_TASK_INFO;
-        try {
-            NetworkManager.getJsonString(tableName, new NetworkManager.ResponseCallback() {
-                @Override
-                public void onResponse(Response response) throws IOException {
-                    String responseStr = response.body().string();
+        NetworkManager.getJsonString(tableName, new NetworkManager.ResponseCallback() {
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String responseStr = response.body().string();
+                try {
                     List list = JsonTools.getJsonList(responseStr, TableTaskInfo.class);
-                    Loger.w("jsonList", list.toString());
-
+                    Loger.w(TAG, "jsonList" + list.toString());
                     dbHelper.deleteAll(TableTaskInfo.class);
                     dbHelper.insertAll(list);
 
@@ -175,16 +179,16 @@ public class TaskListActivity extends AppCompatActivity
                             }
                         });
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+            }
 
-                @Override
-                public void onFailure(Request request, IOException e) {
+            @Override
+            public void onFailure(Request request, IOException e) {
 
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            }
+        });
     }
 
     /**

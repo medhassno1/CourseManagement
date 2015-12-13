@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -87,7 +88,7 @@ public class TaskCreationActivity extends AppCompatActivity
         edtTxTeacherDeadline = (EditText) findViewById(R.id.edtTx_add_task_teacher_deadline);
         edtTxTaskName = (EditText) findViewById(R.id.edtTx_add_task_name);
         edtTxTaskTeam = (EditText) findViewById(R.id.edtTx_add_task_team);
-        edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
+//        edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
         btnImportFile = (Button) findViewById(R.id.btn_add_task_import_file);
         imgvFileImg = (ImageView) findViewById(R.id.imgv_add_task_file_img);
         tvFileName = (TextView) findViewById(R.id.tv_add_task_file_name);
@@ -150,11 +151,14 @@ public class TaskCreationActivity extends AppCompatActivity
                                     String result = NetworkManager
                                             .postToServerSync(ConstantStr.TABLE_TASK_INFO,
                                                     json, NetworkManager.INSERT_TABLE);
+                                    Loger.w("resultTask",result);
                                     List<TableCourseMultiline> courseTable = readExcelToDB();
+                                    Loger.w("行数",String.valueOf(courseTable.size()));
                                     String tableJson = JsonTools.getJsonString(courseTable);
+//                                    Loger.w("resultTask",tableJson);
                                     String result2 = NetworkManager
                                             .postToServerSync(tableCourseName, tableJson, NetworkManager.CREATE_TABLE);
-
+                                    Loger.w("resultTable",result2);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     showError();
@@ -191,7 +195,6 @@ public class TaskCreationActivity extends AppCompatActivity
             @Override
             public void run() {
                 progress.cancel();
-                finish();
             }
         });
     }
@@ -211,6 +214,7 @@ public class TaskCreationActivity extends AppCompatActivity
     private List<TableCourseMultiline> readExcelToDB() {
         String commonName = TableCourseMultiline.class.getSimpleName();
         dbHelper.dropTable(commonName);
+        dbHelper.dropTable(tableCourseName);
         dbHelper.createNewCourseTable();
 
         ExcelTools excelTools = new ExcelTools();
@@ -230,7 +234,7 @@ public class TaskCreationActivity extends AppCompatActivity
         newTask.setTaskState("0");
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
-        newTask.setRemark(edtTxTaskRemark.getText().toString());
+//        newTask.setRemark(edtTxTaskRemark.getText().toString());
         newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + year + semester);
         return newTask;
     }
