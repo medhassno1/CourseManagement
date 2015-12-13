@@ -1,6 +1,6 @@
 <?php
 /**
- * 传入tableName和jsonData，插入数据到多行表，并在单行表内进行更新
+ * ����tableName��jsonData���������ݵ����б������ڵ��б��ڽ��и���
  */
 error_reporting(0);
 $jsonData = $_POST["jsonData"];
@@ -13,7 +13,7 @@ if (!$con) {
 } else {
     mysqli_query($con, "SET NAMES utf8");
     $jsonArry = json_decode($jsonData, true);
-    // 获取数据库表的字段名
+    // ��ȡ���ݿ������ֶ���
     $keys = array_keys($jsonArry[0]);
     $tableList = '(' . implode($keys, ',') . ')';
     foreach ($jsonArry as $row) {
@@ -24,10 +24,10 @@ if (!$con) {
         $cbTableName = 'cb_' . $tableName;
         $search = mysqli_query($con, "select * from $cbTableName WHERE courseName = '$row[courseName]' ");
         $result = mysqli_fetch_array($search);
-        //更新老师
-        $updateTeacher = $result['teacherName'] . $row['teacherName'] . ';';
-        $updateTimePeriod = $result['timePeriod'] . $row['timePeriod'] . ';';
-        $updateRemark = $result['remark'] . $row['remark'] . ';';
+        //������ʦ
+        $updateTeacher = $result['teacherName'] . $row['teacherName'] . '；';
+        $updateTimePeriod = $result['timePeriod'] . $row['timePeriod'] . '；';
+        $updateRemark = $result['remark'] . $row['remark'] . '；';
         $sql = "UPDATE $cbTableName SET timePeriod='$updateTimePeriod',teacherName ='$updateTeacher',remark='$updateRemark' WHERE courseName = '$row[courseName]'";
         mysqli_query($con, $sql);
         print_r($sql);
