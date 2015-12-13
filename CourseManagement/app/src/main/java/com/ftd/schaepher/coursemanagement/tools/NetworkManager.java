@@ -67,6 +67,18 @@ public class NetworkManager {
                 .build();
         client.newCall(request).enqueue(callback);
     }
+    // 异步的post
+    public static void deleteServerUser(String tableName, String workNumber,  ResponseCallback callback) {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("tableName", tableName)
+                .add("workName", workNumber)
+                .build();
+        Request request = new Request.Builder()
+                .url(DELETE_USER)
+                .post(formBody)
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
 
     // 同步的post
     public static String postToServerSync(String tableName, String jsonData, String actionURL) throws IOException {
