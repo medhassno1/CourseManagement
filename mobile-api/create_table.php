@@ -6,12 +6,12 @@ error_reporting(0);
 require_once './classes/class_create_table.php';
 require_once './classes/class_insert_tc_update_bc.php';
 $tableName = $_POST["tableName"];
-$jsonDate=$_POST["jsonDate"];
+$jsonData=$_POST["jsonData"];
 session_start();
 $ident = $_SESSION['id'];
 
 $createTable =new CreateTable();
-$createTable->creatTable($tableName,$ident);
+$createTable->creatTable($tableName,$ident,$jsonDate);
 $insert = new InsertTcUpdateBc();
-$insert->insertTcUpdateBc($tableName,$jsonDate);
+$insert->insertTcUpdateBc($tableName,$jsonData);
 
