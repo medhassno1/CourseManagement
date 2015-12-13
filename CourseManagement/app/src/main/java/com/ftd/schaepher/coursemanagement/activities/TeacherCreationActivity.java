@@ -11,11 +11,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.rey.material.app.SimpleDialog;
 
 /**
@@ -29,6 +38,11 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     private EditText edtTxPhoneNumber;
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
+    private RadioGroup rdoGroup;
+    private String selectedIdentity;
+    private RadioButton rdoBtnTeacher;
+    private RadioButton rdoBtnDepartment;
+    private RadioButton rdoBtnOffice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +54,42 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("添加用户");
 
-//        控件初始化最好封装到一个方法里面
+        initView();
+
+        rdoGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton rdoBtn = (RadioButton) findViewById(checkedId);
+                if (rdoBtn == rdoBtnOffice) {
+                    edtTxDepartment.setVisibility(View.GONE);
+                    edtTxMajor.setVisibility(View.GONE);
+                    selectedIdentity = ConstantStr.ID_TEACHING_OFFICE;
+                } else if (rdoBtn == rdoBtnDepartment) {
+                    edtTxDepartment.setVisibility(View.VISIBLE);
+                    edtTxMajor.setVisibility(View.VISIBLE);
+                    selectedIdentity = ConstantStr.ID_DEPARTMENT_HEAD;
+                } else {
+                    edtTxDepartment.setVisibility(View.VISIBLE);
+                    edtTxMajor.setVisibility(View.GONE);
+                    selectedIdentity = ConstantStr.ID_TEACHER;
+                }
+            }
+        });
+        rdoBtnTeacher.setChecked(true);
+
+    }
+
+    private void initView(){
         edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_workNumber);
         edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_creation_password);
         edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_creation_name);
         edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_phone_number);
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_creation_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
+        rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_create_identity);
+        rdoBtnTeacher = (RadioButton)findViewById(R.id.rdoBtn_create_teacher);
+        rdoBtnDepartment = (RadioButton)findViewById(R.id.rdoBtn_create_department_head);
+        rdoBtnOffice = (RadioButton)findViewById(R.id.rdoBtn_create_teaching_office);
 
         edtTxTeacherNumber.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED); // 工号输入框的格式
         edtTxDepartment.setInputType(InputType.TYPE_NULL);
@@ -56,6 +99,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         edtTxDepartment.setOnFocusChangeListener(this);
         edtTxMajor.setOnFocusChangeListener(this);
         edtTxMajor.setSingleLine(false);
+
     }
 
     @Override
@@ -77,17 +121,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                             setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
-//                                    这里判断要添加哪种身份
-                                    TableUserTeacher teacher = getTeacherData();
-                                    try {
-//                                        这里添加网络请求
-                                        dbHelper.insert(teacher);
-                                    } catch (Exception e) {
-                                        Toast.makeText(TeacherCreationActivity.this,
-                                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
-                                    }
-                                    finish();
+                                    submitToServer();
                                 }
                             }).setNegativeButton
                             (android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -185,9 +219,9 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     }
 
     /**
-     * 获得界面数据
+     * 获得界面数据-教师
      */
-    private TableUserTeacher getTeacherData() {
+    private TableUserTeacher getUITeacherData() {
         TableUserTeacher teacher = new TableUserTeacher();
         teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
         teacher.setPassword(edtTxPassword.getText().toString().trim());
@@ -196,6 +230,41 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
 
         return teacher;
+    }
+
+    /**
+     * 获得界面数据-系负责人
+     */
+    private TableUserDepartmentHead getUIDepartmentHeadData() {
+        TableUserDepartmentHead departmentHead = new TableUserDepartmentHead();
+        departmentHead.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+        departmentHead.setPassword(edtTxPassword.getText().toString().trim());
+        departmentHead.setName(edtTxTeacherName.getText().toString().trim());
+        departmentHead.setDepartment(edtTxDepartment.getText().toString().trim());
+        departmentHead.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+        return  departmentHead;
+    }
+
+    /**
+     * 获得界面数据-系负责人及其负责专业
+     */
+    private TableManageMajor getUIManageMajorData() {
+        TableManageMajor manageMajor = new TableManageMajor();
+        manageMajor.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+        manageMajor.setMajor(edtTxMajor.getText().toString().trim());
+        return  manageMajor;
+    }
+
+    /**
+     * 获得界面数据-教学办
+     */
+    private TableUserTeachingOffice getUITeachingOfficeData() {
+        TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
+        teachingOffice.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
+        teachingOffice.setPassword(edtTxPassword.getText().toString().trim());
+        teachingOffice.setName(edtTxTeacherName.getText().toString().trim());
+        teachingOffice.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+        return teachingOffice;
     }
 
     private boolean isAllWrite(){
@@ -209,5 +278,61 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
             return true;
         }
         return  false;
+    }
+
+    //提交数据到服务器
+    private void submitToServer(){
+        new Thread(){
+            @Override
+            public void run(){
+                CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
+                if(selectedIdentity.equals(ConstantStr.ID_TEACHER)){
+                    TableUserTeacher teacher = getUITeacherData();
+                    try {
+                        Loger.i("createteacher", "开始发送服务器");
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                JsonTools.getJsonString(teacher), NetworkManager.INSERT_TABLE);
+                        Loger.i("createteacher", "发送服务器结束，开始插入本地数据库");
+                        dbHelper.insert(teacher);
+                        Loger.i("createteacher", "插入本地数据库结束");
+                    } catch (Exception e) {
+                        Toast.makeText(TeacherCreationActivity.this,
+                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
+                    //系负责人
+                }else if(selectedIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+                    TableUserDepartmentHead departmentHead = getUIDepartmentHeadData();
+                    TableManageMajor ManageMajor = getUIManageMajorData();
+                    try {
+                        //系负责人表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_DEPARTMENT_HEAD,
+                                JsonTools.getJsonString(departmentHead), NetworkManager.INSERT_TABLE);
+                        dbHelper.insert(departmentHead);
+                        //系负责人专业表
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
+                                JsonTools.getJsonString(ManageMajor), NetworkManager.INSERT_TABLE);
+                        dbHelper.insert(ManageMajor);
+                    } catch (Exception e) {
+                        Toast.makeText(TeacherCreationActivity.this,
+                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
+                    //教学办
+                }else{
+                    TableUserTeachingOffice teachingOffice = getUITeachingOfficeData();
+                    try {
+                        NetworkManager.postToServerSync(ConstantStr.TABLE_TEACHER_OFFICE,
+                                JsonTools.getJsonString(teachingOffice), NetworkManager.INSERT_TABLE);
+                        dbHelper.insert(teachingOffice);
+                    } catch (Exception e) {
+                        Toast.makeText(TeacherCreationActivity.this,
+                                "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
+                }
+            }
+        }.start();
+        //教师
     }
 }

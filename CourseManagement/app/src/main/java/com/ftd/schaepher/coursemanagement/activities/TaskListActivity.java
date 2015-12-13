@@ -112,6 +112,7 @@ public class TaskListActivity extends AppCompatActivity
         super.onResume();
         setSpinnerData();
         initUserInformation();
+
     }
 
     // 初始化当前用户的数据

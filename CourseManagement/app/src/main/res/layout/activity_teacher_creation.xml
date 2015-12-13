@@ -24,6 +24,38 @@
         </android.support.design.widget.AppBarLayout>
     </android.support.design.widget.CoordinatorLayout>
 
+    <RadioGroup
+        android:id="@+id/rdoGroup_create_identity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        >
+
+        <RadioButton
+            android:id="@+id/rdoBtn_create_teaching_office"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:text="教学办" />
+
+        <RadioButton
+            android:id="@+id/rdoBtn_create_department_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:checked="true"
+            android:text="系负责人" />
+
+        <RadioButton
+            android:id="@+id/rdoBtn_create_teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:text="教师" />
+    </RadioGroup>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -120,5 +152,6 @@
                 android:layout_height="wrap_content"
                 android:hint="所负责专业" />
         </android.support.design.widget.TextInputLayout>
+
     </LinearLayout>
 </LinearLayout>
