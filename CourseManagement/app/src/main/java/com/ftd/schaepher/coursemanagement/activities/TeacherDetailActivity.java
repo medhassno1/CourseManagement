@@ -36,6 +36,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private EditText edtTxPhoneNumber;
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
+    private EditText edtTxEmail;
     private String userIdentity;
 
     private CourseDBHelper dbHelper;
@@ -150,6 +151,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 office.setPassword(edtTxPassword.getText().toString().trim());
                 office.setName(edtTxTeacherName.getText().toString().trim());
                 office.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                office.setEmail(edtTxEmail.getText().toString().trim());
                 return office;
             }
             case ConstantStr.ID_DEPARTMENT_HEAD: {
@@ -159,6 +161,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 department.setName(edtTxTeacherName.getText().toString().trim());
                 department.setDepartment(edtTxDepartment.getText().toString().trim());
                 department.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                department.setEmail(edtTxEmail.getText().toString().trim());
                 return department;
             }
             case ConstantStr.ID_TEACHER: {
@@ -168,6 +171,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 teacher.setName(edtTxTeacherName.getText().toString().trim());
                 teacher.setDepartment(edtTxDepartment.getText().toString().trim());
                 teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
+                teacher.setEmail(edtTxEmail.getText().toString().trim());
                 return teacher;
             }
             default:

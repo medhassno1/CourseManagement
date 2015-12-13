@@ -13,8 +13,8 @@ public class TableUserTeachingOffice {
     private String workNumber;
     private String password;
     private String name;
-    private String sex;
-    private String birthday;
+//    private String sex;
+//    private String birthday;
     private String telephone;
     private String email;
 
@@ -26,8 +26,8 @@ public class TableUserTeachingOffice {
         this.workNumber = workNumber;
         this.password = password;
         this.name = name;
-        this.sex = sex;
-        this.birthday = birthday;
+//        this.sex = sex;
+//        this.birthday = birthday;
         this.telephone = telephone;
         this.email = email;
     }
@@ -56,21 +56,21 @@ public class TableUserTeachingOffice {
         this.name = name;
     }
 
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-
-    public String getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
-    }
+//    public String getSex() {
+//        return sex;
+//    }
+//
+//    public void setSex(String sex) {
+//        this.sex = sex;
+//    }
+//
+//    public String getBirthday() {
+//        return birthday;
+//    }
+//
+//    public void setBirthday(String birthday) {
+//        this.birthday = birthday;
+//    }
 
     public String getTelephone() {
         return telephone;
@@ -94,8 +94,8 @@ public class TableUserTeachingOffice {
                 "workNumber='" + workNumber + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
-                ", sex='" + sex + '\'' +
-                ", birthday='" + birthday + '\'' +
+//                ", sex='" + sex + '\'' +
+//                ", birthday='" + birthday + '\'' +
                 ", telephone='" + telephone + '\'' +
                 ", email='" + email + '\'' +
                 '}';
