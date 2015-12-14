@@ -99,8 +99,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         if (excelListData != null) {
             excelListData.clear();
         }
-        excelListData.add(EXCEL_HEADER);
-
         // 根据表名查找数据库对应表数据
         dbHelper.dropTable(commonTableName);
         try {
@@ -109,13 +107,18 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             e.printStackTrace();
             dbHelper.createNewCourseTable();
         }
+
         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
+        if (excelListData.size() > 0) {
+            excelListData.add(0, EXCEL_HEADER);
+        }
         dbHelper.changeTableName(commonTableName, tableName);
 
         mExcelAdapter = new
                 ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
         ListView excelListView;
         excelListView = (ListView) findViewById(R.id.lv_excel_display);
+        excelListView.setEmptyView(findViewById(R.id.tv_empty_excel));
         excelListView.setAdapter(mExcelAdapter);
         excelListView.setOnItemClickListener(this);
     }
@@ -154,8 +157,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         hasCommitted = dbHelper.getIsFinishCommit(workNumber);
                         Loger.d("isfinish", String.valueOf(hasCommitted));
                         excelListData.clear();
-                        excelListData.add(EXCEL_HEADER);
                         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
+                        if (excelListData.size() > 0) {
+                            excelListData.add(0,EXCEL_HEADER);
+                        }
                         dbHelper.changeTableName(commonTableName, tableName);
                         Loger.w("exceldata", list.toString());
                     }
@@ -364,7 +369,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 if (taskState.equals("2")) {
                     showForbidCommitDialog("报课任务已结束");
                 } else {
-                    showCommitTaskDialog("是否公开报课","一旦公共将无法再进行修改！");
+                    showCommitTaskDialog("是否公开报课", "一旦公共将无法再进行修改！");
                 }
                 return true;
             default:
@@ -447,7 +452,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 String result = NetworkManager.postToServerSync(cbTableName,
                         JsonTools.getJsonString(commitData), NetworkManager.INSERT_OR_UPDATE_CB_TABLE);
                 sendToast("提交成功");
-                if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)){
+                if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
                     TableTaskInfo task = new TableTaskInfo("1", tableName);
                     dbHelper.update(task);
                 } else {

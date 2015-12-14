@@ -86,6 +86,7 @@ public class TaskListActivity extends AppCompatActivity
         setNavViewConfig();
         setSupportDoubleBackExit(true);
         mListView = (ListView) findViewById(R.id.lv_task_list);
+        mListView.setEmptyView(findViewById(R.id.tv_empty_listview));
         refreshableView = (RefreshableView) findViewById(R.id.refreshTask_view);
         dbHelper = new CourseDBHelper(TaskListActivity.this);
         taskListData = dbHelper.findAll(TableTaskInfo.class);
