@@ -95,7 +95,6 @@ public class TeacherListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_list);
-        refreshableView = (RefreshableView) findViewById(R.id.refreshTeacher_view);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
@@ -111,14 +110,17 @@ public class TeacherListActivity extends AppCompatActivity
 
         setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
         setIvDeleteTextOnClick(); // 设置叉叉的监听器
+
+        initUserInformation();
+        refreshTeacherListData();
+        initTeacherListView();
+        Loger.i("TeacherListActivity","执行了oncreat");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initUserInformation();
-        refreshTeacherListData();
-        initTeacherListView();
+        Loger.i("TeacherListActivity", "执行了onResume");
         getServerTeacherData();
     }
 
@@ -212,7 +214,7 @@ public class TeacherListActivity extends AppCompatActivity
                     new NetworkManager.ResponseCallback() {
                         @Override
                         public void onResponse(Response response) throws IOException {
-                            //从服务器获取教师数据，并更新到本地数据库
+                            //从服务器获取系负责人数据，并更新到本地数据库
                             List list = JsonTools.getJsonList(response.body().string(), TableUserDepartmentHead.class);
                             Loger.w("jsonList", list.toString());
                             dbHelper.insertAll(list);
@@ -328,8 +330,12 @@ public class TeacherListActivity extends AppCompatActivity
         switch (parent.getId()) {
             case R.id.lv_office_list:
                 Loger.i("parent", "教学办");
+                Loger.i("parent","位置是："+position);
+               // Loger.i("parent", "教学办"+dbHelper.findAll(TableUserTeachingOffice.class));
                 queryWorkNumber = officeListData.get(position).getWorkNumber();
                 queryIdentity = ConstantStr.ID_TEACHING_OFFICE;
+
+
                 break;
             case R.id.lv_department_list:
                 Loger.i("parent", "系负责人");
@@ -354,9 +360,9 @@ public class TeacherListActivity extends AppCompatActivity
         intend.putExtra("isQueryingSelf", false);
         startActivity(intend);
 
-        Loger.i("str", String.valueOf(parent));
-        Loger.i("str", position + "    " + id);
-        Loger.i("str", queryWorkNumber + "  " + queryIdentity);
+        Loger.i("parent", String.valueOf(parent));
+        Loger.i("parent", position + "    " + id);
+        Loger.i("parent", queryWorkNumber + "  " + queryIdentity);
     }
 
     // 点击标题栏的子菜单事件

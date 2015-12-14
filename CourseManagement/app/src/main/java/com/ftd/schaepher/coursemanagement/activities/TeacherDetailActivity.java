@@ -37,6 +37,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
     private EditText edtTxEmail;
+    private ActionBar mActionBar;
     private String userIdentity;
 
     private CourseDBHelper dbHelper;
@@ -49,7 +50,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_teacher_detail);
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_detail);
         setSupportActionBar(mToolbar);
-        ActionBar mActionBar = getSupportActionBar();
+        mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("用户信息");
         dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
@@ -60,6 +61,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_phone_number);
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_detail_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_detail_major);
+        edtTxEmail = (EditText)findViewById(R.id.edtTx_teacher_detail_email);
 
         initTeacherData();
         initUserPermission();
@@ -83,6 +85,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
             queryWorkNumber = intent.getStringExtra("teacherID");
             Loger.i("str2", "工号" + queryWorkNumber + "身份" + queryIdentity);
         }
+
+        queryIdentity = intent.getStringExtra("teacherIdentity");
+        queryWorkNumber = intent.getStringExtra("teacherID");
 
         setUserData(queryIdentity, queryWorkNumber);
     }
@@ -193,6 +198,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.teacher_detail_activity_actions, menu);
+        if (!userIdentity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
+            menu.removeItem(R.id.action_modify_infomation);
+        }
         return true;
     }
 

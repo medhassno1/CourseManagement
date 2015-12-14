@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,11 +14,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.adapter.FileListAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
@@ -39,6 +43,7 @@ public class FileSelectActivity extends AppCompatActivity
     private TextView tvPath;
     private FileListAdapter mFileAdapter;
     private TextView tvItemCount;
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,24 +146,48 @@ public class FileSelectActivity extends AppCompatActivity
                             (android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    progress = new ProgressDialog(FileSelectActivity.this);
+                                    progress.setMessage("导入表格中...");
+                                    progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                    progress.setCancelable(false);
+                                    progress.show();
                                     new Thread() {
                                         @Override
                                         public void run() {
                                             ExcelTools excelTools = new ExcelTools();
                                             excelTools.setPath(path);
+
                                             List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
-                                            //导入教师表
-                                            for (int i = 0; i < teachersList.size(); i++) {
-                                                CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
-                                                TableUserTeacher teacher = teachersList.get(i);
-                                                try {
-                                                    NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
-                                                            JsonTools.getJsonString(teacher), NetworkManager.INSERT_TABLE);
-                                                    dbHelper.insert(teacher);
-                                                    finish();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
+                                            List<TableUserDepartmentHead> departmentHeadList = excelTools.readDepartmentHeadExcel();
+                                            List<TableUserTeachingOffice> teachingOfficeList = excelTools.readTeachingOfficeExcel();
+
+                                            Loger.i("dataList1","开始输出数据");
+                                         //   Loger.i("dataList",teachersList.toString());
+                                            Loger.i("dataList",departmentHeadList.toString());
+                                            Loger.i("dataList",teachingOfficeList.toString());
+                                            //导入职工表
+                                            CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
+                                            try {
+                                                Loger.i("dataList1","开始导入教师数据");
+                                                NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                                        JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
+                                                dbHelper.deleteAll(TableUserTeacher.class);
+                                                dbHelper.insertAll(teachersList);
+                                                Loger.i("dataList1", "开始导入系负责人数据");
+                                                NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                                                        JsonTools.getJsonString(departmentHeadList), NetworkManager.INSERT_TABLE);
+                                                dbHelper.deleteAll(TableUserDepartmentHead.class);
+                                                dbHelper.insertAll(departmentHeadList);
+                                                Loger.i("dataList1", "开始导入教学办数据");
+                                                NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                                                        JsonTools.getJsonString(teachingOfficeList), NetworkManager.INSERT_TABLE);
+                                                dbHelper.deleteAll(TableUserTeachingOffice.class);
+                                                dbHelper.insertAll(teachingOfficeList);
+                                                finish();
+                                                closeProgress();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                                showError();
                                             }
                                         }
                                     }.start();
@@ -193,5 +222,25 @@ public class FileSelectActivity extends AppCompatActivity
                             })
                     .show();
         }
+    }
+
+    private void showError() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+                Toast.makeText(FileSelectActivity.this, "导入错误，请重新导入", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void closeProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+                Toast.makeText(FileSelectActivity.this, "导入成功！", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
