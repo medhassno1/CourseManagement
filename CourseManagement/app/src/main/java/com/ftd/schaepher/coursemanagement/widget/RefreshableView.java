@@ -331,11 +331,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
         }else {
             firstChild = linearLayout.getChildAt(0);
         }
-
-//        Log.i("TAG112","firstChild是："+firstChild.toString());
-//        Log.i("TAG112","listView.getChildAt(1)："+listView.getChildAt(1));
-//        Log.i("TAG112","listView.getChildAt(2)："+listView.getChildAt(2));
-//        Log.i("TAG112","listView.getChildAt(3)："+listView.getChildAt(3));
+        
         if (firstChild != null) {
             int firstVisiblePos;
             if(isRefreshListView){
@@ -344,8 +340,6 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
                 firstVisiblePos = listView.getFirstVisiblePosition();
             }
 
-            Log.i("TAG112","firstVisiblePos位置是："+firstVisiblePos);
-            Log.i("TAG112","firstChild.getTop()是："+firstChild.getTop());
            // if (firstVisiblePos == 0 && firstChild.getTop() == 0) {
             if (firstVisiblePos == 0 ) {
                 if (!ableToPull) {

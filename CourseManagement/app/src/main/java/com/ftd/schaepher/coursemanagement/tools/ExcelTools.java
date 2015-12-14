@@ -5,7 +5,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +32,9 @@ public class ExcelTools {
     // public String path = "/storage/emulated/0/tencent/QQfile_recv/course.xls";
     // 这是个静态路径，默认为qq接收文件夹
     public String path = "mnt/sdcard/course.xls";
+    public List<TableUserTeacher> teachersList ;
+    public List<TableUserDepartmentHead> departmentHeadList;
+    public List<TableUserTeachingOffice> teachingOfficeList;
 
     public ExcelTools() {
     }
@@ -51,7 +56,7 @@ public class ExcelTools {
         if (!new File(path).exists()) {
             Toast.makeText(context, "该文件不存在！", Toast.LENGTH_LONG).show();
         } else if (!path.endsWith(".xls")) {   //判断是否是excel文件
-            Toast.makeText(context, "该文件必须以[.xls]结尾！", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "该文件必须以[.xls]或者[.xlsx]结尾！", Toast.LENGTH_LONG).show();
         } else {
             return true;
         }
@@ -112,20 +117,27 @@ public class ExcelTools {
     }
 
 
-    // 读取Teacher表格的所有数据
+   /* // 读取Teacher表格的所有数据
     public List<TableUserTeacher> readTeacherExcel() {
         int rows;
         int beginRows = 4;
         ArrayList<TableUserTeacher> list = new ArrayList<>();
-        Log.i("Data", "目录是否可读");
-
+        Log.i("dataList", "目录是否可读");
+        Log.i("dataList", "是否正确" + isTrueFileName());
         if (isTrueFileName()) {
             try {
+                Log.i("dataList", "开始workbook  "+path);
                 Workbook book = Workbook.getWorkbook(new File(path));//工作簿
-                sheet = book.getSheet(0);//工作表
+                Log.i("dataList", "book是否为空" + (book==null));
+                if(book.getSheet(0)!=null){
+                    sheet = book.getSheet(0);//工作表
+                }else{
+                    sheet = book.getSheet(1);//工作表
+                    Log.i("dataList", "book.getSheet(0)是否为空");
+                }
                 rows = sheet.getRows();//行数
-
-                Log.i("Data", "行数" + rows);
+                Log.i("dataList", "行数" + rows);
+                Loger.i("dataList","数据"+getCellValue(1,1)+getCellValue(1,2)+getCellValue(1,5));
 
                 //判断从第几行导入数据
                 for (int i = 1; i <= rows; i++) {
@@ -139,15 +151,82 @@ public class ExcelTools {
 
                 for (int i = beginRows; i <= rows; i++) {
                     TableUserTeacher teacher = new TableUserTeacher();
+                    TableUserDepartmentHead departmentHead= new TableUserDepartmentHead();
+                    TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
 
-                    teacher.setWorkNumber(getCellValue(i, 1));//导入教师信息
-                    teacher.setPassword(getCellValue(i, 2));
-                    teacher.setName(getCellValue(i, 3));
-                    teacher.setTelephone(getCellValue(i, 4));
-                    teacher.setDepartment(getCellValue(i, 5));
+                    if(getCellValue(i,5).contains("教师")){
+                        teacher.setWorkNumber(getCellValue(i, 1));//导入教师信息
+                        teacher.setPassword(getCellValue(i, 1));//默认密码为工号
+                        teacher.setName(getCellValue(i, 2));
+                        teacher.setSex(getCellValue(i, 3));
+                        teacher.setBirthday(getCellValue(i, 4));
 
-                    Log.i("Data", getCellValue(i, 5));
-                    list.add(teacher);
+                        Log.i("dataList","teacher是"+teacher);
+                        teachersList.add(teacher);
+                        list.add(teacher);
+                    }else if(getCellValue(i,5).contains("系主任")){
+                        departmentHead.setWorkNumber(getCellValue(i, 1));//导入系负责人信息
+                        departmentHead.setPassword(getCellValue(i, 1));//默认密码为工号
+                        departmentHead.setName(getCellValue(i, 2));
+                        departmentHead.setSex(getCellValue(i, 3));
+                        departmentHead.setBirthday(getCellValue(i, 4));
+                        departmentHeadList.add(departmentHead);
+                    }else{
+                        teachingOffice.setWorkNumber(getCellValue(i, 1));//导入系负责人信息
+                        teachingOffice.setPassword(getCellValue(i, 1));//默认密码为工号
+                        teachingOffice.setName(getCellValue(i, 2));
+                       // teachingOffice.setSex(getCellValue(i, 3));
+                        //teachingOffice.setBirthday(getCellValue(i, 4));
+                        teachingOfficeList.add(teachingOffice);
+                    }
+                }
+            } catch (BiffException e) {
+                Log.i("data", "BiffException失败");
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.i("data", "IOException失败");
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }*/
+
+    // 读取Teacher表格的所有教师数据
+    public List<TableUserTeacher> readTeacherExcel() {
+        int rows;
+        int beginRows = 4;
+        ArrayList<TableUserTeacher> list = new ArrayList<>();
+        if (isTrueFileName()) {
+            try {
+                Workbook book = Workbook.getWorkbook(new File(path));//工作簿
+                if(book.getSheet(0)!=null){
+                    sheet = book.getSheet(0);//工作表
+                }else{
+                    sheet = book.getSheet(1);//工作表
+                }
+                rows = sheet.getRows();//行数
+                //判断从第几行导入数据
+                for (int i = 1; i <= rows; i++) {
+                    Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
+                    //匹配数字
+                    if (getCellValue(i, 1).matches("^[0-9]+$")) {
+                        beginRows = i;
+                        break;
+                    }
+                }
+                for (int i = beginRows; i <= rows; i++) {
+                    TableUserTeacher teacher = new TableUserTeacher();
+
+                    if(getCellValue(i,5).contains("教师")){
+                        teacher.setWorkNumber(getCellValue(i, 1));//导入教师信息
+                        teacher.setPassword(getCellValue(i, 1));//默认密码为工号
+                        teacher.setName(getCellValue(i, 2));
+                        teacher.setSex(getCellValue(i, 3));
+                        teacher.setBirthday(getCellValue(i, 4));
+
+                        list.add(teacher);
+                    }
                 }
             } catch (BiffException e) {
                 Log.i("data", "BiffException失败");
@@ -160,6 +239,96 @@ public class ExcelTools {
         return list;
     }
 
+    // 读取Teacher表格的所有数据
+    public List<TableUserDepartmentHead> readDepartmentHeadExcel() {
+        int rows;
+        int beginRows = 4;
+        ArrayList<TableUserDepartmentHead> list = new ArrayList<>();
+        if (isTrueFileName()) {
+            try {
+                Workbook book = Workbook.getWorkbook(new File(path));//工作簿
+                if(book.getSheet(0)!=null){
+                    sheet = book.getSheet(0);//工作表
+                }else{
+                    sheet = book.getSheet(1);//工作表
+                }
+                rows = sheet.getRows();//行数
+                //判断从第几行导入数据
+                for (int i = 1; i <= rows; i++) {
+                    Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
+                    //匹配数字
+                    if (getCellValue(i, 1).matches("^[0-9]+$")) {
+                        beginRows = i;
+                        break;
+                    }
+                }
+
+                for (int i = beginRows; i <= rows; i++) {
+                    TableUserDepartmentHead departmentHead= new TableUserDepartmentHead();
+                    if(getCellValue(i,5).contains("系主任")){
+                        departmentHead.setWorkNumber(getCellValue(i, 1));//导入系负责人信息
+                        departmentHead.setPassword(getCellValue(i, 1));//默认密码为工号
+                        departmentHead.setName(getCellValue(i, 2));
+                        departmentHead.setSex(getCellValue(i, 3));
+                        departmentHead.setBirthday(getCellValue(i, 4));
+                        list.add(departmentHead);
+                    }
+                }
+            } catch (BiffException e) {
+                Log.i("data", "BiffException失败");
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.i("data", "IOException失败");
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
+    // 读取Teacher表格的所有数据
+    public List<TableUserTeachingOffice> readTeachingOfficeExcel() {
+        int rows;
+        int beginRows = 4;
+        ArrayList<TableUserTeachingOffice> list = new ArrayList<>();
+        if (isTrueFileName()) {
+            try {
+                Workbook book = Workbook.getWorkbook(new File(path));//工作簿
+                if(book.getSheet(0)!=null){
+                    sheet = book.getSheet(0);//工作表
+                }else{
+                    sheet = book.getSheet(1);//工作表
+                }
+                rows = sheet.getRows();//行数
+                //判断从第几行导入数据
+                for (int i = 1; i <= rows; i++) {
+                    Log.i("tra0", "行数" + i + "[" + getCellValue(i, 1) + "]");
+                    //匹配数字
+                    if (getCellValue(i, 1).matches("^[0-9]+$")) {
+                        beginRows = i;
+                        break;
+                    }
+                }
+
+                for (int i = beginRows; i <= rows; i++) {
+                    TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
+                    if(!getCellValue(i,5).contains("教师")&&getCellValue(i,5).contains("系主任"))
+                    teachingOffice.setWorkNumber(getCellValue(i, 1));//导入系负责人信息
+                    teachingOffice.setPassword(getCellValue(i, 1));//默认密码为工号
+                    teachingOffice.setName(getCellValue(i, 2));
+                    // teachingOffice.setSex(getCellValue(i, 3));
+                    //teachingOffice.setBirthday(getCellValue(i, 4));
+                    list.add(teachingOffice);
+                }
+            } catch (BiffException e) {
+                Log.i("data", "BiffException失败");
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.i("data", "IOException失败");
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
     /**
      * 获取表格i行j列的单元格的值
      */
