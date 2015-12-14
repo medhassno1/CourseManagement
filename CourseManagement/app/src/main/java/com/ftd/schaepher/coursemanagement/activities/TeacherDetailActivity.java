@@ -61,6 +61,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_phone_number);
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_detail_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_detail_major);
+        edtTxEmail = (EditText)findViewById(R.id.edtTx_teacher_detail_email);
 
         initTeacherData();
         initUserPermission();
@@ -76,14 +77,14 @@ public class TeacherDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         boolean isQueryingSelf = intent.getBooleanExtra("isQueryingSelf", true);
 
-      /*  if (isQueryingSelf) {
+        if (isQueryingSelf) {
             queryIdentity = userIdentity;
             queryWorkNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         } else {
             queryIdentity = intent.getStringExtra("teacherIdentity");
             queryWorkNumber = intent.getStringExtra("teacherID");
             Loger.i("str2", "工号" + queryWorkNumber + "身份" + queryIdentity);
-        }*/
+        }
 
         queryIdentity = intent.getStringExtra("teacherIdentity");
         queryWorkNumber = intent.getStringExtra("teacherID");
