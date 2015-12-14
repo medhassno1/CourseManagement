@@ -1,9 +1,11 @@
 <?php
 /**
- * ´«ÈëjsonDataºÍtableName£¬ÓÉÏµ¸ºÔðÈËºÍ½ÌÑ§°ì¸üÐÂµ¥ÐÐ±í
+ * ä¼ å…¥jsonDataå’ŒtableNameï¼Œç”±ç³»è´Ÿè´£äººå’Œæ•™å­¦åŠžæ›´æ–°å•è¡Œè¡¨
  */
 $jsonData = $_POST["jsonData"];
 $tableName = $_POST["tableName"];
+session_start();
+$iden = $_SESSION['id'];
 $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
 if (!$con) {
     die('Could not connect: ' . mysql_error());
@@ -14,4 +16,12 @@ if (!$con) {
         $sql = "UPDATE $tableName SET timePeriod='$row[timePeriod];',teacherName ='$row[teacherName];',remark='$row[remark];' WHERE courseName = '$row[courseName]'";
         mysqli_query($con, $sql);
     }
+    $tcTableName = substr($tableName, 3);
+    if ($iden == 'user_department_head') {
+        $statement = "UPDATE task_info SET taskState='1'WHERE relativeTable='$tcTableName'";
+
+    } else {
+        $statement = "UPDATE task_info SET taskState='2'WHERE relativeTable='$tcTableName'";
+    }
+    mysqli_query($con, $statement);
 }
