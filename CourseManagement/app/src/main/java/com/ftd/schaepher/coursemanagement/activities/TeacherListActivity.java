@@ -95,7 +95,6 @@ public class TeacherListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_list);
-        refreshableView = (RefreshableView) findViewById(R.id.refreshTeacher_view);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
         mToolbar.setTitle("教师列表");
         setSupportActionBar(mToolbar);
@@ -326,6 +325,8 @@ public class TeacherListActivity extends AppCompatActivity
                 Loger.i("parent", "教学办");
                 queryWorkNumber = officeListData.get(position).getWorkNumber();
                 queryIdentity = ConstantStr.ID_TEACHING_OFFICE;
+                Loger.i("parent","位置是："+position);
+
                 break;
             case R.id.lv_department_list:
                 Loger.i("parent", "系负责人");
@@ -350,9 +351,9 @@ public class TeacherListActivity extends AppCompatActivity
         intend.putExtra("isQueryingSelf", false);
         startActivity(intend);
 
-        Loger.i("str", String.valueOf(parent));
-        Loger.i("str", position + "    " + id);
-        Loger.i("str", queryWorkNumber + "  " + queryIdentity);
+        Loger.i("parent", String.valueOf(parent));
+        Loger.i("parent", position + "    " + id);
+        Loger.i("parent", queryWorkNumber + "  " + queryIdentity);
     }
 
     // 点击标题栏的子菜单事件
