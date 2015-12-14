@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.db.Initialize;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
@@ -68,7 +67,7 @@ public class LoginActivity extends AppCompatActivity
         btnLogin.setOnClickListener(this);
 
         autoSetWorkNumber();
-//        initDatabaseData();
+
     }
 
 
@@ -82,25 +81,7 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * 第一次登陆的操作，即初始化数据库
-     */
-    private void initDatabaseData() {
-        SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
-        boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        if (isFirstRun) {
-            Loger.v("初始化数据库", "正在初始化");
-            editor.putBoolean("isFirstRun", false);
-            editor.apply();
 
-            Initialize initialize = new Initialize(); // 初始化数据库
-            initialize.init(this);
-            Loger.v("初始化数据库", "初始化完成");
-        } else {
-            Loger.v("初始化数据库", "已初始化过");
-        }
-    }
 
     @Override
     public void onClick(View v) {
@@ -130,7 +111,7 @@ public class LoginActivity extends AppCompatActivity
                     progress.show();
 
                     login();
-//                    loginOffLine();
+
                 }
                 break;
 
@@ -212,16 +193,7 @@ public class LoginActivity extends AppCompatActivity
         });
     }
 
-    public void loginOffLine() {
-        informationEditor.putString(ConstantStr.USER_IDENTITY, identity);//保存用户名、身份
-        informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);
-        informationEditor.apply();
 
-        Intent intend = new Intent();
-        intend.setClass(LoginActivity.this, TaskListActivity.class);
-        LoginActivity.this.finish();
-        startActivity(intend);
-    }
 
     // 处理输入错误提示
     @Override
