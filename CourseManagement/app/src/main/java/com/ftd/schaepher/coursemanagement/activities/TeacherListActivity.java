@@ -150,23 +150,27 @@ public class TeacherListActivity extends AppCompatActivity
 
     // 初始化教师列表界面的控件
     private void initTeacherListView() {
+        teacherListView = (MoreListView) findViewById(R.id.lv_teacher_list);
+        teacherListView.setEmptyView(findViewById(R.id.tv_empty_teacher));
+        departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
+        departmentListView.setEmptyView(findViewById(R.id.tv_empty_department));
+        officeListView = (MoreListView) findViewById(R.id.lv_office_list);
+        officeListView.setEmptyView(findViewById(R.id.tv_empty_office));
+
         if (teacherListData != null) {
             teacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
-            teacherListView = (MoreListView) findViewById(R.id.lv_teacher_list);
             teacherListView.setAdapter(teacherAdapter);
             teacherListView.setOnItemClickListener(this);
         }
         if (departmentListData != null) {
             departmentAdapter =
                     new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
-            departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
             departmentListView.setAdapter(departmentAdapter);
             departmentListView.setOnItemClickListener(this);
         }
         if (officeListData != null) {
             officeAdapter =
                     new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
-            officeListView = (MoreListView) findViewById(R.id.lv_office_list);
             officeListView.setAdapter(officeAdapter);
             officeListView.setOnItemClickListener(this);
         }

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
@@ -50,6 +51,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private String workNumber;
     private String identity;
     private boolean hasCommitted = true;
+    private String taskState;
     private String commonTableName;
     private ProgressDialog progress;
     private ExcelAdapter mExcelAdapter;
@@ -72,17 +74,13 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tableName = getIntent().getStringExtra("tableName");
         commonTableName = TableCourseMultiline.class.getSimpleName();
 
-        // 判断是否已有数据
-        dbHelper.dropTable(commonTableName);
-        dbHelper.changeTableName(tableName, commonTableName);
-
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
-
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         userName = sharedPre.getString(ConstantStr.USER_NAME, "");
         workNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
+        taskState = dbHelper.findById(tableName, TableTaskInfo.class).getTaskState();
 
         getServerData();
     }
@@ -101,8 +99,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         if (excelListData != null) {
             excelListData.clear();
         }
-        excelListData.add(EXCEL_HEADER);
-
         // 根据表名查找数据库对应表数据
         dbHelper.dropTable(commonTableName);
         try {
@@ -111,13 +107,18 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             e.printStackTrace();
             dbHelper.createNewCourseTable();
         }
+
         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
+        if (excelListData.size() > 0) {
+            excelListData.add(0, EXCEL_HEADER);
+        }
         dbHelper.changeTableName(commonTableName, tableName);
 
         mExcelAdapter = new
                 ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
         ListView excelListView;
         excelListView = (ListView) findViewById(R.id.lv_excel_display);
+        excelListView.setEmptyView(findViewById(R.id.tv_empty_excel));
         excelListView.setAdapter(mExcelAdapter);
         excelListView.setOnItemClickListener(this);
     }
@@ -140,6 +141,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             list.remove(0);
                             list.remove(0);
                         }
+                        Loger.d("taskState", taskState + "||data:" + excelListData.size());
+
+                        //报课任务进行中或审核状态
                         dbHelper.dropTable(commonTableName);
                         try {
                             dbHelper.changeTableName(tableName, commonTableName);
@@ -153,8 +157,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         hasCommitted = dbHelper.getIsFinishCommit(workNumber);
                         Loger.d("isfinish", String.valueOf(hasCommitted));
                         excelListData.clear();
-                        excelListData.add(EXCEL_HEADER);
                         excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
+                        if (excelListData.size() > 0) {
+                            excelListData.add(0,EXCEL_HEADER);
+                        }
                         dbHelper.changeTableName(commonTableName, tableName);
                         Loger.w("exceldata", list.toString());
                     }
@@ -214,6 +220,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     .setPositiveButton("确认选择", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            EditText edtTxDialogTeacher =
+                                    (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_teacher);
                             EditText edtTxDialogFromToEnd =
                                     (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
                             EditText edtTxDialogNote =
@@ -227,7 +235,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setCourseName(excelListData.get(position).getCourseName());
                                 courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
                                 courseModify.setRemark(edtTxDialogNote.getText().toString());
-                                courseModify.setTeacherName(userName);
+                                courseModify.setTeacherName(edtTxDialogTeacher.getText().toString());
                                 courseModify.setWorkNumber(workNumber);
                                 dbHelper.update(courseModify);
 
@@ -251,7 +259,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark("");
                                 courseModify.setTeacherName("");
                                 courseModify.setWorkNumber("");
-                                //表的主键已经设置成自增id，因此这里无法更新到数据库，怎么解决再讨论
                                 dbHelper.update(courseModify);
 
                                 dbHelper.changeTableName(commonTableName, tableName);
@@ -284,6 +291,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         TextView tvDialogComputerHour = (TextView) v.findViewById(R.id.tv_dialog_computer_hour);
         EditText edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
         EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
+        EditText edtTxDialogTeacher = (EditText) v.findViewById(R.id.edtTx_dialog_teacher);
 
         TableCourseMultiline rowData = excelListData.get(position);
         tvDialogGrade.setText(rowData.getGrade());
@@ -295,10 +303,15 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tvDialogClassHour.setText(rowData.getCourseHour());
         tvDialogExperimentHour.setText(rowData.getPracticeHour());
         tvDialogComputerHour.setText(rowData.getOnMachineHour());
+        edtTxDialogTeacher.setText(rowData.getTeacherName());
         edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
         edtTxDialogNote.setText(rowData.getRemark());
         if (hasCommitted) {
+            edtTxDialogTeacher.setFocusable(false);
+            edtTxDialogTeacher.setEnabled(false);
+            edtTxDialogFromToEnd.setFocusable(false);
             edtTxDialogFromToEnd.setEnabled(false);
+            edtTxDialogNote.setFocusable(false);
             edtTxDialogNote.setEnabled(false);
         }
     }
@@ -314,7 +327,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 menu.findItem(R.id.action_commit_check).setVisible(true);
                 break;
             case ConstantStr.ID_TEACHING_OFFICE:
-
+                menu.findItem(R.id.action_finish_task).setVisible(true);
                 break;
             default:
                 break;
@@ -331,10 +344,32 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             case R.id.action_commit_task:
                 Loger.d("TAG", "commit task");
                 //点击提交报课逻辑
-                if (hasCommitted) {
-                    showForbidCommitDialog();
+                if (taskState.equals("2")) {
+                    showForbidCommitDialog("报课任务已结束，无法进行提交");
+                } else if (taskState.equals("1")) {
+                    showForbidCommitDialog("报课信息正在审核中，请等待...");
                 } else {
-                    showCommitTaskDialog();
+                    if (hasCommitted) {
+                        showForbidCommitDialog("您已进行过提交，不能再次提交！");
+                    } else {
+                        showCommitTaskDialog("是否提交报课", "一旦提交将不能再次修改报课信息！");
+                    }
+                }
+                return true;
+            case R.id.action_commit_check:
+                if (taskState.equals("2")) {
+                    showForbidCommitDialog("报课任务已结束，无法进行提交");
+                } else if (taskState.equals("1")) {
+                    showForbidCommitDialog("您已进行过提交，不能再次提交！");
+                } else {
+                    showCommitTaskDialog("是否提交审核", "一旦提交将不能再次修改报课信息！");
+                }
+                return true;
+            case R.id.action_finish_task:
+                if (taskState.equals("2")) {
+                    showForbidCommitDialog("报课任务已结束");
+                } else {
+                    showCommitTaskDialog("是否公开报课", "一旦公共将无法再进行修改！");
                 }
                 return true;
             default:
@@ -342,10 +377,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         }
     }
 
-    private void showCommitTaskDialog() {
+    private void showCommitTaskDialog(String title, String message) {
         final SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
-        commitTaskDialog.message("一旦提交将不能再次修改报课信息！")
-                .title("是否提交报课")
+        commitTaskDialog.message(message)
+                .title(title)
                 .positiveAction("确定")
                 .positiveActionClickListener(new View.OnClickListener() {
                     @Override
@@ -378,9 +413,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 }).show();
     }
 
-    private void showForbidCommitDialog() {
+    private void showForbidCommitDialog(String message) {
         final SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
-        commitTaskDialog.message("您已提交过报课，不能再次提交！")
+        commitTaskDialog.message(message)
                 .title("提示")
                 .positiveAction("确定")
                 .positiveActionClickListener(new View.OnClickListener() {
@@ -395,23 +430,42 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private void postToServer() {
         dbHelper.dropTable(commonTableName);
         dbHelper.changeTableName(tableName, commonTableName);
-        List<TableCourseMultiline> commitData =
-                dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
-        Loger.d("commitData", String.valueOf(commitData));
-        dbHelper.changeTableName(commonTableName, tableName);
-        Loger.d("commitData", JsonTools.getJsonString(commitData));
+        if (identity.equals(ConstantStr.ID_TEACHER)) {
+            List<TableCourseMultiline> commitData =
+                    dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
+            Loger.d("commitData", String.valueOf(commitData));
+            Loger.d("commitData", JsonTools.getJsonString(commitData));
+            try {
+                String result = NetworkManager.postToServerSync(tableName,
+                        JsonTools.getJsonString(commitData), NetworkManager.SUBMIT_SELECTED_COURSE);
 
-        try {
-            String result = NetworkManager.postToServerSync(tableName,
-                    JsonTools.getJsonString(commitData), NetworkManager.SUBMIT_SELECTED_COURSE);
-
-            sendToast("提交成功");
-            hasCommitted = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            sendToast("提交失败，请重新提交");
+                sendToast("提交成功");
+                hasCommitted = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                sendToast("提交失败，请重新提交");
+            }
+        } else {
+            List<TableCourseMultiline> commitData = dbHelper.findAll(TableCourseMultiline.class);
+            String cbTableName = "cb_" + tableName;
+            try {
+                String result = NetworkManager.postToServerSync(cbTableName,
+                        JsonTools.getJsonString(commitData), NetworkManager.INSERT_OR_UPDATE_CB_TABLE);
+                sendToast("提交成功");
+                if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+                    TableTaskInfo task = new TableTaskInfo("1", tableName);
+                    dbHelper.update(task);
+                } else {
+                    TableTaskInfo task = new TableTaskInfo("2", tableName);
+                    dbHelper.update(task);
+                }
+                taskState = dbHelper.findById(tableName, TableTaskInfo.class).getTaskState();
+            } catch (IOException e) {
+                e.printStackTrace();
+                sendToast("提交失败，请重新提交");
+            }
         }
-
+        dbHelper.changeTableName(commonTableName, tableName);
     }
 
     public void sendToast(final String message) {
@@ -498,6 +552,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             TextView tvTeacher;
             TextView tvNote;
         }
+
     }
 
     @Override
