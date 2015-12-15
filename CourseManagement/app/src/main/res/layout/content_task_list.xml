@@ -20,15 +20,36 @@
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+                <Spinner
+                    android:id="@+id/spinner_select_term"
+                    android:layout_width="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            </android.support.v7.widget.Toolbar>
+
         </android.support.design.widget.AppBarLayout>
     </android.support.design.widget.CoordinatorLayout>
 
-    <ListView
-        android:id="@+id/lv_task_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:background="#fff">
-    </ListView>
+    <com.ftd.schaepher.coursemanagement.widget.RefreshableView
+        android:id="@+id/refreshTask_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <ListView
+            android:id="@+id/lv_task_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="#fff">
+        </ListView>
+        <TextView
+            android:id="@+id/tv_empty_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="正在获取数据..."
+            android:textSize="20sp"
+            android:textColor="#b0bec5"/>
+    </com.ftd.schaepher.coursemanagement.widget.RefreshableView>
 </LinearLayout>

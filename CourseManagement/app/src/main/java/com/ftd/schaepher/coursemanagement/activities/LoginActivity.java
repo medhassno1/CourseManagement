@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,16 +13,17 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
-import com.ftd.schaepher.coursemanagement.db.Initialize;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
-import com.ftd.schaepher.coursemanagement.tools.ConstantTools;
+import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
-import com.ftd.schaepher.coursemanagement.tools.ServerTools;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-import com.rey.material.widget.ProgressView;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
-import org.apache.http.Header;
+import java.io.IOException;
+
 
 /**
  * Created by sxq on 2015/10/28.
@@ -35,90 +35,68 @@ public class LoginActivity extends AppCompatActivity
     private static final String TAG = "LoginActivity";
 
     private Button btnLogin;
-    private EditText edtTxUserName;
+    private EditText edtTxWorkNumber;
     private EditText edtTxPassWord;
     private RadioGroup rdoGroup;
-    private TextInputLayout layoutUserName;
+    private TextInputLayout layoutWorkNumber;
     private TextInputLayout layoutPassWord;
     private ProgressDialog progress;
 
-    private String userName;
+    private String workNumber;
     private String password;
     private String identity;
 
-    private SharedPreferences.Editor ownInformationSaveEditor;
+    private SharedPreferences.Editor informationEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        edtTxUserName = (EditText) findViewById(R.id.edtTx_login_username);
+        edtTxWorkNumber = (EditText) findViewById(R.id.edtTx_login_workNumber);
         edtTxPassWord = (EditText) findViewById(R.id.edtTx_login_password);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_check_identity);
         btnLogin = (Button) findViewById(R.id.btn_login);
-        layoutUserName = (TextInputLayout) findViewById(R.id.inputLayout_login_username);
+        layoutWorkNumber = (TextInputLayout) findViewById(R.id.inputLayout_login_workNumber);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
-        ownInformationSaveEditor = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).edit();
+        informationEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
 
-        edtTxUserName.setOnFocusChangeListener(this);
+        edtTxWorkNumber.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
         btnLogin.setOnClickListener(this);
 
-        autoSetUserName();
-        initDatabaseData();
+        autoSetWorkNumber();
 
-        ServerTools serverTools = new ServerTools(this);
-        serverTools.postTableToServer(TableUserTeacher.class, ConstantTools.ID_TEACHER, ServerTools.INSERT_TABLE);
     }
 
 
     /**
-     * 自动输入保存的用户名
+     * 自动输入保存的账号
      */
-    private void autoSetUserName() {
-        userName = getSharedPreferences(ConstantTools.USER_INFORMATION, MODE_PRIVATE).getString(ConstantTools.USER_ACCOUNT, "");
-        if (!userName.equals("")) {
-            edtTxUserName.setText(userName);
+    private void autoSetWorkNumber() {
+        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
+        if (!workNumber.equals("")) {
+            edtTxWorkNumber.setText(workNumber);
         }
     }
 
-    /**
-     * 第一次登陆的操作，即初始化数据库
-     */
-    private void initDatabaseData() {
-        SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
-        boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        if (isFirstRun) {
-            Log.v("初始化数据库", "正在初始化");
-            editor.putBoolean("isFirstRun", false);
-            editor.apply();
-
-            Initialize initialize = new Initialize(); // 初始化数据库
-            initialize.init(this);
-            Log.v("初始化数据库", "初始化完成");
-        } else {
-            Log.v("初始化数据库", "已初始化过");
-        }
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                userName = edtTxUserName.getText().toString().trim();
+                workNumber = edtTxWorkNumber.getText().toString().trim();
                 password = edtTxPassWord.getText().toString().trim();
                 switch (rdoGroup.getCheckedRadioButtonId()) {
                     case R.id.rdoBtn_teacher:
-                        identity = ConstantTools.ID_TEACHER;
+                        identity = ConstantStr.ID_TEACHER;
                         break;
                     case R.id.rdoBtn_department_head:
-                        identity = ConstantTools.ID_DEPARTMENT_HEAD;
+                        identity = ConstantStr.ID_DEPARTMENT_HEAD;
                         break;
                     case R.id.rdoBtn_teaching_office:
-                        identity = ConstantTools.ID_TEACHING_OFFICE;
+                        identity = ConstantStr.ID_TEACHING_OFFICE;
                         break;
                     default:
                         break;
@@ -130,8 +108,9 @@ public class LoginActivity extends AppCompatActivity
                     progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progress.setCancelable(true);
                     progress.show();
+
                     login();
-//                    loginOffLine();
+
                 }
                 break;
 
@@ -144,80 +123,81 @@ public class LoginActivity extends AppCompatActivity
      * 检查账号密码
      */
     private boolean isTrueForm() {
-        if (userName.equals("") || password.equals("")) {
-            if (userName.equals("")) {
-                layoutUserName.setError(getString(R.string.nullUserName));
+        if (workNumber.equals("") || password.equals("")) {
+            if (workNumber.equals("")) {
+                layoutWorkNumber.setError(getString(R.string.nullWorkNumber));
             }
             if (password.equals("")) {
                 layoutPassWord.setError(getString(R.string.nullPassWord));
             }
         } else {
-            layoutUserName.setError(null);
+            layoutWorkNumber.setError(null);
             layoutPassWord.setError(null);
             return true;
         }
         return false;
     }
 
-    // 处理登录逻辑
     public void login() {
-        RequestParams params = new RequestParams();
-        params.add("login-user", userName);
-        params.add("login-password", password);
-        params.add("ident", identity);
         try {
-            NetworkManager.post(NetworkManager.URL_LOGIN, params, new AsyncHttpResponseHandler() {
+            NetworkManager.login(workNumber, password, identity, new NetworkManager.ResponseCallback() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                public void onResponse(Response response) throws IOException {
+                    String result = response.body().string();
+                    Loger.d(TAG, result);
                     progress.cancel();
-                    String html = new String(response);
-                    Log.w("Login收到的数据", html); // 服务器返回的文本
-                    if (html.equals("true")) {
-                        // 跳转,同时将选择登录的身份信息存储在本地，方便下一个界面根据不同身份做相应修改
-
-                        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-                        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
-                        ownInformationSaveEditor.apply();
+                    if (!result.equals("false")) {
+//                        这里应该改为获取服务器个人数据，并存储到数据库中
+                        informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
+                        informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);
+                        informationEditor.apply();
+                        CourseDBHelper dbHelper = new CourseDBHelper(LoginActivity.this);
+                        try {
+                            String pojoClassName = GlobalMap.get(identity);
+                            Class clazz = Class.forName(pojoClassName);
+                            Object user = JsonTools.getJsonObject(result, clazz);
+                            dbHelper.insertOrUpdate(user);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                         Intent intend = new Intent();
                         intend.setClass(LoginActivity.this, TaskListActivity.class);
                         LoginActivity.this.finish();
                         startActivity(intend);
                     } else {
-                        Toast.makeText(LoginActivity.this, "账号或密码错误",
-                                Toast.LENGTH_SHORT).show();
+                        sendToast("账号或密码错误");
                     }
+
                 }
 
                 @Override
-                public void onFailure(int statusCode, Header[] headers,
-                                      byte[] response, Throwable throwable) {
+                public void onFailure(Request request, IOException e) {
                     progress.cancel();
-                    Toast.makeText(LoginActivity.this, "登录失败，请检查网络状况",
-                            Toast.LENGTH_SHORT).show();
+                    sendToast("请求服务器失败");
                 }
             });
-        } catch (Exception e) {
-            Log.e(TAG, e.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void loginOffLine() {
-        ownInformationSaveEditor.putString(ConstantTools.USER_IDENTITY, identity);//保存用户名、身份
-        ownInformationSaveEditor.putString(ConstantTools.USER_ACCOUNT, userName);
-        ownInformationSaveEditor.apply();
-
-        Intent intend = new Intent();
-        intend.setClass(LoginActivity.this, TaskListActivity.class);
-        LoginActivity.this.finish();
-        startActivity(intend);
+    public void sendToast(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(LoginActivity.this, message,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     // 处理输入错误提示
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        if (!edtTxUserName.getText().toString().equals("")) {
-            layoutUserName.setError(null);
+        if (!edtTxWorkNumber.getText().toString().equals("")) {
+            layoutWorkNumber.setError(null);
         }
 
         if (!edtTxPassWord.getText().toString().equals("")) {

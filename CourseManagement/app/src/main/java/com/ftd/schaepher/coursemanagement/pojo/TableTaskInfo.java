@@ -10,13 +10,12 @@ import net.tsz.afinal.annotation.sqlite.Table;
 @Table(name = "TableTaskInfo")
 public class TableTaskInfo {
     @Id
-    private int id;
     private String relativeTable;
     private String year;
     private String semester;
     private String departmentDeadline;
     private String teacherDeadline;
-    private String remark;
+    //    private String remark;
     private String taskState;
 
     public TableTaskInfo() {
@@ -25,14 +24,6 @@ public class TableTaskInfo {
     public TableTaskInfo(String taskState, String relativeTable) {
         this.taskState = taskState;
         this.relativeTable = relativeTable;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getRelativeTable() {
@@ -75,13 +66,13 @@ public class TableTaskInfo {
         this.teacherDeadline = teacherDeadline;
     }
 
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
+//    public String getRemark() {
+//        return remark;
+//    }
+//
+//    public void setRemark(String remark) {
+//        this.remark = remark;
+//    }
 
     public String getTaskState() {
         return taskState;
@@ -94,13 +85,12 @@ public class TableTaskInfo {
     @Override
     public String toString() {
         return "TableTaskInfo{" +
-                "id=" + id +
                 ", relativeTable='" + relativeTable + '\'' +
                 ", year='" + year + '\'' +
                 ", semester='" + semester + '\'' +
                 ", departmentDeadline='" + departmentDeadline + '\'' +
                 ", teacherDeadline='" + teacherDeadline + '\'' +
-                ", remark='" + remark + '\'' +
+//                ", remark='" + remark + '\'' +
                 ", taskState='" + taskState + '\'' +
                 '}';
     }

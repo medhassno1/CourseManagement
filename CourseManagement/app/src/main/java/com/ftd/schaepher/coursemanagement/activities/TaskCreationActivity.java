@@ -2,17 +2,15 @@ package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,10 +24,17 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.widget.WheelView;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -44,17 +49,21 @@ public class TaskCreationActivity extends AppCompatActivity
     private EditText edtTxTeacherDeadline;
     private EditText edtTxTaskName;
     private EditText edtTxTaskTeam;
-    private EditText edtTxTaskRemark;
+    //    private EditText edtTxTaskRemark;
     private ImageView imgvFileImg;
     private TextView tvFileName;
     private Button btnImportFile;
+    private ProgressDialog progress;
     private CourseDBHelper dbHelper;
     private String filePath;
     private String fileName;
     private String tableCourseName;
-    private static final int RELEASE = 1;
-    private static final int RELEASE_FAILURE = 2;
-    private ProgressDialog progress;
+    private String year;
+    private String semester;
+
+    private static final String[] SEMESTER = new String[]{"01", "02", "03", "04"};
+
+    private List<String> termYear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +74,6 @@ public class TaskCreationActivity extends AppCompatActivity
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("发布报课任务");
-
         initWidgetAndListener();
 
         dbHelper = new CourseDBHelper(TaskCreationActivity.this);
@@ -77,7 +85,7 @@ public class TaskCreationActivity extends AppCompatActivity
         edtTxTeacherDeadline = (EditText) findViewById(R.id.edtTx_add_task_teacher_deadline);
         edtTxTaskName = (EditText) findViewById(R.id.edtTx_add_task_name);
         edtTxTaskTeam = (EditText) findViewById(R.id.edtTx_add_task_team);
-        edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
+//        edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
         btnImportFile = (Button) findViewById(R.id.btn_add_task_import_file);
         imgvFileImg = (ImageView) findViewById(R.id.imgv_add_task_file_img);
         tvFileName = (TextView) findViewById(R.id.tv_add_task_file_name);
@@ -85,14 +93,17 @@ public class TaskCreationActivity extends AppCompatActivity
         edtTxTeacherDeadline.setOnFocusChangeListener(this);
         edtTxDepartmentDeadline.setOnFocusChangeListener(this);
         edtTxTaskName.setOnFocusChangeListener(this);
+        edtTxTaskTeam.setOnFocusChangeListener(this);
 
         edtTxTaskName.setOnClickListener(this);
         btnImportFile.setOnClickListener(this);
         edtTxDepartmentDeadline.setOnClickListener(this);
         edtTxTeacherDeadline.setOnClickListener(this);
+        edtTxTaskTeam.setOnClickListener(this);
         edtTxDepartmentDeadline.setInputType(InputType.TYPE_NULL);
         edtTxTeacherDeadline.setInputType(InputType.TYPE_NULL);
         edtTxTaskName.setInputType(InputType.TYPE_NULL);
+        edtTxTaskTeam.setInputType(InputType.TYPE_NULL);
     }
 
     @Override
@@ -126,9 +137,31 @@ public class TaskCreationActivity extends AppCompatActivity
                         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                         progress.setCancelable(false);
                         progress.show();
-                        Message msg = new Message();
-                        msg.what = RELEASE;
-                        mHandler.sendMessage(msg);
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                TableTaskInfo task = createTaskInformation();
+                                tableCourseName = task.getRelativeTable();
+                                dbHelper.insert(task);
+                                String json = JsonTools.getJsonString(task);
+                                try {
+                                    String result = NetworkManager
+                                            .postToServerSync(ConstantStr.TABLE_TASK_INFO,
+                                                    json, NetworkManager.INSERT_TABLE);
+                                    Loger.w("resultTask", result);
+
+                                    List<TableCourseMultiline> courseTable = readExcelToDB();
+                                    String tableJson = JsonTools.getJsonString(courseTable);
+                                    String result2 = NetworkManager
+                                            .postToServerSync(tableCourseName, tableJson, NetworkManager.CREATE_TABLE);
+                                    Loger.w("resultTable", result2);
+                                    closeProgress();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    showError();
+                                }
+                            }
+                        }.start();
                     }
                 });
                 notificationDialog.negativeActionClickListener(new View.OnClickListener() {
@@ -143,6 +176,25 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 
+    private void showError() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TaskCreationActivity.this, "发布错误，请重新发布", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void closeProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.cancel();
+                Toast.makeText(TaskCreationActivity.this, "发布成功！", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private boolean isPassValidate() {
         if (edtTxTaskName.getText().toString().trim().equals("")) {
             Toast.makeText(this, "请选择开课专业", Toast.LENGTH_SHORT).show();
@@ -154,61 +206,40 @@ public class TaskCreationActivity extends AppCompatActivity
         return true;
     }
 
-    //建表
-    private void createTable() {
-        SQLiteDatabase db = openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-        db.execSQL("DROP TABLE IF EXISTS TableCourseMultiline");
-        db.execSQL(CourseDBHelper.CREATE_TABLE_COURSE_MULTILINE);
+    // 从Excel表获取数据，并存入数据库
+    private List<TableCourseMultiline> readExcelToDB() {
+        String commonName = TableCourseMultiline.class.getSimpleName();
+        dbHelper.dropTable(commonName);
+        dbHelper.dropTable(tableCourseName);
+        dbHelper.createNewCourseTable();
 
-        TableCourseMultiline course = new TableCourseMultiline();
-        //解析Excel表格
         ExcelTools excelTools = new ExcelTools();
         excelTools.setPath(filePath);
         List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
-        //数据存入数据库
-        for (int i = 0; i < courseList.size(); i++) {
-            course = courseList.get(i);
-            dbHelper.insert(course);
-        }
-        //改名
-        db.execSQL("ALTER TABLE TableCourseMultiline RENAME TO " + tableCourseName);
-        db.close();
+
+        dbHelper.insertAll(courseList);
+        dbHelper.changeTableName(commonName, tableCourseName);
+        return courseList;
     }
 
-    // 获取即将发布的任务的信息,未完成
-    private TableTaskInfo getNewTaskInformation() {
+    // 获取即将发布的任务的信息,未完成（哪里未完成？发布到服务器？）
+    private TableTaskInfo createTaskInformation() {
         TableTaskInfo newTask = new TableTaskInfo();
-        newTask.setYear("2015");
-        newTask.setSemester("02");
+        newTask.setYear(year);
+        newTask.setSemester(semester);
         newTask.setTaskState("0");
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
-        newTask.setRemark(edtTxTaskRemark.getText().toString());
-        newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + "201502");
+//        newTask.setRemark(edtTxTaskRemark.getText().toString());
+        newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + year + semester);
         return newTask;
     }
 
     // 控件的焦点监听事件
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        switch (v.getId()) {
-            case R.id.edtTx_add_task_department_deadline:
-                if (hasFocus) {
-                    onClick(v);
-                }
-                break;
-            case R.id.edtTx_add_task_teacher_deadline:
-                if (hasFocus) {
-                    onClick(v);
-                }
-                break;
-            case R.id.edtTx_add_task_name: {
-                if (hasFocus) {
-                    onClick(v);
-                }
-            }
-            default:
-                break;
+        if (hasFocus) {
+            onClick(v);
         }
     }
 
@@ -221,6 +252,10 @@ public class TaskCreationActivity extends AppCompatActivity
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         switch (v.getId()) {
+            case R.id.edtTx_add_task_team:
+                selectTerm();
+                break;
+
             case R.id.edtTx_add_task_department_deadline:
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -240,6 +275,7 @@ public class TaskCreationActivity extends AppCompatActivity
                 break;
 
             case R.id.edtTx_add_task_name:
+                // 这里数据尽可能分离
                 simpleDialog.items(new String[]{"计算机（实验班）", "计算机（卓越班）", "计算机专业",
                         "软件工程专业", "数学类（实验班）", "数学类", "网络工程专业", "信息安全专业"}, 0)
                         .title("选择专业")
@@ -270,42 +306,47 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case RELEASE:
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            TableTaskInfo task = getNewTaskInformation();
-                            tableCourseName = task.getRelativeTable();
-                            try {
-                                createTable();
-                                dbHelper.insert(task);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Message msg = new Message();
-                                msg.what = RELEASE_FAILURE;
-                                mHandler.sendMessage(msg);
-                            } finally {
-                                progress.cancel();
-                                finish();
-                            }
-                        }
-                    }.start();
-                    break;
-
-                case RELEASE_FAILURE:
-                    Toast.makeText(TaskCreationActivity.this,"发布错误，请重新发布",Toast.LENGTH_SHORT).show();
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-                    break;
+    private void selectTerm() {
+        // 计算年份，给出近十年可供选择
+        Calendar mCalendar = Calendar.getInstance();
+        mCalendar.setTimeInMillis(System.currentTimeMillis());
+        int yearCur = mCalendar.get(Calendar.YEAR);
+//        Loger.d("TaskCreationActivity", yearCur);
+        if (termYear == null) {
+            termYear = new ArrayList<>();
+            for (int i = yearCur - 5; i < yearCur + 5; i++) {
+                termYear.add(String.valueOf(i));
             }
         }
-    };
+        View wheelView = LayoutInflater.from(this).inflate(R.layout.dialog_wheel_view, null);
+        final WheelView wvSelectTermYear = (WheelView) wheelView.findViewById(R.id.wheel_view_term_year);
+        final WheelView wvSelectTermDay = (WheelView) wheelView.findViewById(R.id.wheel_view_term_day);
+        wvSelectTermYear.setOffset(1);
+        wvSelectTermYear.setItems(termYear);
+        wvSelectTermYear.setSelection(5);
+        wvSelectTermDay.setOffset(1);
+        wvSelectTermDay.setItems(Arrays.asList(SEMESTER));
+        wvSelectTermDay.setSelection(0);
+
+        new AlertDialog.Builder(this)
+                .setTitle("选择学期")
+                .setView(wheelView)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        year = wvSelectTermYear.getSelectedItem();
+                        semester = wvSelectTermDay.getSelectedItem();
+                        edtTxTaskTeam.setText(year + semester);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -315,7 +356,7 @@ public class TaskCreationActivity extends AppCompatActivity
             filePath = data.getStringExtra("fileName");
             fileName = filePath.split("/")[filePath.split("/").length - 1];
             tvFileName.setText(fileName);
-            Log.d("filePath", filePath);
+            Loger.d("filePath", filePath);
         }
     }
 

@@ -18,7 +18,7 @@ public class TableCourseMultiline {
     private String people;
     private String courseType;
     private String courseCredit;
-    private String courseHours;
+    private String courseHour;
     private String practiceHour;
     private String onMachineHour;
     private String timePeriod;
@@ -28,14 +28,14 @@ public class TableCourseMultiline {
     public TableCourseMultiline() {
     }
 
-    public TableCourseMultiline(  String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHours, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
+    public TableCourseMultiline(String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHour, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
         this.grade = grade;
         this.major = major;
         this.people = people;
         this.courseName = courseName;
         this.courseType = courseType;
         this.courseCredit = courseCredit;
-        this.courseHours = courseHours;
+        this.courseHour = courseHour;
         this.practiceHour = practiceHour;
         this.onMachineHour = onMachineHour;
         this.timePeriod = timePeriod;
@@ -107,12 +107,12 @@ public class TableCourseMultiline {
         this.courseCredit = courseCredit;
     }
 
-    public String getCourseHours() {
-        return courseHours;
+    public String getCourseHour() {
+        return courseHour;
     }
 
-    public void setCourseHours(String courseHours) {
-        this.courseHours = courseHours;
+    public void setCourseHour(String courseHour) {
+        this.courseHour = courseHour;
     }
 
     public String getPracticeHour() {
@@ -158,7 +158,8 @@ public class TableCourseMultiline {
     @Override
     public String toString() {
         return "TableCourseMultiline{" +
-                "insertTime='" + insertTime + '\'' +
+                "courseCredit='" + courseCredit + '\'' +
+                ", insertTime='" + insertTime + '\'' +
                 ", workNumber='" + workNumber + '\'' +
                 ", grade='" + grade + '\'' +
                 ", major='" + major + '\'' +
@@ -166,7 +167,7 @@ public class TableCourseMultiline {
                 ", courseName='" + courseName + '\'' +
                 ", courseType='" + courseType + '\'' +
                 ", courseCredit='" + courseCredit + '\'' +
-                ", courseHours='" + courseHours + '\'' +
+                ", courseHour='" + courseHour + '\'' +
                 ", practiceHour='" + practiceHour + '\'' +
                 ", onMachineHour='" + onMachineHour + '\'' +
                 ", timePeriod='" + timePeriod + '\'' +

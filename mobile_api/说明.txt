@@ -1,0 +1,26 @@
+creat_table:传入tableName（根据身份验证为user_teaching_office可用）创建任务列表（包括多行和单行）
+
+delete_task:传入tableName（根据身份验证为user_teaching_office可用） 根据多行表的表名删除任务表中的任务及相对应的单行和多行表）
+
+delete_user:传入tableName和workNumer（根据身份验证为user_teaching_office可用）删除用户信息，如果是删除系负责人，则删除department_head_majors
+
+insert_table:传入tableName，插入数据到tableName
+
+login:登陆
+
+query_by_table_name：传入tableName，根据表名查询表中所有的信息
+
+
+query_teacher_select_courses:传入jsonData和workNumber,根据workNUmber查询报课情况，先从任务列表中查询任务的taskState，如果已完成，就在单行表中查询，否则在多行表中查询
+
+insert_tc_update_bc: *传入tableName和jsonData，插入数据到多行表，并在单行表内进行更新
+
+
+update_manager_major:传入jsonData,更新系负责人所负责系表
+
+
+update_insert_cb_table：传入jsonData和tableName，由系负责人和教学办更新单行表，已发送过来的数据为准更新整个字段
+
+update_user_office:传入jsonData和tableName，（根据身份验证为user_teaching_office可用）更新教学办用户表
+
+update_user_teacher_department：传入jsonData和tableName，根据身份验证更新教师和系负责人用户表，身份为user_teaching_office则有权利修改department，否则不能修改
