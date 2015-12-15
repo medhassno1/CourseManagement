@@ -3,7 +3,7 @@ require_once './classes/class_query_table_name.php';
 $name = $_POST["tableName"];
 
 $query = new QueryTableName();
-$query->queryTableName($name);
+$query->queryT($name);
 ?>
 
 

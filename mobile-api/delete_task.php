@@ -9,4 +9,4 @@ $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
 session_start();
 $ident = $_SESSION['id'];
 $deleteTable = new DeleteTask();
-$deleteTable->deleteTask($tableName, $ident);
+$deleteTable->deleteT($tableName, $ident);

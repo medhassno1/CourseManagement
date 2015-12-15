@@ -10,4 +10,4 @@ session_start();
 $ident = $_SESSION['id'];
 
 $updateUser=new UpdateUserOffice();
-$updateUser->updateUserOffice($jsonData,$tableName,$ident);
+$updateUser->updateUser($jsonData,$tableName,$ident);

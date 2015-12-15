@@ -2,7 +2,7 @@
 
 class UpdateManagerMajor
 {
-    public function UpdateManagerMajor($jsonData = "")
+    public function UpdateManager($jsonData = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

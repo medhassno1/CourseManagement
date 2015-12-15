@@ -10,5 +10,5 @@ session_start();
 $ident = $_SESSION['id'];
 
 $updateUserTeacherDepartment = new UpdateUserTeacherDepartment();
-$updateUserTeacherDepartment->updateUserTeacherDepartment($jsonData, $tableName, $ident);
+$updateUserTeacherDepartment->updateTeacherDepartment($jsonData, $tableName, $ident);
 ?>

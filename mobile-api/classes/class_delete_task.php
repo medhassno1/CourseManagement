@@ -2,7 +2,7 @@
 
 class DeleteTask
 {
-    public function deleteTask($tableName = "", $ident = "")
+    public function deleteT($tableName = "", $ident = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

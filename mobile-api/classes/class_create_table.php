@@ -2,7 +2,7 @@
 
 class CreateTable
 {
-    public function creatTable($tableName = "", $ident = "",$jsonData = "")
+    public function create($tableName = "", $ident = "",$jsonData = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

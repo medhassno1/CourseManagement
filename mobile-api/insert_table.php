@@ -8,6 +8,6 @@ $jsonData = $_POST["jsonData"];
 
 $tableName = $_POST["tableName"];
 $insertTable = new InsertTable();
-$insertTable->insertTable($tableName, $jsonData);
+$insertTable->insertT($tableName, $jsonData);
 
 ?>

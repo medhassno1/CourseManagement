@@ -9,5 +9,5 @@ session_start();
 $iden = $_SESSION['id'];
 
 $update = new UpdateInsertCbTable();
-$update->updateInsertCbTable($jsonData, $tableName, $iden);
+$update->updateInsert($jsonData, $tableName, $iden);
 ?>
