@@ -65,11 +65,6 @@ public class CourseDBHelper {
         database.execSQL(createTableCourseMultiline);
     }
 
-    public void createCourseTable() {
-        TableCourseMultiline courseMultiline = new TableCourseMultiline();
-        finalDb.save(courseMultiline);
-    }
-
     // 增
     public void insert(Object entity) {
         finalDb.save(entity);
@@ -140,11 +135,7 @@ public class CourseDBHelper {
         database.execSQL("Drop table if exists " + tableName);
     }
 
-    public void createTableName() {
-
-    }
-
-    public boolean getIsFinishCommit(String workNumber) {
+    public boolean getCommitState(String workNumber) {
         List<TableCourseMultiline> list =
                 finalDb.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
 //            Loger.d("isfinish", String.valueOf(list.size()));

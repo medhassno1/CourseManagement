@@ -546,4 +546,10 @@ public class TaskListActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbHelper.close();
+    }
 }

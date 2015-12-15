@@ -96,7 +96,7 @@ public class TeacherListActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_list);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_list);
-        mToolbar.setTitle("教师列表");
+        mToolbar.setTitle("用户列表");
         setSupportActionBar(mToolbar);
         dbHelper = new CourseDBHelper(TeacherListActivity.this);
 
@@ -114,13 +114,11 @@ public class TeacherListActivity extends AppCompatActivity
         initUserInformation();
         refreshTeacherListData();
         initTeacherListView();
-        Loger.i("TeacherListActivity","执行了oncreat");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Loger.i("TeacherListActivity", "执行了onResume");
         getServerTeacherData();
     }
 
@@ -188,20 +186,25 @@ public class TeacherListActivity extends AppCompatActivity
                         @Override
                         public void onResponse(Response response) throws IOException {
                             //从服务器获取教师数据，并更新到本地数据库
-                            List list = JsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
-                            Loger.w("jsonList", list.toString());
-                            dbHelper.insertAll(list);
+                            try {
+                                List list = JsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
+                                Loger.w("jsonList", list.toString());
+                                dbHelper.deleteAll(TableUserTeacher.class);
+                                dbHelper.insertAll(list);
 
-                            TeacherListActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //从本地数据库获取教师数据
-                                    teacherListData = dbHelper.findAll(TableUserTeacher.class);
-                                    teacherAdapter.clear();
-                                    teacherAdapter.addAll(teacherListData);
-                                    teacherAdapter.notifyDataSetChanged();
-                                }
-                            });
+                                TeacherListActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //从本地数据库获取教师数据
+                                        teacherListData = dbHelper.findAll(TableUserTeacher.class);
+                                        teacherAdapter.clear();
+                                        teacherAdapter.addAll(teacherListData);
+                                        teacherAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         @Override
@@ -215,19 +218,24 @@ public class TeacherListActivity extends AppCompatActivity
                         @Override
                         public void onResponse(Response response) throws IOException {
                             //从服务器获取系负责人数据，并更新到本地数据库
-                            List list = JsonTools.getJsonList(response.body().string(), TableUserDepartmentHead.class);
-                            Loger.w("jsonList", list.toString());
-                            dbHelper.insertAll(list);
+                            try {
+                                List list = JsonTools.getJsonList(response.body().string(), TableUserDepartmentHead.class);
+                                Loger.w("jsonList", list.toString());
+                                dbHelper.deleteAll(TableUserDepartmentHead.class);
+                                dbHelper.insertAll(list);
 
-                            TeacherListActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
-                                    departmentAdapter.clear();
-                                    departmentAdapter.addAll(departmentListData);
-                                    departmentAdapter.notifyDataSetChanged();
-                                }
-                            });
+                                TeacherListActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+                                        departmentAdapter.clear();
+                                        departmentAdapter.addAll(departmentListData);
+                                        departmentAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         @Override
@@ -241,19 +249,24 @@ public class TeacherListActivity extends AppCompatActivity
                         @Override
                         public void onResponse(Response response) throws IOException {
                             //从服务器获取教师数据，并更新到本地数据库
-                            List list = JsonTools.getJsonList(response.body().string(), TableUserTeachingOffice.class);
-                            Loger.w("jsonList", list.toString());
-                            dbHelper.insertAll(list);
+                            try {
+                                List list = JsonTools.getJsonList(response.body().string(), TableUserTeachingOffice.class);
+                                Loger.w("jsonList", list.toString());
+                                dbHelper.deleteAll(TableUserTeachingOffice.class);
+                                dbHelper.insertAll(list);
 
-                            TeacherListActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
-                                    officeAdapter.clear();
-                                    officeAdapter.addAll(officeListData);
-                                    officeAdapter.notifyDataSetChanged();
-                                }
-                            });
+                                TeacherListActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+                                        officeAdapter.clear();
+                                        officeAdapter.addAll(officeListData);
+                                        officeAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         @Override
@@ -330,8 +343,8 @@ public class TeacherListActivity extends AppCompatActivity
         switch (parent.getId()) {
             case R.id.lv_office_list:
                 Loger.i("parent", "教学办");
-                Loger.i("parent","位置是："+position);
-               // Loger.i("parent", "教学办"+dbHelper.findAll(TableUserTeachingOffice.class));
+                Loger.i("parent", "位置是：" + position);
+                // Loger.i("parent", "教学办"+dbHelper.findAll(TableUserTeachingOffice.class));
                 queryWorkNumber = officeListData.get(position).getWorkNumber();
                 queryIdentity = ConstantStr.ID_TEACHING_OFFICE;
 
@@ -483,7 +496,7 @@ public class TeacherListActivity extends AppCompatActivity
                             String tableName = bundle.getString("tableName");
                             String workNumber = bundle.getString("workNumber");
                             NetworkManager.deleteServerUser(tableName, workNumber,
-                                    new MyRespons(tableName, workNumber));
+                                    new MyResponse(tableName, workNumber));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Loger.d("delete", "程序崩溃");
@@ -497,11 +510,11 @@ public class TeacherListActivity extends AppCompatActivity
         }
     }
 
-    class MyRespons implements NetworkManager.ResponseCallback {
+    class MyResponse implements NetworkManager.ResponseCallback {
         private String tableName;
         private String workNumber;
 
-        public MyRespons(String tableName, String workNumber) {
+        public MyResponse(String tableName, String workNumber) {
             super();
             this.tableName = tableName;
             this.workNumber = workNumber;
