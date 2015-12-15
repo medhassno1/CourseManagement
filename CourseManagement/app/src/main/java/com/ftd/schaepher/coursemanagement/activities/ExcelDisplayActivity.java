@@ -44,13 +44,13 @@ import java.util.List;
  */
 public class ExcelDisplayActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
+    private static final String TAG = "ExcelDisplayActivity::";
     private List<TableCourseMultiline> excelListData;
     private CourseDBHelper dbHelper;
     private String tableName;
-    private String userName;
     private String workNumber;
     private String identity;
-    private boolean hasCommitted = true;
+    private boolean hasCommitted;
     private String taskState;
     private String commonTableName;
     private ProgressDialog progress;
@@ -73,11 +73,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
         tableName = getIntent().getStringExtra("tableName");
         commonTableName = TableCourseMultiline.class.getSimpleName();
-
+        hasCommitted = true;
         actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
-        userName = sharedPre.getString(ConstantStr.USER_NAME, "");
         workNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
         taskState = dbHelper.findById(tableName, TableTaskInfo.class).getTaskState();
@@ -89,13 +88,14 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     protected void onResume() {
         super.onResume();
         try {
-            init();
+            initListData();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void init() {
+    private void initListData() {
+
         if (excelListData != null) {
             excelListData.clear();
         }
@@ -107,8 +107,11 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             e.printStackTrace();
             dbHelper.createNewCourseTable();
         }
+        List<TableCourseMultiline> list = dbHelper.findAll(TableCourseMultiline.class);
 
-        excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
+        removeFirstThree(list);
+
+        excelListData.addAll(list);
         if (excelListData.size() > 0) {
             excelListData.add(0, EXCEL_HEADER);
         }
@@ -123,27 +126,38 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         excelListView.setOnItemClickListener(this);
     }
 
+    private void removeFirstThree(List<TableCourseMultiline> list) {
+        // 去掉表格前三行
+        if (list.size() != 0) {
+            int three = 0;
+            int size = list.size();
+            for (int index = 0; three < 3 && index < size; ) {
+                String insertTime = list.get(index).getInsertTime();
+                if (insertTime.equals("1") || insertTime.equals("2") || insertTime.equals("3")) {
+                    list.remove(index);
+                    three++;
+                } else {
+                    index++;
+                }
+            }
+        }
+    }
+
     private void getServerData() {
         try {
             NetworkManager.getTeacherSelect(tableName, workNumber, new NetworkManager.ResponseCallback() {
                 @Override
                 public void onResponse(Response response) throws IOException {
                     String responseStr = response.body().string();
-//                    Loger.w("exceldata",responseStr);
-                    List list = JsonTools.getJsonList(responseStr, TableCourseMultiline.class);
+                    Loger.w(TAG + "GetServerData", "ResponseData:" + responseStr);
+                    List<TableCourseMultiline> list =
+                            JsonTools.getJsonList(responseStr, TableCourseMultiline.class);
                     //有返回数据代表交互成功
                     if (list != null) {
-                        Loger.d("exceldata", "list not null");
-                        TableCourseMultiline course = (TableCourseMultiline) list.get(0);
-                        if (course.getCourseName().equals("")) {
-                            Loger.d("exceldata", "过滤掉前三行无用信息");
-                            list.remove(0);
-                            list.remove(0);
-                            list.remove(0);
-                        }
-                        Loger.d("taskState", taskState + "||data:" + excelListData.size());
+                        Loger.d(TAG + "GetServerData",
+                                "TaskState:" + taskState + "\ndata:" + excelListData.size());
 
-                        //报课任务进行中或审核状态
+                        // 插入数据库
                         dbHelper.dropTable(commonTableName);
                         try {
                             dbHelper.changeTableName(tableName, commonTableName);
@@ -151,34 +165,35 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             e.printStackTrace();
                             dbHelper.createNewCourseTable();
                         }
+                        hasCommitted = dbHelper.getCommitState(workNumber);
+                        Loger.d(TAG + "GetServerData", "isFinish: " + String.valueOf(hasCommitted));
                         dbHelper.deleteAll(TableCourseMultiline.class);
                         dbHelper.insertAll(list);
-
-                        hasCommitted = dbHelper.getIsFinishCommit(workNumber);
-                        Loger.d("isfinish", String.valueOf(hasCommitted));
-                        excelListData.clear();
-                        excelListData.addAll(dbHelper.findAll(TableCourseMultiline.class));
-                        if (excelListData.size() > 0) {
-                            excelListData.add(0,EXCEL_HEADER);
-                        }
                         dbHelper.changeTableName(commonTableName, tableName);
-                        Loger.w("exceldata", list.toString());
-                    }
 
-                    if (mExcelAdapter != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mExcelAdapter.notifyDataSetChanged();
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                init();
-                            }
-                        });
+                        // 显示在界面上
+                        removeFirstThree(list);
+                        excelListData.clear();
+                        excelListData.addAll(list);
+                        if (excelListData.size() > 0) {
+                            excelListData.add(0, EXCEL_HEADER);
+                        }
+                        if (mExcelAdapter != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mExcelAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initListData();
+                                }
+                            });
+                        }
+
                     }
                 }
 
@@ -565,9 +580,15 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     .positiveActionClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ExcelDisplayActivity.super.onBackPressed();
+                            ExcelDisplayActivity.this.finish();
                         }
                     }).show();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbHelper.close();
     }
 }

@@ -16,8 +16,4 @@ public class ConstantStr {
     public static final String USER_NAME = "userName";
     public static final String USER_WORK_NUMBER = "workNumber";
     public static final String USER_INFORMATION = "userInformation";
-    public static final String ACTION_UPDATE_CB_TABLE = "updateCbTable";
-    public static final String ACTION_INSERT_TASK_TABLE = "insertTaskTable";
-    public static final String ACTION_INSERT_USER_TABLE = "insertUserTable";
-    public static final String ACTION_INSERT_TABLE = "insertTable";
 }
