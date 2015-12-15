@@ -1,6 +1,6 @@
 <?php
 /**
- * 传入tableName，插入数据到tableName
+ * 浼犲叆tableName锛屾彃鍏ユ暟鎹埌tableName
  */
 error_reporting(0);
 require_once './classes/class_insert_table.php';
