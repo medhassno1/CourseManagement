@@ -2,7 +2,7 @@
 
 class QueryTeacherSelectCourses
 {
-    public function queryTeacherSelectCourses($tableName = "", $workNumber = "", $ident = "")
+    public function queryTeacher($tableName = "", $workNumber = "", $ident = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

@@ -2,7 +2,7 @@
 
 class UpdateUserTeacherDepartment
 {
-    public function updateUserTeacherDepartment($jsonData = "", $tableName = "", $ident = "")
+    public function updateTeacherDepartment($jsonData = "", $tableName = "", $ident = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

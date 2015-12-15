@@ -2,7 +2,7 @@
 
 class UpdateInsertCbTable
 {
-    public function  updateInsertCbTable($jsonData="",$tableName = "",$iden="")
+    public function  updateInsert($jsonData="",$tableName = "",$iden="")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

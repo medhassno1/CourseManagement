@@ -1,7 +1,7 @@
 <?php
 class DeleteUser
 {
-    public function  deleteUser($tableName = "", $ident = "",$workNumber =""){
+    public function  deleteU($tableName = "", $ident = "",$workNumber =""){
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {
             die('Could not connect: ' . mysqli_error());

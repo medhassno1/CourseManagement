@@ -2,7 +2,7 @@
 
 class InsertTcUpdateBc
 {
-    public function insertTcUpdateBc($tableName = "", $jsonData = "")
+    public function insertTc($tableName = "", $jsonData = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

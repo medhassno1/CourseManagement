@@ -8,6 +8,6 @@ $jsonData = $_POST["jsonData"];
 
 $tableName = $_POST["tableName"];
 $insertTcUpdateBc = new InsertTcUpdateBc();
-$insertTcUpdateBc->insertTcUpdateBc($tableName, $jsonData);
+$insertTcUpdateBc->insertTc($tableName, $jsonData);
 
 ?>

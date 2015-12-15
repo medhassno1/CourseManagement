@@ -13,5 +13,5 @@ session_start();
 $ident = $_SESSION['id'];
 
 $deleteUser=new DeleteUser();
-$deleteUser->deleteUser($tableName,$ident,$workNumber);
+$deleteUser->deleteU($tableName,$ident,$workNumber);
 

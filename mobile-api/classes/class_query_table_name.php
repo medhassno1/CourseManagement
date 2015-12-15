@@ -2,7 +2,7 @@
 
 class QueryTableName
 {
-    public function queryTableName($name=""){
+    public function queryT($name=""){
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {
             die('Could not connect: ' . mysqli_error());

@@ -2,7 +2,7 @@
 
 class UpdateUserOffice
 {
-    public function updateUserOffice($jsonData = "", $tableName = "", $ident = "")
+    public function updateUser($jsonData = "", $tableName = "", $ident = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {

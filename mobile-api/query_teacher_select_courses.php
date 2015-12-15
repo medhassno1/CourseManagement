@@ -12,5 +12,5 @@ session_start();
 $ident = $_SESSION['id'];
 
 $queryTeacher = new QueryTeacherSelectCourses();
-$queryTeacher->queryTeacherSelectCourses($tableName, $workNumber, $ident);
+$queryTeacher->queryTeacher($tableName, $workNumber, $ident);
 ?>
