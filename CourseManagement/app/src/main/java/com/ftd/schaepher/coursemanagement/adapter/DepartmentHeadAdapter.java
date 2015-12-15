@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 
 import java.util.List;
 

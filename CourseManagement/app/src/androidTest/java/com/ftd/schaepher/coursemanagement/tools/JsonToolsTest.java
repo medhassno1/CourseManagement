@@ -55,14 +55,14 @@ public class JsonToolsTest extends TestCase {
         super.runTest();
     }
 
-    public void testGetJsonList(){
+    public void testGetJsonList() {
         List<TableUserTeacher> actualList = JsonTools.getJsonList(jsonString, TableUserTeacher.class);
         Assert.assertEquals(expectedList.toString(), actualList.toString());
     }
 
-    public void testGetJsonString(){
+    public void testGetJsonString() {
         String string = JsonTools.getJsonString(expectedList);
-        assertSame(jsonString,string);
+        assertSame(jsonString, string);
 
     }
 

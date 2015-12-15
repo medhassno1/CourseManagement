@@ -18,14 +18,13 @@ import java.util.concurrent.TimeUnit;
 public class NetworkManager {
     // 服务器基础地址，指向存放api的文件夹
     private static final String URL_BASE = "http://114.215.153.57/tcs/mobile-api/";
-//    private static final String URL_BASE = "http://schaepher.imwork.net:22817/mobile-api/";
     // 创建创建表格并且插入数据（发布新任务）
     public static final String CREATE_TABLE = URL_BASE + "create_table.php";
     // 删除任务
     public static final String DELETE_TASK = URL_BASE + "delete_task.php";
     // 删除用户
     public static final String DELETE_USER = URL_BASE + "delete_user.php";
-    // 插入任意一张表
+    // 插入任意一张表。（可用来创建用户等添加的操作）
     public static final String INSERT_TABLE = URL_BASE + "insert_table.php";
     // 提交报课
     public static final String SUBMIT_SELECTED_COURSE = URL_BASE + "insert_tc_update_bc.php";
@@ -67,8 +66,9 @@ public class NetworkManager {
                 .build();
         client.newCall(request).enqueue(callback);
     }
+
     // 异步的post
-    public static void deleteServerUser(String tableName, String workNumber,  ResponseCallback callback) {
+    public static void deleteServerUser(String tableName, String workNumber, ResponseCallback callback) {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .add("workName", workNumber)

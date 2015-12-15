@@ -15,7 +15,7 @@ public class TableTaskInfo {
     private String semester;
     private String departmentDeadline;
     private String teacherDeadline;
-//    private String remark;
+    //    private String remark;
     private String taskState;
 
     public TableTaskInfo() {

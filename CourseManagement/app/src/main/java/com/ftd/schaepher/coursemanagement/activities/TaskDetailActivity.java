@@ -17,7 +17,6 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
-import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.rey.material.app.SimpleDialog;
 
@@ -60,7 +59,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private String excelTitle;
     private String taskTerm;
     private String taskName;
-//    private String workNumber;
+    //    private String workNumber;
     private String toTableName;
 
     @Override
@@ -93,7 +92,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cardvTaskDetail.setOnClickListener(this);
 
         Loger.d("relativeTable", relativeTable);
-        task =  dbHelper.findById(relativeTable, TableTaskInfo.class);
+        task = dbHelper.findById(relativeTable, TableTaskInfo.class);
         Loger.d("TAG", task.toString());
         taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);

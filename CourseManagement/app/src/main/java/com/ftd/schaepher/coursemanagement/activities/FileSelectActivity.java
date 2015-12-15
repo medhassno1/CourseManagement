@@ -161,14 +161,14 @@ public class FileSelectActivity extends AppCompatActivity
                                             List<TableUserDepartmentHead> departmentHeadList = excelTools.readDepartmentHeadExcel();
                                             List<TableUserTeachingOffice> teachingOfficeList = excelTools.readTeachingOfficeExcel();
 
-                                            Loger.i("dataList1","开始输出数据");
-                                         //   Loger.i("dataList",teachersList.toString());
-                                            Loger.i("dataList",departmentHeadList.toString());
-                                            Loger.i("dataList",teachingOfficeList.toString());
+                                            Loger.i("dataList1", "开始输出数据");
+                                            //   Loger.i("dataList",teachersList.toString());
+                                            Loger.i("dataList", departmentHeadList.toString());
+                                            Loger.i("dataList", teachingOfficeList.toString());
                                             //导入职工表
                                             CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
                                             try {
-                                                Loger.i("dataList1","开始导入教师数据");
+                                                Loger.i("dataList1", "开始导入教师数据");
                                                 NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
                                                         JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
                                                 dbHelper.deleteAll(TableUserTeacher.class);
