@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 /**
  * Created by Administrator on 2015/12/10.
@@ -97,7 +97,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
 
     /**
      * 需要去下拉刷新的ListView
-     *
+     * <p/>
      * 增加对LinearLayout的下拉刷新
      */
     private ListView listView;
@@ -151,7 +151,8 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
      * 当前处理什么状态，可选值有STATUS_PULL_TO_REFRESH, STATUS_RELEASE_TO_REFRESH,
      * STATUS_REFRESHING 和 STATUS_REFRESH_FINISHED
      */
-    private int currentStatus = STATUS_REFRESH_FINISHED;;
+    private int currentStatus = STATUS_REFRESH_FINISHED;
+    ;
 
     /**
      * 记录上一次的状态是什么，避免进行重复操作
@@ -212,16 +213,16 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
             hideHeaderHeight = -header.getHeight();
             headerLayoutParams = (MarginLayoutParams) header.getLayoutParams();
             headerLayoutParams.topMargin = hideHeaderHeight;
-            Log.i("TAG111","onLayout中getChildAt(0)"+getChildAt(0));
-            Log.i("TAG111", "onLayout中getChildAt(1)" + getChildAt(1));
-            if(getChildAt(1).toString().contains("ListView")){
-                Log.i("TAG11","开始执行获得listView，设置setOnTouchListener");
+            Loger.i("TAG111", "onLayout中getChildAt(0)" + getChildAt(0));
+            Loger.i("TAG111", "onLayout中getChildAt(1)" + getChildAt(1));
+            if (getChildAt(1).toString().contains("ListView")) {
+                Loger.i("TAG11", "开始执行获得listView，设置setOnTouchListener");
                 isRefreshListView = true;
                 listView = (ListView) getChildAt(1);
                 listView.setOnTouchListener(this);
-            }else{
-                Log.i("TAG11", "开始执行获得linearLayout，设置setOnTouchListener");
-                isRefreshListView =false ;
+            } else {
+                Loger.i("TAG11", "开始执行获得linearLayout，设置setOnTouchListener");
+                isRefreshListView = false;
                 linearLayout = (LinearLayout) getChildAt(1);
                 linearLayout.setOnTouchListener(this);
             }
@@ -236,7 +237,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         setIsAbleToPull(event);
-        Log.i("TAG11", "ableToPull是：" + ableToPull);
+        Loger.i("TAG11", "ableToPull是：" + ableToPull);
         if (ableToPull) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -279,15 +280,15 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
                     || currentStatus == STATUS_RELEASE_TO_REFRESH) {
                 updateHeaderView();
                 // 当前正处于下拉或释放状态，要让ListView失去焦点，否则被点击的那一项会一直处于选中状态
-               if(isRefreshListView){
-                   listView.setPressed(false);
-                   listView.setFocusable(false);
-                   listView.setFocusableInTouchMode(false);
-               }else{
-                   linearLayout.setPressed(false);
-                   linearLayout.setFocusable(false);
-                   linearLayout.setFocusableInTouchMode(false);
-               }
+                if (isRefreshListView) {
+                    listView.setPressed(false);
+                    listView.setFocusable(false);
+                    listView.setFocusableInTouchMode(false);
+                } else {
+                    linearLayout.setPressed(false);
+                    linearLayout.setFocusable(false);
+                    linearLayout.setFocusableInTouchMode(false);
+                }
                 lastStatus = currentStatus;
                 // 当前正处于下拉或释放状态，通过返回true屏蔽掉ListView的滚动事件
                 return true;
@@ -299,10 +300,8 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
     /**
      * 给下拉刷新控件注册一个监听器。
      *
-     * @param listener
-     *            监听器的实现。
-     * @param id
-     *            为了防止不同界面的下拉刷新在上次更新时间上互相有冲突， 请不同界面在注册下拉刷新监听器时一定要传入不同的id。
+     * @param listener 监听器的实现。
+     * @param id       为了防止不同界面的下拉刷新在上次更新时间上互相有冲突， 请不同界面在注册下拉刷新监听器时一定要传入不同的id。
      */
     public void setOnRefreshListener(PullToRefreshListener listener, int id) {
         mListener = listener;
@@ -326,25 +325,25 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
      */
     private void setIsAbleToPull(MotionEvent event) {
         View firstChild;
-        if(isRefreshListView) {
+        if (isRefreshListView) {
             firstChild = listView.getChildAt(0);
-        }else {
+        } else {
             firstChild = linearLayout.getChildAt(0);
         }
-        
+
         if (firstChild != null) {
             int firstVisiblePos;
-            if(isRefreshListView){
+            if (isRefreshListView) {
                 firstVisiblePos = listView.getFirstVisiblePosition();
-            }else{
+            } else {
                 firstVisiblePos = listView.getFirstVisiblePosition();
             }
 
-           // if (firstVisiblePos == 0 && firstChild.getTop() == 0) {
-            if (firstVisiblePos == 0 ) {
+            // if (firstVisiblePos == 0 && firstChild.getTop() == 0) {
+            if (firstVisiblePos == 0) {
                 if (!ableToPull) {
                     yDown = event.getRawY();
-                    Log.i("TAG112","event.getRawY()是："+event.getRawY());
+                    Loger.i("TAG112", "event.getRawY()是：" + event.getRawY());
                 }
                 // 如果首个元素的上边缘，距离父布局值为0，就说明ListView滚动到了最顶部，此时应该允许下拉刷新
                 ableToPull = true;
@@ -521,8 +520,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
     /**
      * 使当前线程睡眠指定的毫秒数。
      *
-     * @param time
-     *            指定当前线程睡眠多久，以毫秒为单位
+     * @param time 指定当前线程睡眠多久，以毫秒为单位
      */
     private void sleep(int time) {
         try {

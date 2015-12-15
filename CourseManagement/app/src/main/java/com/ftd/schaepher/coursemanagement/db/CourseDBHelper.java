@@ -26,24 +26,6 @@ public class CourseDBHelper {
     public CourseDBHelper(Context context) {
         finalDb = FinalDb.create(context, "teacherclass.db");
         database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-//        initTable();
-    }
-
-    private void initTable() {
-        TableUserTeacher teacher = new TableUserTeacher();
-        finalDb.save(teacher);
-
-        TableUserDepartmentHead tableUserDepartmentHead = new TableUserDepartmentHead();
-        finalDb.save(tableUserDepartmentHead);
-
-        TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
-        finalDb.save(teachingOffice);
-
-        TableTaskInfo tableTaskInfo = new TableTaskInfo();
-        finalDb.save(tableTaskInfo);
-
-        TableManageMajor tableManageMajor = new TableManageMajor();
-        finalDb.save(tableManageMajor);
     }
 
     public void createNewCourseTable() {

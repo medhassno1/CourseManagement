@@ -82,7 +82,6 @@ public class LoginActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -192,7 +191,6 @@ public class LoginActivity extends AppCompatActivity
             }
         });
     }
-
 
 
     // 处理输入错误提示

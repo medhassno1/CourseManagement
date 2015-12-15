@@ -1,6 +1,5 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
-import com.ftd.schaepher.coursemanagement.pojo.TableCourseCombine;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
@@ -20,35 +19,37 @@ import java.util.List;
 public class JsonTools {
     private static Gson gson = new GsonBuilder().serializeNulls().create();
 
-    public static <T> T getJsonObject(String json,Class<T> tableClass){
-        return gson.fromJson(json,tableClass);
+    public static <T> T getJsonObject(String json, Class<T> tableClass) {
+        return gson.fromJson(json, tableClass);
     }
 
-    public static  <T> T getJsonList(String json,Class tableClass) {
+    public static <T> T getJsonList(String json, Class tableClass) {
         Type type;
-        switch(tableClass.getSimpleName()){
+        switch (tableClass.getSimpleName()) {
             case "TableUserTeacher":
-                type = new TypeToken<List<TableUserTeacher>>(){}.getType();
+                type = new TypeToken<List<TableUserTeacher>>() {
+                }.getType();
                 break;
             case "TableUserDepartmentHead":
-                type = new TypeToken<List<TableUserDepartmentHead>>(){}.getType();
+                type = new TypeToken<List<TableUserDepartmentHead>>() {
+                }.getType();
                 break;
             case "TableUserTeachingOffice":
-                type = new TypeToken<List<TableUserTeachingOffice>>(){}.getType();
+                type = new TypeToken<List<TableUserTeachingOffice>>() {
+                }.getType();
                 break;
             case "TableTaskInfo":
-                type = new TypeToken<List<TableTaskInfo>>(){}.getType();
-                break;
-            case "TableCourseCombine":
-                type = new TypeToken<List<TableCourseCombine>>(){}.getType();
+                type = new TypeToken<List<TableTaskInfo>>() {
+                }.getType();
                 break;
             case "TableCourseMultiline":
-                type = new TypeToken<List<TableCourseMultiline>>(){}.getType();
+                type = new TypeToken<List<TableCourseMultiline>>() {
+                }.getType();
                 break;
             default:
                 return null;
         }
-        return gson.fromJson(json,type);
+        return gson.fromJson(json, type);
     }
 
     public static String getJsonString(List<?> list) {
@@ -61,12 +62,4 @@ public class JsonTools {
         return gson.toJson(list);
     }
 
-
-//    public static <E> List<E> getJsonListTest(String json,Class<E> eClass){
-//        Type type = new TypeToken<List<E>>(){}.getType();
-//        List<E> list = gson.fromJson(json,type);
-//        Loger.w("size",String.valueOf(list.size()));
-//        Loger.w("JsonTools_list",list.toString());
-//        return list;
-//    }
 }

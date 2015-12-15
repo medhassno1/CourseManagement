@@ -13,7 +13,7 @@ public class TableUserTeachingOffice {
     private String workNumber;
     private String password;
     private String name;
-//    private String sex;
+    //    private String sex;
 //    private String birthday;
     private String telephone;
     private String email;

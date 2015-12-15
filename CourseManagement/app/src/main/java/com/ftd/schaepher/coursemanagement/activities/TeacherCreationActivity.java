@@ -80,7 +80,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
 
     }
 
-    private void initView(){
+    private void initView() {
         edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_creation_workNumber);
         edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_creation_password);
         edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_creation_name);
@@ -89,9 +89,9 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_creation_major);
         edtTxEmail = (EditText) findViewById(R.id.edtTx_teacher_creation_email);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_create_identity);
-        rdoBtnTeacher = (RadioButton)findViewById(R.id.rdoBtn_create_teacher);
-        rdoBtnDepartment = (RadioButton)findViewById(R.id.rdoBtn_create_department_head);
-        rdoBtnOffice = (RadioButton)findViewById(R.id.rdoBtn_create_teaching_office);
+        rdoBtnTeacher = (RadioButton) findViewById(R.id.rdoBtn_create_teacher);
+        rdoBtnDepartment = (RadioButton) findViewById(R.id.rdoBtn_create_department_head);
+        rdoBtnOffice = (RadioButton) findViewById(R.id.rdoBtn_create_teaching_office);
 
         edtTxTeacherNumber.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED); // 工号输入框的格式
         edtTxDepartment.setInputType(InputType.TYPE_NULL);
@@ -118,7 +118,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                 finish();
                 return true;
             case R.id.action_confim_add_teacher:
-               if(isAllWrite()){
+                if (isAllWrite()) {
                     new AlertDialog.Builder(this).setTitle("提示").setMessage("是否确认添加").
                             setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
@@ -245,7 +245,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         departmentHead.setDepartment(edtTxDepartment.getText().toString().trim());
         departmentHead.setTelephone(edtTxPhoneNumber.getText().toString().trim());
         departmentHead.setEmail(edtTxEmail.getText().toString().trim());
-        return  departmentHead;
+        return departmentHead;
     }
 
     /**
@@ -255,7 +255,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         TableManageMajor manageMajor = new TableManageMajor();
         manageMajor.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
         manageMajor.setMajor(edtTxMajor.getText().toString().trim());
-        return  manageMajor;
+        return manageMajor;
     }
 
     /**
@@ -271,26 +271,26 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         return teachingOffice;
     }
 
-    private boolean isAllWrite(){
-        if(edtTxTeacherNumber.getText().toString().trim().equals("")){
+    private boolean isAllWrite() {
+        if (edtTxTeacherNumber.getText().toString().trim().equals("")) {
             edtTxTeacherNumber.setError("工号不能为空");
-        }else if(edtTxPassword.getText().toString().trim().equals("")){
+        } else if (edtTxPassword.getText().toString().trim().equals("")) {
             edtTxPassword.setError("密码不能为空");
-        }else if(edtTxTeacherName.getText().toString().trim().equals("")){
+        } else if (edtTxTeacherName.getText().toString().trim().equals("")) {
             edtTxTeacherName.setError("姓名不能为空");
-        }else {
+        } else {
             return true;
         }
-        return  false;
+        return false;
     }
 
     //提交数据到服务器
-    private void submitToServer(){
-        new Thread(){
+    private void submitToServer() {
+        new Thread() {
             @Override
-            public void run(){
+            public void run() {
                 CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
-                if(selectedIdentity.equals(ConstantStr.ID_TEACHER)){
+                if (selectedIdentity.equals(ConstantStr.ID_TEACHER)) {
                     TableUserTeacher teacher = getUITeacherData();
                     try {
                         Loger.i("createteacher", "开始发送服务器");
@@ -305,7 +305,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     }
                     finish();
                     //系负责人
-                }else if(selectedIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+                } else if (selectedIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
                     TableUserDepartmentHead departmentHead = getUIDepartmentHeadData();
                     TableManageMajor ManageMajor = getUIManageMajorData();
                     try {
@@ -323,9 +323,9 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     }
                     finish();
                     //教学办
-                }else{
+                } else {
                     TableUserTeachingOffice teachingOffice = getUITeachingOfficeData();
-                    Loger.w("TeacherCreationActivity",teachingOffice.toString());
+                    Loger.w("TeacherCreationActivity", teachingOffice.toString());
                     try {
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                 JsonTools.getJsonString(teachingOffice), NetworkManager.INSERT_TABLE);

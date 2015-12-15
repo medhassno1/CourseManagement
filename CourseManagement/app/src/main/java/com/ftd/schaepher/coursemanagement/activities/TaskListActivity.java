@@ -218,7 +218,7 @@ public class TaskListActivity extends AppCompatActivity
         mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
         mListView.setAdapter(mTaskAdapter);
         mListView.setOnItemClickListener(this);
-        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)){
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             mListView.setOnItemLongClickListener(this);
         }
         Loger.i("TAG", "显示数据");
@@ -352,7 +352,7 @@ public class TaskListActivity extends AppCompatActivity
                 mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 mProgress.setCancelable(false);
                 mProgress.show();
-                new Thread(){
+                new Thread() {
                     @Override
                     public void run() {
                         try {
@@ -366,14 +366,14 @@ public class TaskListActivity extends AppCompatActivity
                                 public void run() {
                                     refreshSpinner();
                                     setSpinnerData();
-                                    if (mProgress.isShowing()){
+                                    if (mProgress.isShowing()) {
                                         mProgress.cancel();
                                     }
                                 }
                             });
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Loger.d("delete","程序崩溃");
+                            Loger.d("delete", "程序崩溃");
                             clossProcess();
                         }
                     }
@@ -388,7 +388,7 @@ public class TaskListActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgress.isShowing()){
+                if (mProgress.isShowing()) {
                     mProgress.cancel();
                 }
             }

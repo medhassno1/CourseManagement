@@ -1,6 +1,6 @@
 <?php
 /*
- * 更新系负责人所负责系表
+ * 鏇存柊绯昏礋璐ｄ汉鎵�璐熻矗绯昏〃
  */
 error_reporting(0);
 require_once './classes/class_update_manager_major.php';
