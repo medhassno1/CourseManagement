@@ -54,6 +54,14 @@
                         android:layout_height="wrap_content"
                         android:background="#fff"
                         android:padding="8dp" />
+                    <TextView
+                        android:id="@+id/tv_empty_office"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="正在获取数据..."
+                        android:textSize="16sp"
+                        android:textColor="#03a9f4"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -73,6 +81,14 @@
                         android:layout_height="wrap_content"
                         android:background="#fff"
                         android:padding="8dp" />
+                    <TextView
+                        android:id="@+id/tv_empty_department"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="正在获取数据..."
+                        android:textSize="16sp"
+                        android:textColor="#03a9f4"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -92,6 +108,14 @@
                             android:layout_height="wrap_content"
                             android:background="#fff"
                             android:padding="8dp" />
+                    <TextView
+                        android:id="@+id/tv_empty_teacher"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="正在获取数据..."
+                        android:textSize="16sp"
+                        android:textColor="#03a9f4"/>
 
                 </LinearLayout>
         </LinearLayout>

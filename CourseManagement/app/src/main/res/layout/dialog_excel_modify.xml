@@ -187,6 +187,18 @@
                 android:layout_margin="5dp">
 
                 <EditText
+                    android:id="@+id/edtTx_dialog_teacher"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="任课教师" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp">
+
+                <EditText
                     android:id="@+id/edtTx_dialog_from_to_end"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

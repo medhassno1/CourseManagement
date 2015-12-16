@@ -11,5 +11,10 @@
         android:title="提交报课"
         app:showAsAction="always"
         android:visible="false"/>
+    <item
+        android:id="@+id/action_finish_task"
+        android:title="公开报课"
+        app:showAsAction="always"
+        android:visible="false"/>
 
 </menu>

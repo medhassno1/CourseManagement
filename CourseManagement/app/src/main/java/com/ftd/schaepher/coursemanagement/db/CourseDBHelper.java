@@ -26,24 +26,6 @@ public class CourseDBHelper {
     public CourseDBHelper(Context context) {
         finalDb = FinalDb.create(context, "teacherclass.db");
         database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
-//        initTable();
-    }
-
-    private void initTable() {
-        TableUserTeacher teacher = new TableUserTeacher();
-        finalDb.save(teacher);
-
-        TableUserDepartmentHead tableUserDepartmentHead = new TableUserDepartmentHead();
-        finalDb.save(tableUserDepartmentHead);
-
-        TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
-        finalDb.save(teachingOffice);
-
-        TableTaskInfo tableTaskInfo = new TableTaskInfo();
-        finalDb.save(tableTaskInfo);
-
-        TableManageMajor tableManageMajor = new TableManageMajor();
-        finalDb.save(tableManageMajor);
     }
 
     public void createNewCourseTable() {
@@ -63,11 +45,6 @@ public class CourseDBHelper {
                 + "teacherName text,"
                 + "remark text)";
         database.execSQL(createTableCourseMultiline);
-    }
-
-    public void createCourseTable() {
-        TableCourseMultiline courseMultiline = new TableCourseMultiline();
-        finalDb.save(courseMultiline);
     }
 
     // 增
@@ -140,11 +117,7 @@ public class CourseDBHelper {
         database.execSQL("Drop table if exists " + tableName);
     }
 
-    public void createTableName() {
-
-    }
-
-    public boolean getIsFinishCommit(String workNumber) {
+    public boolean getCommitState(String workNumber) {
         List<TableCourseMultiline> list =
                 finalDb.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
 //            Loger.d("isfinish", String.valueOf(list.size()));

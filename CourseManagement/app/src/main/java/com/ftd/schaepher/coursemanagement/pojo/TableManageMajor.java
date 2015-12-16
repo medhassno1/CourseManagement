@@ -14,7 +14,7 @@ public class TableManageMajor {
     private String workNumber;
     private String major;
 
-    public TableManageMajor(){
+    public TableManageMajor() {
 
     }
 

@@ -115,7 +115,7 @@ public class WheelView extends ScrollView {
                     if (remainder == 0) {
                         selectedIndex = divided + offset;
 
-                        onSeletedCallBack();
+                        onSelectedCallBack();
                     } else {
                         if (remainder > itemHeight / 2) {
                             WheelView.this.post(new Runnable() {
@@ -123,7 +123,7 @@ public class WheelView extends ScrollView {
                                 public void run() {
                                     WheelView.this.smoothScrollTo(0, initialY - remainder + itemHeight);
                                     selectedIndex = divided + offset + 1;
-                                    onSeletedCallBack();
+                                    onSelectedCallBack();
                                 }
                             });
                         } else {
@@ -132,7 +132,7 @@ public class WheelView extends ScrollView {
                                 public void run() {
                                     WheelView.this.smoothScrollTo(0, initialY - remainder);
                                     selectedIndex = divided + offset;
-                                    onSeletedCallBack();
+                                    onSelectedCallBack();
                                 }
                             });
                         }
@@ -315,14 +315,14 @@ public class WheelView extends ScrollView {
      * 选中回调
      */
 
-    private void onSeletedCallBack() {
+    private void onSelectedCallBack() {
         if (null != onWheelViewListener) {
             onWheelViewListener.onSelected(selectedIndex, items.get(selectedIndex));
         }
 
     }
 
-    public void setSeletion(int position) {
+    public void setSelection(int position) {
         final int p = position;
         selectedIndex = p + offset;
         this.post(new Runnable() {
@@ -334,7 +334,7 @@ public class WheelView extends ScrollView {
 
     }
 
-    public String getSeletedItem() {
+    public String getSelectedItem() {
         return items.get(selectedIndex);
     }
 

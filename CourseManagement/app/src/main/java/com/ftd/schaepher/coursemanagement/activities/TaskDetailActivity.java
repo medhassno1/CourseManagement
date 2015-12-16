@@ -17,7 +17,6 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
-import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.rey.material.app.SimpleDialog;
 
@@ -47,7 +46,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private CardView cardvTaskDetail;
     private TextView tvDepartmentDeadline;
     private TextView tvTeacherDeadline;
-    private TextView tvTaskRemark;
     private TextView tvTaskState;
     private TextView tvTaskName;
     private TextView tvTaskTerm;
@@ -61,7 +59,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private String excelTitle;
     private String taskTerm;
     private String taskName;
-    private String workNumber;
+    //    private String workNumber;
     private String toTableName;
 
     @Override
@@ -75,7 +73,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         mActionBar.setDisplayHomeAsUpEnabled(true);
         toTableName = TableCourseMultiline.class.getSimpleName();
 
-        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
+//        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
         relativeTable = getIntent().getStringExtra("relativeTable");
         Loger.i("TAG", "relativeTable" + relativeTable);
         dbHelper = new CourseDBHelper(this);
@@ -94,7 +92,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cardvTaskDetail.setOnClickListener(this);
 
         Loger.d("relativeTable", relativeTable);
-        task =  dbHelper.findById(relativeTable, TableTaskInfo.class);
+        task = dbHelper.findById(relativeTable, TableTaskInfo.class);
         Loger.d("TAG", task.toString());
         taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);
@@ -185,7 +183,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         File file = new File(filePath + ".xls");
         InputStream ins = getResources().openRawResource(R.raw.blank_table);
         OutputStream os = new FileOutputStream(file);
-        int bytesRead = 0;
+        int bytesRead;
         byte[] buffer = new byte[8192];
         while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
             os.write(buffer, 0, bytesRead);
@@ -266,8 +264,9 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         dbHelper.close();
     }
+
 }

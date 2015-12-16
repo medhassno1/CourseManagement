@@ -43,5 +43,13 @@
             android:padding="8dp"
             android:background="#fff">
         </ListView>
+        <TextView
+            android:id="@+id/tv_empty_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="正在获取数据..."
+            android:textSize="20sp"
+            android:textColor="#b0bec5"/>
     </com.ftd.schaepher.coursemanagement.widget.RefreshableView>
 </LinearLayout>

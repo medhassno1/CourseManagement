@@ -61,7 +61,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         edtTxPhoneNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_phone_number);
         edtTxDepartment = (EditText) findViewById(R.id.edtTx_teacher_detail_department);
         edtTxMajor = (EditText) findViewById(R.id.edtTx_teacher_detail_major);
-        edtTxEmail = (EditText)findViewById(R.id.edtTx_teacher_detail_email);
+        edtTxEmail = (EditText) findViewById(R.id.edtTx_teacher_detail_email);
 
         initTeacherData();
         initUserPermission();
@@ -187,7 +187,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     /**
      * 从界面获取系负责人专业表数据
      */
-    private TableManageMajor getManageMajorData(){
+    private TableManageMajor getManageMajorData() {
         TableManageMajor manageMajor = new TableManageMajor();
         manageMajor.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
         manageMajor.setMajor(edtTxMajor.getText().toString().trim());
@@ -251,14 +251,14 @@ public class TeacherDetailActivity extends AppCompatActivity {
     /**
      * 提交数据到服务器
      */
-    private void submitToServer(){
+    private void submitToServer() {
         new Thread() {
             @Override
             public void run() {
                 Object user = getUserData();
-                if(queryIdentity.equals(ConstantStr.ID_TEACHER)){
+                if (queryIdentity.equals(ConstantStr.ID_TEACHER)) {
                     try {
-                        Loger.i("updateteacher","开始发送服务器");
+                        Loger.i("updateteacher", "开始发送服务器");
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
                                 JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_TEACHER);
                         Loger.i("updateteacher", "发送服务器结束，开始插入本地数据库");
@@ -266,7 +266,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }else if(queryIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+                } else if (queryIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
                     TableManageMajor manageMajor = getManageMajorData();
                     try {
                         //系负责人表
@@ -281,7 +281,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     //教学办
-                }else{
+                } else {
                     try {
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                 JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_OFFICE);

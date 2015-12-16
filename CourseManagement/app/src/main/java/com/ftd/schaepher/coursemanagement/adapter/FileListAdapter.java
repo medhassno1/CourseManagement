@@ -5,7 +5,6 @@ package com.ftd.schaepher.coursemanagement.adapter;
  */
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -36,11 +36,11 @@ public class FileListAdapter extends BaseAdapter {
         this.files = files;
         this.isRoot = isRoot;
         mInflater = LayoutInflater.from(context);
-        Log.d("file", "fileName:" + files.get(0).getName());
-        Log.d("file", "filePath:" + files.get(0).getAbsolutePath());
-        Log.d("file", "fileParent:" + files.get(0).getParent());
-        Log.d("file", "isRoot:" + isRoot);
-        Log.d("file", "----------------------");
+        Loger.d("file", "fileName:" + files.get(0).getName());
+        Loger.d("file", "filePath:" + files.get(0).getAbsolutePath());
+        Loger.d("file", "fileParent:" + files.get(0).getParent());
+        Loger.d("file", "isRoot:" + isRoot);
+        Loger.d("file", "----------------------");
     }
 
     @Override

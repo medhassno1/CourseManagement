@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -21,16 +20,16 @@ public class NetChangeReceiver extends BroadcastReceiver {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo == null && NetState.isFirstLoseNetConnect()) {
-            Toast.makeText(context, "网络不可用", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "当前网络不可用", Toast.LENGTH_SHORT).show();
             NetState.setIsFirstLoseNetConnect(false);
             NetState.setIsFirstNetConnect(true);
-            Log.i("netstatus", "网络不可用");
+            Loger.i("netstatus", "网络不可用");
         }
-        if (networkInfo != null&&networkInfo.isConnected() && NetState.isFirstNetConnect()) {
-            Toast.makeText(context, "网络恢复", Toast.LENGTH_SHORT).show();
+        if (networkInfo != null && networkInfo.isConnected() && NetState.isFirstNetConnect()) {
+            Toast.makeText(context, "网络正常", Toast.LENGTH_SHORT).show();
             NetState.setIsFirstNetConnect(false);
             NetState.setIsFirstLoseNetConnect(true);
-            Log.i("netstatus", "网络恢复");
+            Loger.i("netstatus", "网络恢复");
         }
 
 

@@ -323,10 +323,10 @@ public class TaskCreationActivity extends AppCompatActivity
         final WheelView wvSelectTermDay = (WheelView) wheelView.findViewById(R.id.wheel_view_term_day);
         wvSelectTermYear.setOffset(1);
         wvSelectTermYear.setItems(termYear);
-        wvSelectTermYear.setSeletion(5);
+        wvSelectTermYear.setSelection(5);
         wvSelectTermDay.setOffset(1);
         wvSelectTermDay.setItems(Arrays.asList(SEMESTER));
-        wvSelectTermDay.setSeletion(0);
+        wvSelectTermDay.setSelection(0);
 
         new AlertDialog.Builder(this)
                 .setTitle("选择学期")
@@ -334,8 +334,8 @@ public class TaskCreationActivity extends AppCompatActivity
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        year = wvSelectTermYear.getSeletedItem();
-                        semester = wvSelectTermDay.getSeletedItem();
+                        year = wvSelectTermYear.getSelectedItem();
+                        semester = wvSelectTermDay.getSelectedItem();
                         edtTxTaskTeam.setText(year + semester);
                     }
                 })
