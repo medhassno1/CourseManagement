@@ -2,7 +2,7 @@
 
 class UpdateInsertCbTable
 {
-    public function  updateInsert($jsonData="",$tableName = "",$iden="")
+    public function  updateInsert($jsonData="",$tableName = "",$ident="")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {
@@ -15,7 +15,7 @@ class UpdateInsertCbTable
                 mysqli_query($con, $sql);
             }
             $tcTableName = substr($tableName, 3);
-            if ($iden == 'user_department_head') {
+            if ($ident == 'user_department_head') {
                 $statement = "UPDATE task_info SET taskState='1'WHERE relativeTable='$tcTableName'";
 
             } else {
