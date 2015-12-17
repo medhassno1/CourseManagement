@@ -1,6 +1,6 @@
 <?php
 /**
- * ä¼ å…¥jsonDataå’ŒtableNameï¼Œç”±ç³»è´Ÿè´£äººå’Œæ•™å­¦åŠžæ›´æ–°å•è¡Œè¡¨
+ * ´«ÈëjsonDataºÍtableName£¬ÓÉÏµ¸ºÔðÈËºÍ½ÌÑ§°ì¸üÐÂµ¥ÐÐ±í
  */
  error_reporting(0);
 require_once './classes/class';

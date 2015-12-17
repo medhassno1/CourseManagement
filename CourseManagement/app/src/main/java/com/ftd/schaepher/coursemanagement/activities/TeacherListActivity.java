@@ -582,7 +582,6 @@ public class TeacherListActivity extends AppCompatActivity
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        if (refreshableView.getCurrentStatus() == RefreshableView.STATUS_REFRESH_FINISHED) {
             View v = this.getLayoutInflater().inflate(R.layout.popup_dialog_delete, null);
             popupWindow = new PopupWindow(v, ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -612,7 +611,6 @@ public class TeacherListActivity extends AppCompatActivity
             tvDelete = (TextView) v.findViewById(R.id.tv_popup_delete);
             tvDelete.setOnClickListener(this);
             tvDelete.setTag(bundle);
-        }
         return true;
     }
 

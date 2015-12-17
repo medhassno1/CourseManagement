@@ -1,6 +1,6 @@
 <?php
 /**
- * 鎻掑叆澶氳琛ㄧ殑鍚屾椂锛屾洿鏂板崟琛岃〃
+ * 插入多行表的同时，更新单行表
  */
 error_reporting(0);
 require_once './classes/class_insert_tc_update_bc.php';

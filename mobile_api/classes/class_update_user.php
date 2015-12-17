@@ -1,8 +1,8 @@
 <?php
 
-class UpdateUserTeacherDepartment
+class UpdateUser
 {
-    public function updateTeacherDepartment($jsonData = "", $manageMajor = "", $tableName = "", $ident = "")
+    public function updateUserData($jsonData = "", $manageMajor = "", $tableName = "", $ident = "")
     {
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {
@@ -50,7 +50,7 @@ class UpdateUserTeacherDepartment
                         mysqli_query($con, $sql);
                     }
                 } else {
-                    echo "娌℃湁鏉冮檺";
+                    echo "没有权限";
                 }
             }
         }

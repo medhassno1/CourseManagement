@@ -1,5 +1,5 @@
-﻿<?php
-// 关闭错误报告
+<?php
+// �رմ��󱨸�
 error_reporting(0);
 
 require_once './classes/class_login.php';

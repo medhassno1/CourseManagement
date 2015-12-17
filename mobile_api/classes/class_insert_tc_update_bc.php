@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 
 class InsertTcUpdateBc
 {
@@ -10,7 +10,7 @@ class InsertTcUpdateBc
         } else {
             mysqli_query($con, "SET NAMES utf8");
             $jsonArry = json_decode($jsonData, true);
-            // èŽ·å–æ•°æ®åº“è¡¨çš„å­—æ®µå
+            // »ñÈ¡Êý¾Ý¿â±íµÄ×Ö¶ÎÃû
             $keys = array_keys($jsonArry[0]);
             $tableList = '(' . implode($keys, ',') . ')';
             foreach ($jsonArry as $row) {
@@ -27,7 +27,7 @@ class InsertTcUpdateBc
                 $cbTableName = 'cb_' . $tableName;
                 $search = mysqli_query($con, "select * from $cbTableName WHERE courseName = '$row[courseName]' ");
                 $result = mysqli_fetch_array($search);
-                //æ›´æ–°è€å¸ˆ
+                //¸üÐÂÀÏÊ¦
                 $updateTeacher = $result['teacherName'] . $row['teacherName'] . ';';
                 $updateTimePeriod = $result['timePeriod'] . $row['timePeriod'] . ';';
                 $updateRemark = $result['remark'] . $row['remark'] . ';';
