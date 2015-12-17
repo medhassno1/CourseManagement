@@ -27,6 +27,9 @@ import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.rey.material.app.SimpleDialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by sxq on 2015/11/2.
  * 教师添加界面
@@ -251,11 +254,21 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     /**
      * 获得界面数据-系负责人及其负责专业
      */
-    private TableManageMajor getUIManageMajorData() {
-        TableManageMajor manageMajor = new TableManageMajor();
-        manageMajor.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        manageMajor.setMajor(edtTxMajor.getText().toString().trim());
-        return manageMajor;
+    private List<TableManageMajor> getUIManageMajorData() {
+        List manageMajorList = new ArrayList();
+        String majorText = edtTxMajor.getText().toString().trim();
+        String workNumber = edtTxTeacherNumber.getText().toString().trim();
+        String[] majors = majorText.split("\n");
+        for(int i=0;i<majors.length;i++){
+            if(majors[i]!=null&&majors[i].length()!=0){
+                TableManageMajor manageMajor = new TableManageMajor();
+                manageMajor.setWorkNumber(workNumber);
+                manageMajor.setMajor(majors[i]);
+
+                manageMajorList.add(manageMajor);
+            }
+        }
+        return manageMajorList;
     }
 
     /**
@@ -307,7 +320,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     //系负责人
                 } else if (selectedIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
                     TableUserDepartmentHead departmentHead = getUIDepartmentHeadData();
-                    TableManageMajor ManageMajor = getUIManageMajorData();
+                    List<TableManageMajor> manageMajorList = getUIManageMajorData();
                     try {
                         //系负责人表
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
@@ -315,8 +328,8 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                         dbHelper.insert(departmentHead);
                         //系负责人专业表
                         NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
-                                JsonTools.getJsonString(ManageMajor), NetworkManager.INSERT_TABLE);
-                        dbHelper.insert(ManageMajor);
+                                JsonTools.getJsonString(manageMajorList), NetworkManager.INSERT_TABLE);
+                        dbHelper.insertAll(manageMajorList);
                     } catch (Exception e) {
                         Toast.makeText(TeacherCreationActivity.this,
                                 "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();

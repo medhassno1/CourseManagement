@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.ftd.schaepher.coursemanagement.adapter.DepartmentHeadAdapter;
 import com.ftd.schaepher.coursemanagement.adapter.TeacherAdapter;
 import com.ftd.schaepher.coursemanagement.adapter.TeacherOfficeAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
@@ -114,6 +116,8 @@ public class TeacherListActivity extends AppCompatActivity
         initUserInformation();
         refreshTeacherListData();
         initTeacherListView();
+
+        Log.i("jsonList1", "开始执行oncreat()");
     }
 
     @Override
@@ -180,6 +184,7 @@ public class TeacherListActivity extends AppCompatActivity
     }
 
     private void getServerTeacherData() {
+        Log.i("jsonList1","开始执行getServerTeacherData()");
         try {
             NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHER,
                     new NetworkManager.ResponseCallback() {
@@ -188,7 +193,7 @@ public class TeacherListActivity extends AppCompatActivity
                             //从服务器获取教师数据，并更新到本地数据库
                             try {
                                 List list = JsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
-                                Loger.w("jsonList", list.toString());
+                                Log.w("jsonList1", list.toString());
                                 dbHelper.deleteAll(TableUserTeacher.class);
                                 dbHelper.insertAll(list);
 
@@ -220,7 +225,7 @@ public class TeacherListActivity extends AppCompatActivity
                             //从服务器获取系负责人数据，并更新到本地数据库
                             try {
                                 List list = JsonTools.getJsonList(response.body().string(), TableUserDepartmentHead.class);
-                                Loger.w("jsonList", list.toString());
+                                Log.w("jsonList1", list.toString());
                                 dbHelper.deleteAll(TableUserDepartmentHead.class);
                                 dbHelper.insertAll(list);
 
@@ -244,14 +249,35 @@ public class TeacherListActivity extends AppCompatActivity
                         }
                     });
 
+            NetworkManager.getJsonString(ConstantStr.TABLE_MANAGE_MAJOR,
+                    new NetworkManager.ResponseCallback() {
+                        @Override
+                        public void onResponse(Response response) throws IOException {
+                            //从服务器获取系负责人专业数据，并更新到本地数据库
+                            try {
+                                List list = JsonTools.getJsonList(response.body().string(), TableManageMajor.class);
+                                Log.i("jsonList1", list.toString());
+                                dbHelper.deleteAll(TableManageMajor.class);
+                                dbHelper.insertAll(list);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Request request, IOException e) {
+
+                        }
+                    });
+
             NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                     new NetworkManager.ResponseCallback() {
                         @Override
                         public void onResponse(Response response) throws IOException {
-                            //从服务器获取教师数据，并更新到本地数据库
+                            //从服务器获取教学办数据，并更新到本地数据库
                             try {
                                 List list = JsonTools.getJsonList(response.body().string(), TableUserTeachingOffice.class);
-                                Loger.w("jsonList", list.toString());
+                                Loger.w("jsonList1", list.toString());
                                 dbHelper.deleteAll(TableUserTeachingOffice.class);
                                 dbHelper.insertAll(list);
 
