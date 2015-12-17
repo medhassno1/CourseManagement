@@ -263,10 +263,4 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         startActivity(intent);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        dbHelper.close();
-    }
-
 }

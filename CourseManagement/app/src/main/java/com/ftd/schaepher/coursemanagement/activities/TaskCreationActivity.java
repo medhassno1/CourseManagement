@@ -213,7 +213,7 @@ public class TaskCreationActivity extends AppCompatActivity
         dbHelper.dropTable(tableCourseName);
         dbHelper.createNewCourseTable();
 
-        ExcelTools excelTools = new ExcelTools();
+        ExcelTools excelTools = new ExcelTools(TaskCreationActivity.this);
         excelTools.setPath(filePath);
         List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
 

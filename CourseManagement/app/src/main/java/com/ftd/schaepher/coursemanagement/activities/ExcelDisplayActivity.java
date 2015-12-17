@@ -585,10 +585,4 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     }).show();
         }
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dbHelper.close();
-    }
 }

@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -122,18 +123,23 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                 return true;
             case R.id.action_confim_add_teacher:
                 if (isAllWrite()) {
-                    new AlertDialog.Builder(this).setTitle("提示").setMessage("是否确认添加").
-                            setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    new AlertDialog
+                            .Builder(this)
+                            .setTitle("提示")
+                            .setMessage("是否确认添加")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     submitToServer();
                                 }
-                            }).setNegativeButton
-                            (android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            }).show();
+                            })
+                            .setNegativeButton
+                                    (android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                            .show();
                 }
             default:
                 return super.onOptionsItemSelected(item);
@@ -180,7 +186,6 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     public void onClick(View v) {
                         CharSequence[] values = simpleDialog.getSelectedValues();
                         if (values != null) {
-//                            这里要调整，尝试通过序号来判断选了哪些。否则无法插入数据库
                             StringBuffer stringBuffer = new StringBuffer();
                             for (int i = 0; i < values.length; i++) {
                                 stringBuffer.append(values[i]).append(i == values.length - 1 ? "" : "\n");
@@ -255,12 +260,12 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
      * 获得界面数据-系负责人及其负责专业
      */
     private List<TableManageMajor> getUIManageMajorData() {
-        List manageMajorList = new ArrayList();
+        List<TableManageMajor> manageMajorList = new ArrayList<>();
         String majorText = edtTxMajor.getText().toString().trim();
         String workNumber = edtTxTeacherNumber.getText().toString().trim();
         String[] majors = majorText.split("\n");
-        for(int i=0;i<majors.length;i++){
-            if(majors[i]!=null&&majors[i].length()!=0){
+        for (int i = 0; i < majors.length; i++) {
+            if (majors[i] != null && majors[i].length() != 0) {
                 TableManageMajor manageMajor = new TableManageMajor();
                 manageMajor.setWorkNumber(workNumber);
                 manageMajor.setMajor(majors[i]);
@@ -306,12 +311,12 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                 if (selectedIdentity.equals(ConstantStr.ID_TEACHER)) {
                     TableUserTeacher teacher = getUITeacherData();
                     try {
-                        Loger.i("createteacher", "开始发送服务器");
+                        Loger.i("createTeacher", "开始发送服务器");
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
                                 JsonTools.getJsonString(teacher), NetworkManager.INSERT_TABLE);
-                        Loger.i("createteacher", "发送服务器结束，开始插入本地数据库");
+                        Loger.i("createTeacher", "发送服务器结束，开始插入本地数据库");
                         dbHelper.insert(teacher);
-                        Loger.i("createteacher", "插入本地数据库结束");
+                        Loger.i("createTeacher", "插入本地数据库结束");
                     } catch (Exception e) {
                         Toast.makeText(TeacherCreationActivity.this,
                                 "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
