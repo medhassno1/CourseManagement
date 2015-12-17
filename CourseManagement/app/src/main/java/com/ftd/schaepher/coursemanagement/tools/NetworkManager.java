@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkManager {
     // 服务器基础地址，指向存放api的文件夹
-    private static final String URL_BASE = "http://114.215.153.57/tcs/mobile-api/";
+    private static final String URL_BASE = "http://114.215.153.57/tcs/mobile_api/";
     // 创建创建表格并且插入数据（发布新任务）
     public static final String CREATE_TABLE = URL_BASE + "create_table.php";
     // 删除任务
@@ -36,10 +36,8 @@ public class NetworkManager {
     public static final String GET_TABLE_SELECT = URL_BASE + "query_teacher_select_courses.php";
     // 插入或者更新（如果已存在）合一表
     public static final String INSERT_OR_UPDATE_CB_TABLE = URL_BASE + "update_insert_cb_table.php";
-    // 更新系负责人所负责的专业
-    public static final String UPDATE_MANAGER_MAJOR = URL_BASE + "update_manager_major.php";
     // 更新用户信息
-    public static final String UPDATE_USER = URL_BASE + "update_user.php";
+    public static final String UPDATE_USER_DATA = URL_BASE + "update_user.php";
 
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -82,7 +80,7 @@ public class NetworkManager {
                 .add("tableName", tableName)
                 .add("jsonData", jsonData)
                 .build();
-//        Loger.w("JsonData",jsonData);
+        Loger.w("JsonData", jsonData);
         Request request = new Request.Builder()
                 .url(actionURL)
                 .post(formBody)
@@ -95,13 +93,16 @@ public class NetworkManager {
         }
     }
 
-    // 同步的post，用来更新用户信息
-    public static String postToServerSync(String tableName, String jsonData,
-                                          String manageMajor, String actionURL) throws IOException {
+    // 同步的post
+    public static String updateUserData(String tableName, String jsonData,
+                                        String manageMajor, String actionURL) throws IOException {
+        if (manageMajor == null) {
+            manageMajor = " ";
+        }
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .add("jsonData", jsonData)
-                .add("manageMajor",manageMajor)
+                .add("manageMajor", manageMajor)
                 .build();
         Request request = new Request.Builder()
                 .url(actionURL)
@@ -114,7 +115,6 @@ public class NetworkManager {
             throw new IOException("Unexpected code " + response);
         }
     }
-
 
     // 获取任意表的数据
     public static void getJsonString(String tableName,

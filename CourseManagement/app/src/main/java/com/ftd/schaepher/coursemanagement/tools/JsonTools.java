@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
@@ -44,6 +45,10 @@ public class JsonTools {
                 break;
             case "TableCourseMultiline":
                 type = new TypeToken<List<TableCourseMultiline>>() {
+                }.getType();
+                break;
+            case "TableManageMajor":
+                type = new TypeToken<List<TableManageMajor>>() {
                 }.getType();
                 break;
             default:
