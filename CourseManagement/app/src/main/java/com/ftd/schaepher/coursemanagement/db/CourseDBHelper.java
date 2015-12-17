@@ -6,11 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
-import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
-import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 import net.tsz.afinal.FinalDb;
@@ -78,6 +73,12 @@ public class CourseDBHelper {
     // 改
     public void update(Object entity) {
         finalDb.update(entity);
+    }
+
+    public void updateAll(List list) {
+        for (Object obj : list) {
+            finalDb.update(obj);
+        }
     }
 
     // 查
