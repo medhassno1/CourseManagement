@@ -1,7 +1,7 @@
 <?php
 
 class Login{
-    // æµ‹è¯•å·¥å…·PHPUnitè¦æ±‚ä¸€å®šè¦åœ¨è¿™é‡Œç»™å˜é‡é»˜è®¤å€¼ï¼ŒäºŽæ˜¯é»˜è®¤ä¸ºç©ºã€‚
+    // ²âÊÔ¹¤¾ßPHPUnitÒªÇóÒ»¶¨ÒªÔÚÕâÀï¸ø±äÁ¿Ä¬ÈÏÖµ£¬ÓÚÊÇÄ¬ÈÏÎª¿Õ¡£
     public function login($workNumber = "",$password = "",$tableName = ""){
         $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
         if (!$con) {
@@ -10,7 +10,7 @@ class Login{
             mysqli_query($con, "SET NAMES utf8");
         
             $result = mysqli_query($con, "SELECT * FROM $tableName where workNumber = $workNumber and password = $password");
-            if (!$result || mysqli_num_rows($result) == 0) {
+            if (mysqli_num_rows($result) == 0) {
                 return "false";
             } else {
                 $result_arr = mysqli_fetch_assoc($result);

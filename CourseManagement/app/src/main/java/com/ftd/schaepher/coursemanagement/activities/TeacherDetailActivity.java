@@ -86,9 +86,6 @@ public class TeacherDetailActivity extends AppCompatActivity {
             Loger.i("str2", "工号" + queryWorkNumber + "身份" + queryIdentity);
         }
 
-        queryIdentity = intent.getStringExtra("teacherIdentity");
-        queryWorkNumber = intent.getStringExtra("teacherID");
-
         setUserData(queryIdentity, queryWorkNumber);
     }
 
@@ -260,7 +257,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     try {
                         Loger.i("updateteacher", "开始发送服务器");
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
-                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_TEACHER);
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER);
                         Loger.i("updateteacher", "发送服务器结束，开始插入本地数据库");
                         dbHelper.update(user);
                     } catch (Exception e) {
@@ -271,7 +268,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     try {
                         //系负责人表
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
-                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_DEPARTMENT);
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER);
                         dbHelper.update(user);
                         //系负责人专业表
                         NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
@@ -284,7 +281,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 } else {
                     try {
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
-                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_OFFICE);
+                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER);
                         dbHelper.update(user);
                     } catch (Exception e) {
                         e.printStackTrace();

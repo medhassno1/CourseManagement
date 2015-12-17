@@ -19,7 +19,7 @@ class DeleteTask
                 mysqli_query($con, $statement3);
 
             } else {
-                echo "娌℃湁鏉冮檺";
+                echo "没有权限";
             }
         }
     }

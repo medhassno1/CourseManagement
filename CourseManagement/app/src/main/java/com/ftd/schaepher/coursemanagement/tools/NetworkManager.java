@@ -38,12 +38,8 @@ public class NetworkManager {
     public static final String INSERT_OR_UPDATE_CB_TABLE = URL_BASE + "update_insert_cb_table.php";
     // 更新系负责人所负责的专业
     public static final String UPDATE_MANAGER_MAJOR = URL_BASE + "update_manager_major.php";
-    // 更新教学办用户信息
-    public static final String UPDATE_USER_OFFICE = URL_BASE + "update_user_office.php";
-    // 更新教师用户信息
-    public static final String UPDATE_USER_TEACHER = URL_BASE + "update_user_teacher_department.php";
-    // 更新系负责人用户信息
-    public static final String UPDATE_USER_DEPARTMENT = URL_BASE + "update_user_teacher_department.php";
+    // 更新用户信息
+    public static final String UPDATE_USER = URL_BASE + "update_user.php";
 
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -98,6 +94,27 @@ public class NetworkManager {
             throw new IOException("Unexpected code " + response);
         }
     }
+
+    // 同步的post，用来更新用户信息
+    public static String postToServerSync(String tableName, String jsonData,
+                                          String manageMajor, String actionURL) throws IOException {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("tableName", tableName)
+                .add("jsonData", jsonData)
+                .add("manageMajor",manageMajor)
+                .build();
+        Request request = new Request.Builder()
+                .url(actionURL)
+                .post(formBody)
+                .build();
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            return response.body().string();
+        } else {
+            throw new IOException("Unexpected code " + response);
+        }
+    }
+
 
     // 获取任意表的数据
     public static void getJsonString(String tableName,

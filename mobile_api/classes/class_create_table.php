@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 
 class CreateTable
 {
@@ -65,7 +65,7 @@ class CreateTable
                 	echo "false";
             	}
             } else {
-                	echo "æ²¡æœ‰æƒé™";
+                	echo "Ã»ÓÐÈ¨ÏÞ";
             }
         }
     }

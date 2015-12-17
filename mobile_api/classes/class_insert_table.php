@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 
 class InsertTable
 {
@@ -11,7 +11,7 @@ class InsertTable
             mysqli_query($con, "SET NAMES utf8");
             $jsonArry = json_decode($jsonData, true);
 
-            // èŽ·å–æ•°æ®åº“è¡¨çš„å­—æ®µå
+            // »ñÈ¡Êý¾Ý¿â±íµÄ×Ö¶ÎÃû
             $keys = array_keys($jsonArry[0]);
             $tableList = '(' . implode($keys, ',') . ')';
             foreach ($jsonArry as $row) {
