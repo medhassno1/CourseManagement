@@ -1,8 +1,4 @@
-<?php
-/**
- * ����workNUmber��ѯ��������,�������б��в�ѯ������taskState
- * ���������ɣ����ڵ��б��в�ѯ�������ڶ��б��в�ѯ
- */
+﻿<?php
 error_reporting(0);
 require_once './classes/class_query_teacher_select_courses.php';
 require_once './classes/class_query_table_name.php';
@@ -14,8 +10,8 @@ session_start();
 $ident = $_SESSION["id"];
 
 if($ident == "user_teacher"){
-	$queryTeacher = new QueryTeacherSelectCourses();
-	$queryTeacher->queryTeacher($tableName, $workNumber, $ident);
+	$queryTeachers = new QueryTeacherSelectCourses();
+	$queryTeachers->queryTeacher($tableName, $workNumber, $ident);
 } else {
 	$query = new QueryTableName();
 	$tableName = "cb_".$tableName;

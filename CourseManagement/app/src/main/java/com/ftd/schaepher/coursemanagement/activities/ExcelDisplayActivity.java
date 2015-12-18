@@ -144,7 +144,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     private void getServerData() {
-        Loger.w("tableName",tableName);
         try {
             NetworkManager.getTeacherSelect(tableName, workNumber, new NetworkManager.ResponseCallback() {
                 @Override

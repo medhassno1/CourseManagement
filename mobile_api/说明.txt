@@ -24,3 +24,22 @@ update_insert_cb_table：传入jsonData和tableName，由系负责人和教学�
 update_user_office:传入jsonData和tableName，（根据身份验证为user_teaching_office可用）更新教学办用户表
 
 update_user_teacher_department：传入jsonData和tableName，根据身份验证更新教师和系负责人用户表，身份为user_teaching_office则有权利修改department，否则不能修改
+
+
+貌似PHP 5.3不支持使用foreach遍历数据库搜索结果
+
+以下是失败的：
+
+$search = mysql_query($sql);
+foreach ($search as $row) {
+    $output[] = $row;
+}
+
+改成：
+
+$search = mysql_query($sql);
+while ($row = mysql_fetch_assoc($search)) {
+    $output[] = $row;
+}
+
+就成功了

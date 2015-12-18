@@ -132,6 +132,8 @@ public class NetworkManager {
     // 获取教师选课信息
     public static void getTeacherSelect(String tableName, String workNumber,
                                         ResponseCallback callback) throws IOException {
+        Loger.w("tableName",tableName);
+        Loger.w("workNumber",workNumber);
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .add("workNumber", workNumber)

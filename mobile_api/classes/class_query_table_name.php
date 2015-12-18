@@ -1,19 +1,21 @@
 <?php
-
+require_once 'trans.php';
 class QueryTableName
 {
     public function queryT($tableName=""){
-        $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
+        $con = mysql_connect("localhost", "root", "");
+        mysql_select_db('teacher_class_system',$con);
         if (!$con) {
-            die('Could not connect: ' . mysqli_error());
+            die('Could not connect: ' . mysql_error());
         } else {
 
-            mysqli_query($con, "SET NAMES utf8");
-            $result = mysqli_query($con, "SELECT * FROM $tableName");
-            while ($row = mysqli_fetch_assoc($result)) {
+            mysql_query("SET NAMES utf8");
+            $result = mysql_query( "SELECT * FROM $tableName");
+            while ($row = mysql_fetch_assoc($result)) {
                 $output[] = $row;
             }
-            echo json_encode($output, JSON_UNESCAPED_UNICODE);
+            echo json_encode_ex($output,"");
+	    mysql_close();
         }
     }
 
