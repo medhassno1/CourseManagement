@@ -1,17 +1,22 @@
 ﻿<?php
-/**
- * 根据workNUmber查询报课情况,从任务列表中查询任务的taskState
- * 如果已完成，就在单行表中查询，否则在多行表中查询
- */
 error_reporting(0);
 require_once './classes/class_query_teacher_select_courses.php';
+require_once './classes/class_query_table_name.php';
 
 $tableName = $_POST["tableName"];
 $workNumber = $_POST["workNumber"];
 
 session_start();
-$ident = $_SESSION['id'];
+$ident = $_SESSION["id"];
 
-$queryTeacher = new QueryTeacherSelectCourses();
-$queryTeacher->queryTeacher($tableName, $workNumber, $ident);
+if($ident == "user_teacher"){
+	$queryTeachers = new QueryTeacherSelectCourses();
+	$queryTeachers->queryTeacher($tableName, $workNumber, $ident);
+} else {
+	$query = new QueryTableName();
+	$tableName = "cb_".$tableName;
+	$query->queryT($tableName);
+}
+
+
 ?>

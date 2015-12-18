@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.tools;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
+import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
@@ -22,7 +23,7 @@ public class JsonTools {
     public static <T> T getJsonObject(String json, Class<T> tableClass) {
         return gson.fromJson(json, tableClass);
     }
-
+    
     public static <T> T getJsonList(String json, Class tableClass) {
         Type type;
         switch (tableClass.getSimpleName()) {
@@ -46,6 +47,10 @@ public class JsonTools {
                 type = new TypeToken<List<TableCourseMultiline>>() {
                 }.getType();
                 break;
+            case "TableManageMajor":
+                type = new TypeToken<List<TableManageMajor>>() {
+                }.getType();
+                break;
             default:
                 return null;
         }
@@ -61,5 +66,4 @@ public class JsonTools {
         list.add(o);
         return gson.toJson(list);
     }
-
 }

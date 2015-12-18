@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
@@ -134,8 +135,10 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                                     public void run() {
                                         try {
                                             exportFile();
+                                            sendToast("导出成功");
                                         } catch (Exception e) {
                                             e.printStackTrace();
+                                            sendToast("导出失败");
                                         } finally {
                                             closeProgress();
                                         }
@@ -163,6 +166,15 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
             }
         });
     }
+    public void sendToast(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TaskDetailActivity.this, message,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     //导出文件
     private void exportFile() throws Exception {
@@ -180,6 +192,10 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void copyExcel(List<TableCourseMultiline> list) throws IOException, BiffException, WriteException {
+        //删除空表的前三行会出问题，暂时解决办法是删除表格的前三行
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
         File file = new File(filePath + ".xls");
         InputStream ins = getResources().openRawResource(R.raw.blank_table);
         OutputStream os = new FileOutputStream(file);
@@ -261,12 +277,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Intent intent = new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class);
         intent.putExtra("tableName", task.getRelativeTable());
         startActivity(intent);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        dbHelper.close();
     }
 
 }

@@ -1,22 +1,24 @@
-﻿<?php
+<?php
+require_once 'trans.php';
 
 class InsertTable
 {
     public function insertT($tableName = "", $jsonData = "")
     {
-        $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
+        $con = mysql_connect("localhost", "root", "");
+        mysql_select_db('teacher_class_system',$con);
         if (!$con) {
             die('Could not connect: ' . mysql_error());
         } else {
-            mysqli_query($con, "SET NAMES utf8");
+            mysql_query( "SET NAMES utf8");
             $jsonArry = json_decode($jsonData, true);
 
-            // 获取数据库表的字段名
+            // ?????????????????
             $keys = array_keys($jsonArry[0]);
             $tableList = '(' . implode($keys, ',') . ')';
             foreach ($jsonArry as $row) {
                 $statement = "INSERT INTO $tableName $tableList VALUES " . ' ("' . implode($row, '","') . '")';
-                $sql = mysqli_query($con, $statement);
+                $sql = mysql_query( $statement);
             }
         }
     }

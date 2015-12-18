@@ -1,6 +1,6 @@
-ï»¿<?php
+<?php
 /**
- * ï¼ˆæ ¹æ®èº«ä»½éªŒè¯ä¸ºuser_teaching_officeå¯ç”¨ï¼‰åˆ›å»ºä»»åŠ¡åˆ—è¡¨ï¼ˆåŒ…æ‹¬å¤šè¡Œå’Œå•è¡Œï¼‰
+ * £¨¸ù¾ÝÉí·ÝÑéÖ¤Îªuser_teaching_office¿ÉÓÃ£©´´½¨ÈÎÎñÁÐ±í£¨°üÀ¨¶àÐÐºÍµ¥ÐÐ£©
  */
 error_reporting(0);
 require_once './classes/class_create_table.php';

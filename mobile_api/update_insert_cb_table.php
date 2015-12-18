@@ -1,9 +1,9 @@
 <?php
 /**
- * 传入jsonData和tableName，由系负责人和教学办更新单行表
+ * ����jsonData��tableName����ϵ�����˺ͽ�ѧ�����µ��б�
  */
  error_reporting(0);
-require_once './classes/class';
+require_once './classes/class_update_insert_cb_table.php';
 $jsonData = $_POST["jsonData"];
 $tableName = $_POST["tableName"];
 session_start();

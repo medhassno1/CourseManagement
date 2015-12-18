@@ -162,32 +162,36 @@ public class TaskListActivity extends AppCompatActivity
             @Override
             public void onResponse(Response response) throws IOException {
                 String responseStr = response.body().string();
+                List list = null;
                 try {
-                    List list = JsonTools.getJsonList(responseStr, TableTaskInfo.class);
-                    Loger.w(TAG, "jsonList" + list.toString());
-                    dbHelper.deleteAll(TableTaskInfo.class);
-                    dbHelper.insertAll(list);
-
-                    if (mTaskAdapter != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshSpinner();
-                                mTaskAdapter.notifyDataSetChanged();
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshSpinner();
-                                displayTaskList();
-                            }
-                        });
-                    }
+                    list = JsonTools.getJsonList(responseStr, TableTaskInfo.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                dbHelper.deleteAll(TableTaskInfo.class);
+                if (list != null) {
+                    Loger.w(TAG, "jsonList" + list.toString());
+                    dbHelper.insertAll(list);
+                }
+
+                if (mTaskAdapter != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshSpinner();
+                            mTaskAdapter.notifyDataSetChanged();
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshSpinner();
+                            displayTaskList();
+                        }
+                    });
+                }
+
             }
 
             @Override
@@ -374,7 +378,7 @@ public class TaskListActivity extends AppCompatActivity
                         } catch (Exception e) {
                             e.printStackTrace();
                             Loger.d("delete", "程序崩溃");
-                            clossProcess();
+                            closeProcess();
                         }
                     }
                 }.start();
@@ -384,7 +388,7 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
-    private void clossProcess() {
+    private void closeProcess() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -545,11 +549,5 @@ public class TaskListActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dbHelper.close();
     }
 }

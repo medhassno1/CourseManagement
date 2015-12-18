@@ -165,7 +165,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             e.printStackTrace();
                             dbHelper.createNewCourseTable();
                         }
-                        hasCommitted = dbHelper.getCommitState(workNumber);
+                        hasCommitted = dbHelper.hasCommitted(workNumber);
                         Loger.d(TAG + "GetServerData", "isFinish: " + String.valueOf(hasCommitted));
                         dbHelper.deleteAll(TableCourseMultiline.class);
                         dbHelper.insertAll(list);
@@ -584,11 +584,5 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         }
                     }).show();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dbHelper.close();
     }
 }

@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.adapter.FileListAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
@@ -154,18 +153,16 @@ public class FileSelectActivity extends AppCompatActivity
                                     new Thread() {
                                         @Override
                                         public void run() {
-                                            ExcelTools excelTools = new ExcelTools();
+                                            ExcelTools excelTools = new ExcelTools(FileSelectActivity.this);
                                             excelTools.setPath(path);
-
-                                            List<TableUserTeacher> teachersList = excelTools.readTeacherExcel();
-                                            List<TableUserDepartmentHead> departmentHeadList = excelTools.readDepartmentHeadExcel();
-                                            List<TableUserTeachingOffice> teachingOfficeList = excelTools.readTeachingOfficeExcel();
+                                            excelTools.readTeacherExcel();
+                                            List<TableUserTeacher> teachersList = excelTools.getTeacherList();
+                                            List<TableUserTeachingOffice> teachingOfficeList = excelTools.getOfficeList();
 
                                             Loger.i("dataList1", "开始输出数据");
-                                            //   Loger.i("dataList",teachersList.toString());
-                                            Loger.i("dataList", departmentHeadList.toString());
+                                            Loger.i("dataList", teachersList.toString());
                                             Loger.i("dataList", teachingOfficeList.toString());
-                                            //导入职工表
+                                            // 导入职工表
                                             CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
                                             try {
                                                 Loger.i("dataList1", "开始导入教师数据");
@@ -173,18 +170,14 @@ public class FileSelectActivity extends AppCompatActivity
                                                         JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
                                                 dbHelper.deleteAll(TableUserTeacher.class);
                                                 dbHelper.insertAll(teachersList);
-                                                Loger.i("dataList1", "开始导入系负责人数据");
-                                                NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
-                                                        JsonTools.getJsonString(departmentHeadList), NetworkManager.INSERT_TABLE);
-                                                dbHelper.deleteAll(TableUserDepartmentHead.class);
-                                                dbHelper.insertAll(departmentHeadList);
                                                 Loger.i("dataList1", "开始导入教学办数据");
                                                 NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                                         JsonTools.getJsonString(teachingOfficeList), NetworkManager.INSERT_TABLE);
                                                 dbHelper.deleteAll(TableUserTeachingOffice.class);
                                                 dbHelper.insertAll(teachingOfficeList);
-                                                finish();
+
                                                 closeProgress();
+                                                finish();
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                                 showError();

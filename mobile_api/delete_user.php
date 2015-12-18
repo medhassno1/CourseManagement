@@ -1,8 +1,8 @@
-ï»¿<?php
+<?php
 /**
- * ï¼ˆæ ¹æ®èº«ä»½éªŒè¯ä¸ºuser_teaching_officeå¯ç”¨ï¼‰
- * ä¼ å…¥tableNameå’ŒworkNumeråˆ é™¤ç”¨æˆ·ä¿¡æ¯
- * å¦‚æžœæ˜¯åˆ é™¤ç³»è´Ÿè´£äººï¼Œåˆ™åˆ é™¤department_head_majorsä¸­å¯¹åº”çš„ä¿¡æ¯
+ * £¨¸ù¾ÝÉí·ÝÑéÖ¤Îªuser_teaching_office¿ÉÓÃ£©
+ * ´«ÈëtableNameºÍworkNumerÉ¾³ýÓÃ»§ÐÅÏ¢
+ * Èç¹ûÊÇÉ¾³ýÏµ¸ºÔðÈË£¬ÔòÉ¾³ýdepartment_head_majorsÖÐ¶ÔÓ¦µÄÐÅÏ¢
  */
 error_reporting(0);
 require_once './classes/class_delete_user.php';

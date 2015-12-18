@@ -1,47 +1,39 @@
 <?php
+require_once 'trans.php';
 
 class QueryTeacherSelectCourses
 {
     public function queryTeacher($tableName = "", $workNumber = "", $ident = "")
     {
-        $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
+        $con = mysql_connect("localhost", "root", "");
+	    mysql_select_db('teacher_class_system',$con);
         if (!$con) {
-            die('Could not connect: ' . mysqli_error());
+            die('Could not connect: ' . mysql_error());
         } else {
-
-            mysqli_query($con, "SET NAMES utf8");
-            $state = mysqli_query($con, "SELECT taskState FROM task_info WHERE relativeTable='$tableName'");
-            $state_result = mysqli_fetch_assoc($state);
-            if ($state_result['taskState'] == 2) {
-                $tableName_cb = 'cb_' . $tableName;
-
-                $statement = "SELECT * FROM $tableName_cb";
-                $result = mysqli_query($con, $statement);
-
-                foreach ($result as $row) {
-                    $output[] = $row;
-                }
-                echo json_encode($output, JSON_UNESCAPED_UNICODE);
-
+            mysql_query("SET NAMES utf8");
+            $state = mysql_query("SELECT taskState FROM task_info where relativeTable = $tableName");
+            $state_result = mysql_fetch_assoc($state);
+            if ($state_result['taskState'] > 1) {
+                $tableNameCB = 'cb_' . $tableName;
+                $statement = "SELECT * FROM $tableNameCB";
+                $result = mysql_query($statement);
+                while ($row = mysql_fetch_assoc($result)) {
+                	$output[] = $row;
+            	}
+                echo json_encode_ex($output," ");
             } else {
-                $result = mysqli_query($con, "SELECT * FROM $tableName WHERE workNumber = $workNumber");
-                if (mysqli_num_rows($result) < 1) {
-                    $sql = "SELECT * FROM $tableName WHERE workNumber = '' ORDER BY insertTime ";
-                    $search = mysqli_query($con, $sql);
-
-                    foreach ($search as $row) {
-                        $output[] = $row;
-                    }
-                    echo json_encode($output, JSON_UNESCAPED_UNICODE);
-
-
+                $result = mysql_query("SELECT * FROM $tableName WHERE workNumber = '$workNumber'");
+                if (mysql_num_rows($result)>0) {
+                    while ($row = mysql_fetch_assoc($result)) {
+                	$output[] = $row;
+            	    }
+                    echo json_encode_ex($output," ");
                 } else {
-                    foreach ($result as $row) {
-                        $output[] = $row;
-                    }
-                    echo json_encode($output, JSON_UNESCAPED_UNICODE);
-
-
+                    $result = mysql_query("SELECT * FROM $tableName WHERE workNumber = ''");
+                    while ($row = mysql_fetch_assoc($result)) {
+                	$output[] = $row;
+            	    }
+                    echo json_encode_ex($output," ");
                 }
             }
         }

@@ -15,7 +15,6 @@ public class TableTaskInfo {
     private String semester;
     private String departmentDeadline;
     private String teacherDeadline;
-    //    private String remark;
     private String taskState;
 
     public TableTaskInfo() {
@@ -66,14 +65,6 @@ public class TableTaskInfo {
         this.teacherDeadline = teacherDeadline;
     }
 
-//    public String getRemark() {
-//        return remark;
-//    }
-//
-//    public void setRemark(String remark) {
-//        this.remark = remark;
-//    }
-
     public String getTaskState() {
         return taskState;
     }
@@ -90,7 +81,6 @@ public class TableTaskInfo {
                 ", semester='" + semester + '\'' +
                 ", departmentDeadline='" + departmentDeadline + '\'' +
                 ", teacherDeadline='" + teacherDeadline + '\'' +
-//                ", remark='" + remark + '\'' +
                 ", taskState='" + taskState + '\'' +
                 '}';
     }

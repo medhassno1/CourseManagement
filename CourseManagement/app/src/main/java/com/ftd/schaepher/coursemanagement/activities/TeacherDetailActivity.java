@@ -1,6 +1,7 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,9 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sxq on 2015/11/2.
@@ -86,9 +90,6 @@ public class TeacherDetailActivity extends AppCompatActivity {
             Loger.i("str2", "工号" + queryWorkNumber + "身份" + queryIdentity);
         }
 
-        queryIdentity = intent.getStringExtra("teacherIdentity");
-        queryWorkNumber = intent.getStringExtra("teacherID");
-
         setUserData(queryIdentity, queryWorkNumber);
     }
 
@@ -109,6 +110,13 @@ public class TeacherDetailActivity extends AppCompatActivity {
             case ConstantStr.ID_DEPARTMENT_HEAD: {
                 TableUserDepartmentHead Information =
                         dbHelper.findById(queryWorkNumber, TableUserDepartmentHead.class);
+                List<TableManageMajor> manageMajorList =
+                        dbHelper.findAllByWhere(TableManageMajor.class, "workNumber = '" + queryWorkNumber + "'");
+                String majorText = "";
+                for (int i = 0; i < manageMajorList.size(); i++) {
+                    String major = transferMajorNameToChinese(manageMajorList.get(i).getMajor());
+                    majorText = majorText + major + "\n";
+                }
                 if (Information != null) {
                     edtTxTeacherNumber.setText(Information.getWorkNumber());
                     edtTxPassword.setText(Information.getPassword());
@@ -116,6 +124,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     edtTxPhoneNumber.setText(Information.getTelephone());
                     edtTxDepartment.setText(Information.getDepartment());
                     edtTxMajor.setVisibility(View.VISIBLE);
+
+                    edtTxMajor.setText(majorText);
                 }
             }
             break;
@@ -187,12 +197,21 @@ public class TeacherDetailActivity extends AppCompatActivity {
     /**
      * 从界面获取系负责人专业表数据
      */
-    private TableManageMajor getManageMajorData() {
-        TableManageMajor manageMajor = new TableManageMajor();
-        manageMajor.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        manageMajor.setMajor(edtTxMajor.getText().toString().trim());
-        return manageMajor;
+    private List<TableManageMajor> getUIManageMajorData() {
+        List manageMajorList = new ArrayList();
+        String majorText = edtTxMajor.getText().toString().trim();
+        String workNumber = edtTxTeacherNumber.getText().toString().trim();
+        String[] majors = majorText.split("\n");
+        for (int i = 0; i < majors.length; i++) {
+            if (majors[i] != null && majors[i].length() != 0) {
+                TableManageMajor manageMajor = new TableManageMajor();
+                manageMajor.setWorkNumber(workNumber);
+                manageMajor.setMajor(majors[i]);
 
+                manageMajorList.add(manageMajor);
+            }
+        }
+        return manageMajorList;
     }
 
     @Override
@@ -230,7 +249,16 @@ public class TeacherDetailActivity extends AppCompatActivity {
                                             editor.apply();
                                         }
 
+                                        ProgressDialog progress = new ProgressDialog(TeacherDetailActivity.this);
+                                        progress.setMessage("更新中...");
+                                        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                        progress.setCancelable(false);
+                                        progress.show();
+
                                         submitToServer();
+
+                                        progress.cancel();
+
                                     }
                                 })
                         .setNegativeButton
@@ -258,33 +286,30 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 Object user = getUserData();
                 if (queryIdentity.equals(ConstantStr.ID_TEACHER)) {
                     try {
-                        Loger.i("updateteacher", "开始发送服务器");
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
-                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_TEACHER);
-                        Loger.i("updateteacher", "发送服务器结束，开始插入本地数据库");
+                        Loger.i("updateTeacher", "开始发送服务器");
+                        NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHER,
+                                JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
+                        Loger.i("updateTeacher", "发送服务器结束，开始插入本地数据库");
                         dbHelper.update(user);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else if (queryIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
-                    TableManageMajor manageMajor = getManageMajorData();
+                    List<TableManageMajor> manageMajorList = getUIManageMajorData();
                     try {
-                        //系负责人表
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
-                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_DEPARTMENT);
+                        // 系负责人表
+                        NetworkManager.updateUserData(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                                JsonTools.getJsonString(user), JsonTools.getJsonString(manageMajorList), NetworkManager.UPDATE_USER_DATA);
                         dbHelper.update(user);
-                        //系负责人专业表
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
-                                JsonTools.getJsonString(manageMajor), NetworkManager.UPDATE_MANAGER_MAJOR);
-                        dbHelper.update(manageMajor);
+                        dbHelper.updateAll(manageMajorList);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    //教学办
                 } else {
                     try {
-                        NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
-                                JsonTools.getJsonString(user), NetworkManager.UPDATE_USER_OFFICE);
+                        // 教学办
+                        NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                                JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
                         dbHelper.update(user);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -300,4 +325,29 @@ public class TeacherDetailActivity extends AppCompatActivity {
         super.onDestroy();
         dbHelper.close();
     }
+
+    // 专业名映射为中文
+    public String transferMajorNameToChinese(String string) {
+        switch (string) {
+            case "tc_com_exc":
+                return "计算机（卓越班）";
+            case "tc_com_nor":
+                return "计算机专业";
+            case "tc_com_ope":
+                return "计算机（实验班）";
+            case "tc_inf_sec":
+                return "信息安全专业";
+            case "tc_math_nor":
+                return "数学类";
+            case "tc_math_ope":
+                return "数学类（实验班）";
+            case "tc_net_pro":
+                return "网络工程专业";
+            case "tc_soft_pro":
+                return "软件工程专业";
+            default:
+                return string;
+        }
+    }
+
 }

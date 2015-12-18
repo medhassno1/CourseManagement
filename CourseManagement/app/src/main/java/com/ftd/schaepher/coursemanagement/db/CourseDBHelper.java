@@ -6,11 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
-import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
-import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
-import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 
 import net.tsz.afinal.FinalDb;
@@ -24,8 +19,8 @@ public class CourseDBHelper {
     private SQLiteDatabase database;
 
     public CourseDBHelper(Context context) {
-        finalDb = FinalDb.create(context, "teacherclass.db");
-        database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        finalDb = FinalDb.create(context, "teacher_class.db");
+        database = context.openOrCreateDatabase("teacher_class.db", Context.MODE_PRIVATE, null);
     }
 
     public void createNewCourseTable() {
@@ -54,7 +49,7 @@ public class CourseDBHelper {
 
     public void insertAll(List list) {
         for (Object obj : list) {
-            insertOrUpdate(obj);
+            insert(obj);
         }
     }
 
@@ -78,6 +73,12 @@ public class CourseDBHelper {
     // 改
     public void update(Object entity) {
         finalDb.update(entity);
+    }
+
+    public void updateAll(List list) {
+        for (Object obj : list) {
+            finalDb.update(obj);
+        }
     }
 
     // 查
@@ -117,7 +118,7 @@ public class CourseDBHelper {
         database.execSQL("Drop table if exists " + tableName);
     }
 
-    public boolean getCommitState(String workNumber) {
+    public boolean hasCommitted(String workNumber) {
         List<TableCourseMultiline> list =
                 finalDb.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
 //            Loger.d("isfinish", String.valueOf(list.size()));
