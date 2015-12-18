@@ -6,7 +6,7 @@ import android.util.Log;
  * Created by Schaepher on 2015/12/8.
  */
 public class Loger {
-    private static boolean turnOn = true;
+    private static boolean turnOn = false;
 
     public static void v(String tag, String msg) {
         if (turnOn) {
