@@ -1,15 +1,17 @@
 <?php
-
+require_once 'trans.php';
 class CreateTable
 {
     public function create($tableName = "", $ident = "",$jsonData = "")
     {
-        $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
+		$con = mysql_connect("localhost", "root", "");
+		mysql_select_db('teacher_class_system',$con);
         if (!$con) {
             die('Could not connect: ' . mysql_error());
         } else {
             if ($ident == "user_teaching_office") {
-                mysqli_query($con, "SET NAMES utf8");
+                mysql_query( "SET NAMES utf8");
+
                 $sql = "CREATE TABLE IF NOT EXISTS $tableName (
    			insertTime  int(10),
    			workNumber  varchar(40) COLLATE utf8_unicode_ci ,
@@ -52,20 +54,20 @@ class CreateTable
    			PRIMARY KEY (  grade  ,  major  ,  people  ,  courseName  ,  courseType  ,  courseCredit  ,  courseHour  ,  practiceHour  ,  onMachineHour  ,  timePeriod  ,  teacherName  ,  remark  ),
    			KEY   insertTime   (  insertTime  )
  			) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
-            	if (mysqli_query($con, $sql)) {
+            	if (mysql_query( $sql)) {
                 echo "true";
 
                 $jsonArry = json_decode($jsonData, true);
                     foreach ($jsonArry as $row) {
                         $statement = "INSERT INTO $cbTableName (insertTime,grade,major,people,courseName,courseType,courseCredit,courseHour,practiceHour,onMachineHour,timePeriod,teacherName,remark) VALUES('$row[insertTime]','$row[grade]','$row[major]','$row[people]','$row[courseName]','$row[courseType]','$row[courseCredit]','$row[courseHour]','$row[practiceHour]','$row[onMachineHour]','$row[timePeriod]','$row[teacherName]','$row[remark]') ";
 
-                        $sql = mysqli_query($con, $statement);
+                        $sql = mysql_query($statement);
                     }
             	} else {
                 	echo "false";
             	}
             } else {
-                	echo "没有权限";
+                	echo "??????";
             }
         }
     }

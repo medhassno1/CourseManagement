@@ -146,7 +146,7 @@ public class LoginActivity extends AppCompatActivity
                     String result = response.body().string();
                     Loger.d(TAG, result);
                     progress.cancel();
-                    if (!result.equals("false")) {
+                    if (result.startsWith("{")) {
 //                        这里应该改为获取服务器个人数据，并存储到数据库中
                         informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
                         informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);

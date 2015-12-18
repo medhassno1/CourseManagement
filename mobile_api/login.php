@@ -1,6 +1,6 @@
 <?php
 // ¹Ø±Õ´íÎó±¨¸æ
-error_reporting(0);
+
 
 require_once './classes/class_login.php';
 
@@ -9,8 +9,8 @@ $password = $_POST["login-password"];
 $tableName = $_POST["ident"];
 
 $log = new Login;
-$response = $log->login($workNumber,$password,$tableName);
-if(response!="false"){
+$response = $log->login1($workNumber,$password,$tableName);
+if($response!="false"){
     session_start();
     $_SESSION['id']=$tableName;
 }

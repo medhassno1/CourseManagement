@@ -1,26 +1,28 @@
 <?php
+require_once 'trans.php';
 class DeleteUser
 {
     public function  deleteU($tableName = "", $ident = "",$workNumber =""){
-        $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
+        $con = mysql_connect("localhost", "root", "");
+        mysql_select_db('teacher_class_system',$con);
         if (!$con) {
-            die('Could not connect: ' . mysqli_error());
+            die('Could not connect: ' . mysql_error());
         } else {
             if ($ident == 'user_teaching_office') {
                 if ($tableName == 'user_department_head') {
                     $cascade = "DELETE FROM department_head_majors WHERE workNumber = '$workNumber'";
-                    mysqli_query($con, $cascade);
+                    mysql_query( $cascade);
 
                     $sql = "DELETE FROM $tableName WHERE workNumber = '$workNumber'";
-                    mysqli_query($con, $sql);
+                    mysql_query( $sql);
 
                 } else {
                     $sql = "DELETE FROM $tableName WHERE workNumber ='$workNumber'";
-                    mysqli_query($con, $sql);
+                    mysql_query( $sql);
 
                 }
             } else {
-                echo "没有权限";
+                echo "??????";
             }
         }
     }
