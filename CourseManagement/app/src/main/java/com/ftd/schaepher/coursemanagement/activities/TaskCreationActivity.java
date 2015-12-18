@@ -140,11 +140,12 @@ public class TaskCreationActivity extends AppCompatActivity
                         new Thread() {
                             @Override
                             public void run() {
-                                TableTaskInfo task = createTaskInformation();
-                                tableCourseName = task.getRelativeTable();
-                                dbHelper.insert(task);
-                                String json = JsonTools.getJsonString(task);
                                 try {
+                                    TableTaskInfo task = createTaskInformation();
+                                    tableCourseName = task.getRelativeTable();
+                                    dbHelper.insert(task);
+                                    String json = JsonTools.getJsonString(task);
+
                                     String result = NetworkManager
                                             .postToServerSync(ConstantStr.TABLE_TASK_INFO,
                                                     json, NetworkManager.INSERT_TABLE);
@@ -156,6 +157,7 @@ public class TaskCreationActivity extends AppCompatActivity
                                             .postToServerSync(tableCourseName, tableJson, NetworkManager.CREATE_TABLE);
                                     Loger.w("resultTable", result2);
                                     closeProgress();
+                                    clearWidgetData();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     showError();
@@ -176,11 +178,26 @@ public class TaskCreationActivity extends AppCompatActivity
         }
     }
 
+    private void clearWidgetData() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                edtTxTaskTeam.setText("");
+                edtTxDepartmentDeadline.setText("");
+                edtTxTeacherDeadline.setText("");
+                edtTxTaskName.setText("");
+                imgvFileImg.setVisibility(View.GONE);
+                tvFileName.setText("");
+            }
+        });
+    }
+
     private void showError() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(TaskCreationActivity.this, "发布错误，请重新发布", Toast.LENGTH_SHORT).show();
+                progress.cancel();
+                Toast.makeText(TaskCreationActivity.this, "发布失败，不能重复发布相同任务", Toast.LENGTH_SHORT).show();
             }
         });
     }
