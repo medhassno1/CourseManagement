@@ -1,5 +1,5 @@
 <?php
-// ¹Ø±Õ´íÎó±¨¸æ
+// ï¿½Ø±Õ´ï¿½ï¿½ó±¨¸ï¿½
 error_reporting(0);
 
 require_once './classes/class_login.php';
@@ -10,7 +10,7 @@ $tableName = $_POST["ident"];
 
 $log = new Login;
 $response = $log->login($workNumber,$password,$tableName);
-if(response!="false"){
+if($response!="false"){
     session_start();
     $_SESSION['id']=$tableName;
 }

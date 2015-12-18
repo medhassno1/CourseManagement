@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkManager {
     // 服务器基础地址，指向存放api的文件夹
-    private static final String URL_BASE = "http://114.215.153.57/tcs/mobile_api/";
+    private static final String URL_BASE = "http://139.129.39.29/Teacher_class_systemDemo(alpha)/Teacher_class_syetemDemo/mobile_api/";
     // 创建创建表格并且插入数据（发布新任务）
     public static final String CREATE_TABLE = URL_BASE + "create_table.php";
     // 删除任务
