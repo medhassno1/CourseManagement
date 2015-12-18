@@ -1,9 +1,9 @@
 <?php
 /**
- * ´«ÈëjsonDataºÍtableName£¬ÓÉÏµ¸ºÔðÈËºÍ½ÌÑ§°ì¸üÐÂµ¥ÐÐ±í
+ * ï¿½ï¿½ï¿½ï¿½jsonDataï¿½ï¿½tableNameï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ËºÍ½ï¿½Ñ§ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½Ð±ï¿½
  */
  error_reporting(0);
-require_once './classes/class';
+require_once './classes/class_update_insert_cb_table.php';
 $jsonData = $_POST["jsonData"];
 $tableName = $_POST["tableName"];
 session_start();
