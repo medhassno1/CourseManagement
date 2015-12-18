@@ -378,7 +378,7 @@ public class TaskListActivity extends AppCompatActivity
                         } catch (Exception e) {
                             e.printStackTrace();
                             Loger.d("delete", "程序崩溃");
-                            clossProcess();
+                            closeProcess();
                         }
                     }
                 }.start();
@@ -388,7 +388,7 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
-    private void clossProcess() {
+    private void closeProcess() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

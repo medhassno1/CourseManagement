@@ -23,7 +23,7 @@ public class JsonTools {
     public static <T> T getJsonObject(String json, Class<T> tableClass) {
         return gson.fromJson(json, tableClass);
     }
-
+    
     public static <T> T getJsonList(String json, Class tableClass) {
         Type type;
         switch (tableClass.getSimpleName()) {
@@ -66,5 +66,4 @@ public class JsonTools {
         list.add(o);
         return gson.toJson(list);
     }
-
 }

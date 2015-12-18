@@ -11,7 +11,7 @@ class UpdateInsertCbTable
             mysqli_query($con, "SET NAMES utf8");
             $jsonArry = json_decode($jsonData, true);
             foreach ($jsonArry as $row) {
-                $sql = "UPDATE $tableName SET timePeriod='$row[timePeriod];',teacherName ='$row[teacherName];',remark='$row[remark];' WHERE courseName = '$row[courseName]'";
+                $sql = "UPDATE $tableName SET timePeriod='$row[timePeriod]',teacherName ='$row[teacherName]',remark='$row[remark]' WHERE courseName = '$row[courseName]'";
                 mysqli_query($con, $sql);
             }
             $tcTableName = substr($tableName, 3);

@@ -1,17 +1,26 @@
 <?php
 /**
- * ¸ù¾ÝworkNUmber²éÑ¯±¨¿ÎÇé¿ö,´ÓÈÎÎñÁÐ±íÖÐ²éÑ¯ÈÎÎñµÄtaskState
- * Èç¹ûÒÑÍê³É£¬¾ÍÔÚµ¥ÐÐ±íÖÐ²éÑ¯£¬·ñÔòÔÚ¶àÐÐ±íÖÐ²éÑ¯
+ * ï¿½ï¿½ï¿½ï¿½workNUmberï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½Ð²ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½taskState
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½Ð±ï¿½ï¿½Ð²ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½Ð±ï¿½ï¿½Ð²ï¿½Ñ¯
  */
 error_reporting(0);
 require_once './classes/class_query_teacher_select_courses.php';
+require_once './classes/class_query_table_name.php';
 
 $tableName = $_POST["tableName"];
 $workNumber = $_POST["workNumber"];
 
 session_start();
-$ident = $_SESSION['id'];
+$ident = $_SESSION["id"];
 
-$queryTeacher = new QueryTeacherSelectCourses();
-$queryTeacher->queryTeacher($tableName, $workNumber, $ident);
+if($ident == "user_teacher"){
+	$queryTeacher = new QueryTeacherSelectCourses();
+	$queryTeacher->queryTeacher($tableName, $workNumber, $ident);
+} else {
+	$query = new QueryTableName();
+	$tableName = "cb_".$tableName;
+	$query->queryT($tableName);
+}
+
+
 ?>

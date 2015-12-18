@@ -19,8 +19,8 @@ public class CourseDBHelper {
     private SQLiteDatabase database;
 
     public CourseDBHelper(Context context) {
-        finalDb = FinalDb.create(context, "teacherclass.db");
-        database = context.openOrCreateDatabase("teacherclass.db", Context.MODE_PRIVATE, null);
+        finalDb = FinalDb.create(context, "teacher_class.db");
+        database = context.openOrCreateDatabase("teacher_class.db", Context.MODE_PRIVATE, null);
     }
 
     public void createNewCourseTable() {
@@ -49,7 +49,7 @@ public class CourseDBHelper {
 
     public void insertAll(List list) {
         for (Object obj : list) {
-            insertOrUpdate(obj);
+            insert(obj);
         }
     }
 
@@ -118,7 +118,7 @@ public class CourseDBHelper {
         database.execSQL("Drop table if exists " + tableName);
     }
 
-    public boolean getCommitState(String workNumber) {
+    public boolean hasCommitted(String workNumber) {
         List<TableCourseMultiline> list =
                 finalDb.findAllByWhere(TableCourseMultiline.class, "workNumber = \"" + workNumber + "\"");
 //            Loger.d("isfinish", String.valueOf(list.size()));
