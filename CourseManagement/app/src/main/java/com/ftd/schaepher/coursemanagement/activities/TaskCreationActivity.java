@@ -157,6 +157,7 @@ public class TaskCreationActivity extends AppCompatActivity
                                             .postToServerSync(tableCourseName, tableJson, NetworkManager.CREATE_TABLE);
                                     Loger.w("resultTable", result2);
                                     closeProgress();
+                                    clearWidgetData();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     showError();
@@ -175,6 +176,20 @@ public class TaskCreationActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void clearWidgetData() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                edtTxTaskTeam.setText("");
+                edtTxDepartmentDeadline.setText("");
+                edtTxTeacherDeadline.setText("");
+                edtTxTaskName.setText("");
+                imgvFileImg.setVisibility(View.GONE);
+                tvFileName.setText("");
+            }
+        });
     }
 
     private void showError() {
