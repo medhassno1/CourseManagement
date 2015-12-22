@@ -11,18 +11,28 @@ class DeleteUser
             if ($ident == 'user_teaching_office') {
                 if ($tableName == 'user_department_head') {
                     $cascade = "DELETE FROM department_head_majors WHERE workNumber = '$workNumber'";
-                    mysql_query( $cascade);
-
+                    if(mysql_query( $cascade)){
+			echo 'true';
+		    } else {
+		        echo 'false';
+		    }
                     $sql = "DELETE FROM $tableName WHERE workNumber = '$workNumber'";
-                    mysql_query( $sql);
-
+                    if(mysql_query( $sql)){
+			echo 'true';
+		    } else {
+		        echo 'false';
+		    }
                 } else {
-                    $sql = "DELETE FROM $tableName WHERE workNumber ='$workNumber'";
-                    mysql_query( $sql);
+                    $sql = "DELETE FROM $tableName WHERE workNumber = '$workNumber'";
+                    if(mysql_query($sql)){
+			echo 'true';
+		    } else {
+		        echo 'false';
+		    }
 
                 }
             } else {
-                echo "??????";
+                echo "false";
             }
         }
     }

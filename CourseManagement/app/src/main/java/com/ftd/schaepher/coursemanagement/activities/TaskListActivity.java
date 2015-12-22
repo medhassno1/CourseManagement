@@ -174,23 +174,13 @@ public class TaskListActivity extends AppCompatActivity
                     dbHelper.insertAll(list);
                 }
 
-                if (mTaskAdapter != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshSpinner();
-                            mTaskAdapter.notifyDataSetChanged();
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshSpinner();
-                            displayTaskList();
-                        }
-                    });
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshSpinner();
+                        displayTaskList();
+                    }
+                });
 
             }
 
@@ -219,6 +209,9 @@ public class TaskListActivity extends AppCompatActivity
 
     // 显示任务列表数据
     private void displayTaskList() {
+        if (selectedTerm != null) {
+            getDataByTerm(selectedTerm);
+        }
         mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
         mListView.setAdapter(mTaskAdapter);
         mListView.setOnItemClickListener(this);

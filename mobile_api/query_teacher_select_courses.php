@@ -11,7 +11,7 @@ $ident = $_SESSION["id"];
 
 if($ident == "user_teacher"){
 	$queryTeachers = new QueryTeacherSelectCourses();
-	$queryTeachers->queryTeacher($tableName, $workNumber, $ident);
+	$queryTeachers->queryTeacher($tableName, $workNumber);
 } else {
 	$query = new QueryTableName();
 	$tableName = "cb_".$tableName;

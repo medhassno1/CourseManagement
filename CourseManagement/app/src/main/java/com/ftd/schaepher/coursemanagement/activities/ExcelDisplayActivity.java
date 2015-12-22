@@ -25,6 +25,7 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
@@ -55,6 +56,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private String commonTableName;
     private ProgressDialog progress;
     private ExcelAdapter mExcelAdapter;
+    private EditText edtTxDialogFromToEnd;
+    private EditText edtTxDialogNote;
+    private EditText edtTxDialogTeacher;
 
     private static final TableCourseMultiline EXCEL_HEADER = new TableCourseMultiline("年级", "专业", "专业人数",
             "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
@@ -107,23 +111,31 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             e.printStackTrace();
             dbHelper.createNewCourseTable();
         }
-        List<TableCourseMultiline> list = dbHelper.findAll(TableCourseMultiline.class);
+        List<TableCourseMultiline> list;
+        SharedPreferences pre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+        if (!pre.getBoolean(ConstantStr.IS_USER_CHANGED, false)) {
+            list = dbHelper.findAll(TableCourseMultiline.class);
+            removeFirstThree(list);
+            excelListData.addAll(list);
+            if (excelListData.size() > 0) {
+                excelListData.add(0, EXCEL_HEADER);
+            }
+            dbHelper.changeTableName(commonTableName, tableName);
 
-        removeFirstThree(list);
-
-        excelListData.addAll(list);
-        if (excelListData.size() > 0) {
-            excelListData.add(0, EXCEL_HEADER);
+            mExcelAdapter = new
+                    ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
+            ListView excelListView;
+            excelListView = (ListView) findViewById(R.id.lv_excel_display);
+            excelListView.setEmptyView(findViewById(R.id.tv_empty_excel));
+            excelListView.setAdapter(mExcelAdapter);
+            excelListView.setOnItemClickListener(this);
+        } else {
+            SharedPreferences.Editor editor = pre.edit();
+            editor.putBoolean(ConstantStr.IS_USER_CHANGED,false);
+            editor.apply();
         }
-        dbHelper.changeTableName(commonTableName, tableName);
 
-        mExcelAdapter = new
-                ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
-        ListView excelListView;
-        excelListView = (ListView) findViewById(R.id.lv_excel_display);
-        excelListView.setEmptyView(findViewById(R.id.tv_empty_excel));
-        excelListView.setAdapter(mExcelAdapter);
-        excelListView.setOnItemClickListener(this);
+
     }
 
     private void removeFirstThree(List<TableCourseMultiline> list) {
@@ -157,6 +169,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         Loger.d(TAG + "GetServerData",
                                 "TaskState:" + taskState + "\ndata:" + excelListData.size());
 
+                        hasCommitted = responseStr.contains("\"workNumber\":\"" + workNumber + "\"");
+                        Loger.d(TAG + "GetServerData", "HasCommitted: " + String.valueOf(hasCommitted));
+
                         // 插入数据库
                         dbHelper.dropTable(commonTableName);
                         try {
@@ -165,11 +180,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             e.printStackTrace();
                             dbHelper.createNewCourseTable();
                         }
-                        hasCommitted = dbHelper.hasCommitted(workNumber);
-                        Loger.d(TAG + "GetServerData", "isFinish: " + String.valueOf(hasCommitted));
                         dbHelper.deleteAll(TableCourseMultiline.class);
                         dbHelper.insertAll(list);
+
+
                         dbHelper.changeTableName(commonTableName, tableName);
+
 
                         // 显示在界面上
                         removeFirstThree(list);
@@ -257,6 +273,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark(edtTxDialogNote.getText().toString());
                                 courseModify.setTeacherName(edtTxDialogTeacher.getText().toString());
                                 courseModify.setWorkNumber(workNumber);
+
                                 if (!identity.equals(ConstantStr.ID_TEACHER)) {
                                     postOneLineToServer(courseModify);
                                 } else {
@@ -276,23 +293,26 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
-                                dbHelper.dropTable(commonTableName);
-                                dbHelper.changeTableName(tableName, commonTableName);
-
                                 TableCourseMultiline courseModify = new TableCourseMultiline();
                                 courseModify.setCourseName(excelListData.get(position).getCourseName());
                                 courseModify.setTimePeriod("");
                                 courseModify.setRemark("");
                                 courseModify.setTeacherName("");
                                 courseModify.setWorkNumber("");
-                                dbHelper.update(courseModify);
 
-                                dbHelper.changeTableName(commonTableName, tableName);
+                                if (!identity.equals(ConstantStr.ID_TEACHER)) {
+                                    postOneLineToServer(courseModify);
+                                } else {
+                                    dbHelper.dropTable(commonTableName);
+                                    dbHelper.changeTableName(tableName, commonTableName);
+                                    dbHelper.update(courseModify);
+                                    dbHelper.changeTableName(commonTableName, tableName);
+                                    onResume();
+                                }
 
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            onResume();
                         }
                     })
                     .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -305,7 +325,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     // 设置弹窗的数据
-    private void initRowWindowData(int position, View v, boolean canBeChanged) {
+    private void initRowWindowData(int position, View v, boolean canNotBeChanged) {
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -315,9 +335,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         TextView tvDialogClassHour = (TextView) v.findViewById(R.id.tv_dialog_class_hour);
         TextView tvDialogExperimentHour = (TextView) v.findViewById(R.id.tv_dialog_experiment_hour);
         TextView tvDialogComputerHour = (TextView) v.findViewById(R.id.tv_dialog_computer_hour);
-        EditText edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
-        EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
-        EditText edtTxDialogTeacher = (EditText) v.findViewById(R.id.edtTx_dialog_teacher);
+
+        edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
+        edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
+        edtTxDialogTeacher = (EditText) v.findViewById(R.id.edtTx_dialog_teacher);
 
         TableCourseMultiline rowData = excelListData.get(position);
         tvDialogGrade.setText(rowData.getGrade());
@@ -332,7 +353,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         edtTxDialogTeacher.setText(rowData.getTeacherName());
         edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
         edtTxDialogNote.setText(rowData.getRemark());
-        if (canBeChanged) {
+
+        if (canNotBeChanged) {
             edtTxDialogTeacher.setFocusable(false);
             edtTxDialogTeacher.setEnabled(false);
             edtTxDialogFromToEnd.setFocusable(false);
@@ -340,14 +362,24 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             edtTxDialogNote.setFocusable(false);
             edtTxDialogNote.setEnabled(false);
         }
+
+        if (taskState.equals("0")&&identity.equals(ConstantStr.ID_TEACHER)){
+            edtTxDialogTeacher.setFocusable(false);
+            edtTxDialogTeacher.setEnabled(false);
+            String name = dbHelper.findById(workNumber, TableUserTeacher.class).getName();
+            edtTxDialogTeacher.setText(name);
+        }
     }
 
+    // 提交报课的按钮
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.excel_display_activity_actons, menu);
         switch (identity) {
             case ConstantStr.ID_TEACHER:
-                menu.findItem(R.id.action_commit_task).setVisible(true);
+                if (taskState.equals("0")) {
+                    menu.findItem(R.id.action_commit_task).setVisible(true);
+                }
                 break;
 //            case ConstantStr.ID_DEPARTMENT_HEAD:
 //                menu.findItem(R.id.action_commit_check).setVisible(true);
@@ -361,26 +393,27 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         return true;
     }
 
+    // 工具栏
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 return true;
             case R.id.action_commit_task:
                 Loger.d("TAG", "commit task");
                 //点击提交报课逻辑
-                if (taskState.equals("2")) {
-                    showForbidCommitDialog("报课任务已结束，无法进行提交");
-                } else if (taskState.equals("1")) {
-                    showForbidCommitDialog("报课信息正在审核中，请等待...");
+//                if (taskState.equals("2")) {
+//                    showForbidCommitDialog("报课任务已结束，无法进行提交");
+//                } else if (taskState.equals("1")) {
+//                    showForbidCommitDialog("报课信息正在审核中，请等待...");
+//                } else {
+                if (hasCommitted) {
+                    showForbidCommitDialog("您已进行过提交，不能再次提交！");
                 } else {
-                    if (hasCommitted) {
-                        showForbidCommitDialog("您已进行过提交，不能再次提交！");
-                    } else {
-                        showCommitTaskDialog("是否提交报课", "一旦提交将不能再次修改报课信息！");
-                    }
+                    showCommitTaskDialog("是否提交报课", "一旦提交将不能再次修改报课信息！");
                 }
+//                }
                 return true;
 //            case R.id.action_commit_check:
 //                if (taskState.equals("2")) {
@@ -634,6 +667,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         }
                     })
                     .show();
+        } else {
+            finish();
         }
     }
 }
