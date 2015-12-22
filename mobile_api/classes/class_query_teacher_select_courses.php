@@ -3,7 +3,7 @@ require_once 'trans.php';
 
 class QueryTeacherSelectCourses
 {
-    public function queryTeacher($tableName = "", $workNumber = "", $ident = "")
+    public function queryTeacher($tableName = "", $workNumber = "")
     {
         $con = mysql_connect("localhost", "root", "");
 	    mysql_select_db('teacher_class_system',$con);
@@ -11,9 +11,9 @@ class QueryTeacherSelectCourses
             die('Could not connect: ' . mysql_error());
         } else {
             mysql_query("SET NAMES utf8");
-            $state = mysql_query("SELECT taskState FROM task_info where relativeTable = $tableName");
-            $state_result = mysql_fetch_assoc($state);
-            if ($state_result['taskState'] > 1) {
+            $find_state = mysql_query("SELECT taskState FROM task_info where relativeTable = '$tableName'");
+            $state_result = mysql_fetch_assoc($find_state);
+            if ($state_result['taskState'] == 2) {
                 $tableNameCB = 'cb_' . $tableName;
                 $statement = "SELECT * FROM $tableNameCB";
                 $result = mysql_query($statement);

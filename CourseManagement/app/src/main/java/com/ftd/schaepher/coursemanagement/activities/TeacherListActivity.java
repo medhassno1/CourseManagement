@@ -558,11 +558,8 @@ public class TeacherListActivity extends AppCompatActivity
         @Override
         public void onResponse(Response response) throws IOException {
             String result = response.body().string();
-            if (result.equals("没有权限")) {
-                sendToast("没有权限");
-
-            } else {
-                clossProcess();
+//            Loger.w("re", result);
+            if (result.equals("true")) {
                 sendToast("删除成功！");
                 try {
                     Loger.d("delete", "tableName:" + tableName + "|||workNumber:" + workNumber);
@@ -570,8 +567,16 @@ public class TeacherListActivity extends AppCompatActivity
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                refreshListView();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onResume();
+                    }
+                });
+            } else {
+                sendToast("删除失败");
             }
+            clossProcess();
         }
 
         @Override
@@ -582,35 +587,35 @@ public class TeacherListActivity extends AppCompatActivity
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            View v = this.getLayoutInflater().inflate(R.layout.popup_dialog_delete, null);
-            popupWindow = new PopupWindow(v, ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            popupWindow.setFocusable(true);
-            popupWindow.setOutsideTouchable(true);
-            popupWindow.setBackgroundDrawable(new BitmapDrawable());
-            popupWindow.showAsDropDown(view, ((getWindowManager()
-                    .getDefaultDisplay().getWidth() / 3)), -(3 * view.getHeight() / 2));
+        View v = this.getLayoutInflater().inflate(R.layout.popup_dialog_delete, null);
+        popupWindow = new PopupWindow(v, ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        popupWindow.showAsDropDown(view, ((getWindowManager()
+                .getDefaultDisplay().getWidth() / 3)), -(3 * view.getHeight() / 2));
 
-            Bundle bundle = new Bundle();
-            switch (parent.getId()) {
-                case R.id.lv_office_list:
-                    bundle.putString("tableName", ConstantStr.ID_TEACHING_OFFICE);
-                    bundle.putString("workNumber", officeListData.get(position).getWorkNumber());
-                    break;
-                case R.id.lv_department_list:
-                    bundle.putString("tableName", ConstantStr.ID_DEPARTMENT_HEAD);
-                    bundle.putString("workNumber", departmentListData.get(position).getWorkNumber());
-                    break;
-                case R.id.lv_teacher_list:
-                    bundle.putString("tableName", ConstantStr.ID_TEACHER);
-                    bundle.putString("workNumber", teacherListData.get(position).getWorkNumber());
-                    break;
-                default:
-                    break;
-            }
-            tvDelete = (TextView) v.findViewById(R.id.tv_popup_delete);
-            tvDelete.setOnClickListener(this);
-            tvDelete.setTag(bundle);
+        Bundle bundle = new Bundle();
+        switch (parent.getId()) {
+            case R.id.lv_office_list:
+                bundle.putString("tableName", ConstantStr.ID_TEACHING_OFFICE);
+                bundle.putString("workNumber", officeListData.get(position).getWorkNumber());
+                break;
+            case R.id.lv_department_list:
+                bundle.putString("tableName", ConstantStr.ID_DEPARTMENT_HEAD);
+                bundle.putString("workNumber", departmentListData.get(position).getWorkNumber());
+                break;
+            case R.id.lv_teacher_list:
+                bundle.putString("tableName", ConstantStr.ID_TEACHER);
+                bundle.putString("workNumber", teacherListData.get(position).getWorkNumber());
+                break;
+            default:
+                break;
+        }
+        tvDelete = (TextView) v.findViewById(R.id.tv_popup_delete);
+        tvDelete.setOnClickListener(this);
+        tvDelete.setTag(bundle);
         return true;
     }
 
