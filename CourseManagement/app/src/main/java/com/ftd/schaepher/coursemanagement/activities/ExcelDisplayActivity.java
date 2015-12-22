@@ -157,6 +157,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         Loger.d(TAG + "GetServerData",
                                 "TaskState:" + taskState + "\ndata:" + excelListData.size());
 
+                        hasCommitted = responseStr.contains("\"workNumber\":\"" + workNumber + "\"");
+                        Loger.d(TAG + "GetServerData", "HasCommitted: " + String.valueOf(hasCommitted));
+
                         // 插入数据库
                         dbHelper.dropTable(commonTableName);
                         try {
@@ -165,11 +168,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             e.printStackTrace();
                             dbHelper.createNewCourseTable();
                         }
-                        hasCommitted = dbHelper.hasCommitted(workNumber);
-                        Loger.d(TAG + "GetServerData", "isFinish: " + String.valueOf(hasCommitted));
                         dbHelper.deleteAll(TableCourseMultiline.class);
                         dbHelper.insertAll(list);
+
+
                         dbHelper.changeTableName(commonTableName, tableName);
+
 
                         // 显示在界面上
                         removeFirstThree(list);
@@ -347,7 +351,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         getMenuInflater().inflate(R.menu.excel_display_activity_actons, menu);
         switch (identity) {
             case ConstantStr.ID_TEACHER:
-                menu.findItem(R.id.action_commit_task).setVisible(true);
+                if (taskState.equals("0")) {
+                    menu.findItem(R.id.action_commit_task).setVisible(true);
+                }
                 break;
 //            case ConstantStr.ID_DEPARTMENT_HEAD:
 //                menu.findItem(R.id.action_commit_check).setVisible(true);
@@ -361,26 +367,27 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         return true;
     }
 
+    // 工具栏
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 return true;
             case R.id.action_commit_task:
                 Loger.d("TAG", "commit task");
                 //点击提交报课逻辑
-                if (taskState.equals("2")) {
-                    showForbidCommitDialog("报课任务已结束，无法进行提交");
-                } else if (taskState.equals("1")) {
-                    showForbidCommitDialog("报课信息正在审核中，请等待...");
+//                if (taskState.equals("2")) {
+//                    showForbidCommitDialog("报课任务已结束，无法进行提交");
+//                } else if (taskState.equals("1")) {
+//                    showForbidCommitDialog("报课信息正在审核中，请等待...");
+//                } else {
+                if (hasCommitted) {
+                    showForbidCommitDialog("您已进行过提交，不能再次提交！");
                 } else {
-                    if (hasCommitted) {
-                        showForbidCommitDialog("您已进行过提交，不能再次提交！");
-                    } else {
-                        showCommitTaskDialog("是否提交报课", "一旦提交将不能再次修改报课信息！");
-                    }
+                    showCommitTaskDialog("是否提交报课", "一旦提交将不能再次修改报课信息！");
                 }
+//                }
                 return true;
 //            case R.id.action_commit_check:
 //                if (taskState.equals("2")) {
@@ -634,6 +641,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         }
                     })
                     .show();
+        } else {
+            finish();
         }
     }
 }
