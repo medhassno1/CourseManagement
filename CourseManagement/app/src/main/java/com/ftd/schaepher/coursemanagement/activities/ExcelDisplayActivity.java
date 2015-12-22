@@ -223,15 +223,18 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
         initRowWindowData(position, alertDialogView);
         mBuilder.setView(alertDialogView);
-        if (hasCommitted || taskState.equals("2")||
-                (identity.equals(ConstantStr.ID_TEACHER) && !taskState.equals("0")) ) {
+        // 教师若已经提交则不能改；状态为2都不能改；若是教师，且状态不为0，也不能改。
+        if (hasCommitted || taskState.equals("2") ||
+                (identity.equals(ConstantStr.ID_TEACHER) && !taskState.equals("0"))) {
             mBuilder.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
                 }
             });
-        } else {
+        } else if (identity.equals(ConstantStr.ID_TEACHER) ||
+                (!identity.equals(ConstantStr.ID_TEACHER) && taskState.equals("1"))) {
+            // 如果可以改。则教师可以改；系负责人和教学办只有在状态为1时才能改
             mBuilder
                     .setPositiveButton("确认填写", new DialogInterface.OnClickListener() {
                         @Override
@@ -242,27 +245,29 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                     (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_from_to_end);
                             EditText edtTxDialogNote =
                                     (EditText) alertDialogView.findViewById(R.id.edtTx_dialog_note);
-
                             try {
-                                dbHelper.dropTable(commonTableName);
-                                dbHelper.changeTableName(tableName, commonTableName);
-
                                 TableCourseMultiline courseModify = new TableCourseMultiline();
                                 courseModify.setCourseName(excelListData.get(position).getCourseName());
                                 courseModify.setTimePeriod(edtTxDialogFromToEnd.getText().toString());
                                 courseModify.setRemark(edtTxDialogNote.getText().toString());
                                 courseModify.setTeacherName(edtTxDialogTeacher.getText().toString());
                                 courseModify.setWorkNumber(workNumber);
-                                dbHelper.update(courseModify);
-
-                                dbHelper.changeTableName(commonTableName, tableName);
+                                if (!identity.equals(ConstantStr.ID_TEACHER)) {
+                                    postOneLineToServer(courseModify);
+                                } else {
+                                    dbHelper.dropTable(commonTableName);
+                                    dbHelper.changeTableName(tableName, commonTableName);
+                                    dbHelper.update(courseModify);
+                                    dbHelper.changeTableName(commonTableName, tableName);
+                                    onResume();
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            onResume();
+
                         }
                     })
-                    .setNeutralButton("删除填写", new DialogInterface.OnClickListener() {
+                    .setNeutralButton("清空", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
@@ -322,7 +327,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         edtTxDialogTeacher.setText(rowData.getTeacherName());
         edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
         edtTxDialogNote.setText(rowData.getRemark());
-        if (hasCommitted||taskState.equals("2")) {
+        if (hasCommitted || taskState.equals("2")) {
             edtTxDialogTeacher.setFocusable(false);
             edtTxDialogTeacher.setEnabled(false);
             edtTxDialogFromToEnd.setFocusable(false);
@@ -372,22 +377,22 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     }
                 }
                 return true;
-            case R.id.action_commit_check:
-                if (taskState.equals("2")) {
-                    showForbidCommitDialog("报课任务已结束，无法进行提交");
-                } else if (taskState.equals("1")) {
-                    showForbidCommitDialog("您已进行过提交，不能再次提交！");
-                } else {
-                    showCommitTaskDialog("是否提交审核", "一旦提交将不能再次修改报课信息！");
-                }
-                return true;
-            case R.id.action_finish_task:
-                if (taskState.equals("2")) {
-                    showForbidCommitDialog("报课任务已结束");
-                } else {
-                    showCommitTaskDialog("是否公开报课", "一旦公共将无法再进行修改！");
-                }
-                return true;
+//            case R.id.action_commit_check:
+//                if (taskState.equals("2")) {
+//                    showForbidCommitDialog("报课任务已结束，无法进行提交");
+//                } else if (taskState.equals("1")) {
+//                    showForbidCommitDialog("您已进行过提交，不能再次提交！");
+//                } else {
+//                    showCommitTaskDialog("是否提交审核", "一旦提交将不能再次修改报课信息！");
+//                }
+//                return true;
+//            case R.id.action_finish_task:
+//                if (taskState.equals("2")) {
+//                    showForbidCommitDialog("报课任务已结束");
+//                } else {
+//                    showCommitTaskDialog("是否公开报课", "一旦公共将无法再进行修改！");
+//                }
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -442,8 +447,35 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 }).show();
     }
 
-    private void postOneLineToServer() {
+    private void postOneLineToServer(final TableCourseMultiline course) throws IOException {
+        String cbTableName = "cb_" + tableName;
+        NetworkManager.postToServerAsync(cbTableName,
+                JsonTools.getJsonString(course), NetworkManager.INSERT_OR_UPDATE_CB_TABLE, new NetworkManager.ResponseCallback() {
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        String result = response.body().string();
+                        Loger.w("oneLinePost",result);
+                        if (result.equals("true")) {
+                            dbHelper.dropTable(commonTableName);
+                            dbHelper.changeTableName(tableName, commonTableName);
+                            dbHelper.update(course);
+                            dbHelper.changeTableName(commonTableName, tableName);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    onResume();
+                                }
+                            });
+                        } else {
+                            sendToast("更新失败，请重试");
+                        }
+                    }
 
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+
+                    }
+                });
     }
 
     // 提交报课信息到服务器
@@ -465,26 +497,27 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 e.printStackTrace();
                 sendToast("提交失败，请重新提交");
             }
-        } else {
-            List<TableCourseMultiline> commitData = dbHelper.findAll(TableCourseMultiline.class);
-            String cbTableName = "cb_" + tableName;
-            try {
-                String result = NetworkManager.postToServerSync(cbTableName,
-                        JsonTools.getJsonString(commitData), NetworkManager.INSERT_OR_UPDATE_CB_TABLE);
-                sendToast("提交成功");
-                if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
-                    TableTaskInfo task = new TableTaskInfo("1", tableName);
-                    dbHelper.update(task);
-                } else {
-                    TableTaskInfo task = new TableTaskInfo("2", tableName);
-                    dbHelper.update(task);
-                }
-                taskState = dbHelper.findById(tableName, TableTaskInfo.class).getTaskState();
-            } catch (IOException e) {
-                e.printStackTrace();
-                sendToast("提交失败，请重新提交");
-            }
         }
+//        else {
+//            List<TableCourseMultiline> commitData = dbHelper.findAll(TableCourseMultiline.class);
+//            String cbTableName = "cb_" + tableName;
+//            try {
+//                String result = NetworkManager.postToServerSync(cbTableName,
+//                        JsonTools.getJsonString(commitData), NetworkManager.INSERT_OR_UPDATE_CB_TABLE);
+//                sendToast("提交成功");
+//                if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+//                    TableTaskInfo task = new TableTaskInfo("1", tableName);
+//                    dbHelper.update(task);
+//                } else {
+//                    TableTaskInfo task = new TableTaskInfo("2", tableName);
+//                    dbHelper.update(task);
+//                }
+//                taskState = dbHelper.findById(tableName, TableTaskInfo.class).getTaskState();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                sendToast("提交失败，请重新提交");
+//            }
+//        }
         dbHelper.changeTableName(commonTableName, tableName);
     }
 

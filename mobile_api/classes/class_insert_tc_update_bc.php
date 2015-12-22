@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once 'trans.php';
 
 class InsertTcUpdateBc
@@ -20,7 +20,7 @@ class InsertTcUpdateBc
                 echo $statement;
                 $sql = mysql_query( $statement);
                 if ($sql) {
-                    echo " true \n ";
+                    echo "true";
                 } else {
                     echo "false";
                 }
