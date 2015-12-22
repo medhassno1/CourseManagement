@@ -30,9 +30,9 @@ class InsertTcUpdateBc
                 $search = mysql_query( "select * from $cbTableName WHERE courseName = '$row[courseName]' ");
                 $result = mysql_fetch_array($search);
                 //???????
-                $updateTeacher = $result['teacherName'] . $row['teacherName'] . ';';
-                $updateTimePeriod = $result['timePeriod'] . $row['timePeriod'] . ';';
-                $updateRemark = $result['remark'] . $row['remark'] . ';';
+                $updateTeacher = $result['teacherName'] . $row['teacherName'] . '；';
+                $updateTimePeriod = $result['timePeriod'] . $row['timePeriod'] . '；';
+                $updateRemark = $result['remark'] . $row['remark'] . '；';
                 $sql = "UPDATE $cbTableName SET timePeriod='$updateTimePeriod',teacherName ='$updateTeacher',remark='$updateRemark' WHERE courseName = '$row[courseName]'";
                 mysql_query( $sql);
                 print_r($sql);

@@ -65,7 +65,7 @@ public class NetworkManager {
     public static void deleteServerUser(String tableName, String workNumber, ResponseCallback callback) {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
-                .add("workName", workNumber)
+                .add("workNumber", workNumber)
                 .build();
         Request request = new Request.Builder()
                 .url(DELETE_USER)

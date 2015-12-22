@@ -223,7 +223,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
         initRowWindowData(position, alertDialogView);
         mBuilder.setView(alertDialogView);
-        if (hasCommitted) {
+        if (hasCommitted || taskState.equals("2")||
+                (identity.equals(ConstantStr.ID_TEACHER) && !taskState.equals("0")) ) {
             mBuilder.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -232,7 +233,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             });
         } else {
             mBuilder
-                    .setPositiveButton("确认选择", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("确认填写", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             EditText edtTxDialogTeacher =
@@ -261,7 +262,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             onResume();
                         }
                     })
-                    .setNeutralButton("删除选课", new DialogInterface.OnClickListener() {
+                    .setNeutralButton("删除填写", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
@@ -321,7 +322,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         edtTxDialogTeacher.setText(rowData.getTeacherName());
         edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
         edtTxDialogNote.setText(rowData.getRemark());
-        if (hasCommitted) {
+        if (hasCommitted||taskState.equals("2")) {
             edtTxDialogTeacher.setFocusable(false);
             edtTxDialogTeacher.setEnabled(false);
             edtTxDialogFromToEnd.setFocusable(false);
@@ -338,12 +339,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             case ConstantStr.ID_TEACHER:
                 menu.findItem(R.id.action_commit_task).setVisible(true);
                 break;
-            case ConstantStr.ID_DEPARTMENT_HEAD:
-                menu.findItem(R.id.action_commit_check).setVisible(true);
-                break;
-            case ConstantStr.ID_TEACHING_OFFICE:
-                menu.findItem(R.id.action_finish_task).setVisible(true);
-                break;
+//            case ConstantStr.ID_DEPARTMENT_HEAD:
+//                menu.findItem(R.id.action_commit_check).setVisible(true);
+//                break;
+//            case ConstantStr.ID_TEACHING_OFFICE:
+//                menu.findItem(R.id.action_finish_task).setVisible(true);
+//                break;
             default:
                 break;
         }
@@ -439,6 +440,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         commitTaskDialog.cancel();
                     }
                 }).show();
+    }
+
+    private void postOneLineToServer() {
+
     }
 
     // 提交报课信息到服务器
@@ -572,8 +577,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     @Override
     public void onBackPressed() {
-        if (!hasCommitted) {
-            SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
+        if (!hasCommitted && identity.equals(ConstantStr.ID_TEACHER)) {
+            final SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
             commitTaskDialog.message("退出将清除所有修改")
                     .title("提示")
                     .positiveAction("确定")
@@ -582,7 +587,15 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         public void onClick(View v) {
                             ExcelDisplayActivity.this.finish();
                         }
-                    }).show();
+                    })
+                    .negativeAction("取消")
+                    .negativeActionClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            commitTaskDialog.cancel();
+                        }
+                    })
+                    .show();
         }
     }
 }

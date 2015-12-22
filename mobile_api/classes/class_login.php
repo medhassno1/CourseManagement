@@ -9,7 +9,7 @@ class Login{
         } else {
             mysql_query("SET NAMES utf8");
         
-            $result = mysql_query( "SELECT * FROM $tableName where workNumber = $workNumber and password = $password");
+            $result = mysql_query( "SELECT * FROM $tableName where workNumber = '$workNumber' and password = '$password'");
 	    if (mysql_num_rows($result)>0) {
 		$result_arr = mysql_fetch_assoc($result);
 		mysql_close();
