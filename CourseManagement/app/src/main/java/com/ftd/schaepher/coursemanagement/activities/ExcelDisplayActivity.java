@@ -221,20 +221,25 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
-        initRowWindowData(position, alertDialogView);
+
+        // 教师若已经提交则不能改；状态为2都不能改；
+        // 若是教师，且状态不为0，也不能改。
+        // 系负责人和教学办只有在状态为1时才能改
+        boolean doNotChange = hasCommitted || taskState.equals("2") ||
+                (identity.equals(ConstantStr.ID_TEACHER) && !taskState.equals("0")) ||
+                (!identity.equals(ConstantStr.ID_TEACHER) && taskState.equals("0"));
+
+        initRowWindowData(position, alertDialogView, doNotChange);
         mBuilder.setView(alertDialogView);
-        // 教师若已经提交则不能改；状态为2都不能改；若是教师，且状态不为0，也不能改。
-        if (hasCommitted || taskState.equals("2") ||
-                (identity.equals(ConstantStr.ID_TEACHER) && !taskState.equals("0"))) {
+
+        if (doNotChange) {
             mBuilder.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
                 }
             });
-        } else if (identity.equals(ConstantStr.ID_TEACHER) ||
-                (!identity.equals(ConstantStr.ID_TEACHER) && taskState.equals("1"))) {
-            // 如果可以改。则教师可以改；系负责人和教学办只有在状态为1时才能改
+        } else {
             mBuilder
                     .setPositiveButton("确认填写", new DialogInterface.OnClickListener() {
                         @Override
@@ -300,7 +305,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     // 设置弹窗的数据
-    private void initRowWindowData(int position, View v) {
+    private void initRowWindowData(int position, View v, boolean canBeChanged) {
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -327,7 +332,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         edtTxDialogTeacher.setText(rowData.getTeacherName());
         edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
         edtTxDialogNote.setText(rowData.getRemark());
-        if (hasCommitted || taskState.equals("2")) {
+        if (canBeChanged) {
             edtTxDialogTeacher.setFocusable(false);
             edtTxDialogTeacher.setEnabled(false);
             edtTxDialogFromToEnd.setFocusable(false);
@@ -454,7 +459,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     @Override
                     public void onResponse(Response response) throws IOException {
                         String result = response.body().string();
-                        Loger.w("oneLinePost",result);
+                        Loger.w("oneLinePost", result);
                         if (result.equals("true")) {
                             dbHelper.dropTable(commonTableName);
                             dbHelper.changeTableName(tableName, commonTableName);
