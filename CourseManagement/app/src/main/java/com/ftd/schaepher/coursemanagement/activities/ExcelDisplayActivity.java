@@ -25,6 +25,7 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
@@ -55,6 +56,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private String commonTableName;
     private ProgressDialog progress;
     private ExcelAdapter mExcelAdapter;
+    private EditText edtTxDialogFromToEnd;
+    private EditText edtTxDialogNote;
+    private EditText edtTxDialogTeacher;
 
     private static final TableCourseMultiline EXCEL_HEADER = new TableCourseMultiline("年级", "专业", "专业人数",
             "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
@@ -269,6 +273,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark(edtTxDialogNote.getText().toString());
                                 courseModify.setTeacherName(edtTxDialogTeacher.getText().toString());
                                 courseModify.setWorkNumber(workNumber);
+
                                 if (!identity.equals(ConstantStr.ID_TEACHER)) {
                                     postOneLineToServer(courseModify);
                                 } else {
@@ -288,23 +293,26 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
-                                dbHelper.dropTable(commonTableName);
-                                dbHelper.changeTableName(tableName, commonTableName);
-
                                 TableCourseMultiline courseModify = new TableCourseMultiline();
                                 courseModify.setCourseName(excelListData.get(position).getCourseName());
                                 courseModify.setTimePeriod("");
                                 courseModify.setRemark("");
                                 courseModify.setTeacherName("");
                                 courseModify.setWorkNumber("");
-                                dbHelper.update(courseModify);
 
-                                dbHelper.changeTableName(commonTableName, tableName);
+                                if (!identity.equals(ConstantStr.ID_TEACHER)) {
+                                    postOneLineToServer(courseModify);
+                                } else {
+                                    dbHelper.dropTable(commonTableName);
+                                    dbHelper.changeTableName(tableName, commonTableName);
+                                    dbHelper.update(courseModify);
+                                    dbHelper.changeTableName(commonTableName, tableName);
+                                    onResume();
+                                }
 
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            onResume();
                         }
                     })
                     .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -317,7 +325,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     // 设置弹窗的数据
-    private void initRowWindowData(int position, View v, boolean canBeChanged) {
+    private void initRowWindowData(int position, View v, boolean canNotBeChanged) {
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -327,9 +335,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         TextView tvDialogClassHour = (TextView) v.findViewById(R.id.tv_dialog_class_hour);
         TextView tvDialogExperimentHour = (TextView) v.findViewById(R.id.tv_dialog_experiment_hour);
         TextView tvDialogComputerHour = (TextView) v.findViewById(R.id.tv_dialog_computer_hour);
-        EditText edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
-        EditText edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
-        EditText edtTxDialogTeacher = (EditText) v.findViewById(R.id.edtTx_dialog_teacher);
+
+        edtTxDialogFromToEnd = (EditText) v.findViewById(R.id.edtTx_dialog_from_to_end);
+        edtTxDialogNote = (EditText) v.findViewById(R.id.edtTx_dialog_note);
+        edtTxDialogTeacher = (EditText) v.findViewById(R.id.edtTx_dialog_teacher);
 
         TableCourseMultiline rowData = excelListData.get(position);
         tvDialogGrade.setText(rowData.getGrade());
@@ -344,7 +353,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         edtTxDialogTeacher.setText(rowData.getTeacherName());
         edtTxDialogFromToEnd.setText(rowData.getTimePeriod());
         edtTxDialogNote.setText(rowData.getRemark());
-        if (canBeChanged) {
+
+        if (canNotBeChanged) {
             edtTxDialogTeacher.setFocusable(false);
             edtTxDialogTeacher.setEnabled(false);
             edtTxDialogFromToEnd.setFocusable(false);
@@ -352,8 +362,16 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             edtTxDialogNote.setFocusable(false);
             edtTxDialogNote.setEnabled(false);
         }
+
+        if (taskState.equals("0")&&identity.equals(ConstantStr.ID_TEACHER)){
+            edtTxDialogTeacher.setFocusable(false);
+            edtTxDialogTeacher.setEnabled(false);
+            String name = dbHelper.findById(workNumber, TableUserTeacher.class).getName();
+            edtTxDialogTeacher.setText(name);
+        }
     }
 
+    // 提交报课的按钮
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.excel_display_activity_actons, menu);
