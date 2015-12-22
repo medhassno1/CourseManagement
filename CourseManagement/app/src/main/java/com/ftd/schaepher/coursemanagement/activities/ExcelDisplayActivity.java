@@ -25,6 +25,7 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
@@ -352,8 +353,16 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             edtTxDialogNote.setFocusable(false);
             edtTxDialogNote.setEnabled(false);
         }
+
+        if (taskState.equals("0")&&identity.equals(ConstantStr.ID_TEACHER)){
+            edtTxDialogTeacher.setFocusable(false);
+            edtTxDialogTeacher.setEnabled(false);
+            String name = dbHelper.findById(workNumber, TableUserTeacher.class).getName();
+            edtTxDialogTeacher.setText(name);
+        }
     }
 
+    // 提交报课的按钮
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.excel_display_activity_actons, menu);
