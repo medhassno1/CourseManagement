@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity
     private String workNumber;
     private String password;
     private String identity;
+    private String workNumberPre;
 
     private SharedPreferences.Editor informationEditor;
 
@@ -75,7 +76,8 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的账号
      */
     private void autoSetWorkNumber() {
-        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
+        workNumberPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
+        workNumber = workNumberPre;
         if (!workNumber.equals("")) {
             edtTxWorkNumber.setText(workNumber);
         }
@@ -147,7 +149,11 @@ public class LoginActivity extends AppCompatActivity
                     Loger.d(TAG, result);
                     progress.cancel();
                     if (result.startsWith("{")) {
-//                        这里应该改为获取服务器个人数据，并存储到数据库中
+                        // 判断是否更换账号
+                        if (!workNumber.equals(workNumberPre)) {
+                            informationEditor.putBoolean(ConstantStr.IS_USER_CHANGED, true);
+                        }
+
                         informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
                         informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);
                         informationEditor.apply();

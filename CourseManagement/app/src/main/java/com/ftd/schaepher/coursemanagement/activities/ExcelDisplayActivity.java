@@ -107,23 +107,31 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             e.printStackTrace();
             dbHelper.createNewCourseTable();
         }
-        List<TableCourseMultiline> list = dbHelper.findAll(TableCourseMultiline.class);
+        List<TableCourseMultiline> list;
+        SharedPreferences pre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+        if (!pre.getBoolean(ConstantStr.IS_USER_CHANGED, false)) {
+            list = dbHelper.findAll(TableCourseMultiline.class);
+            removeFirstThree(list);
+            excelListData.addAll(list);
+            if (excelListData.size() > 0) {
+                excelListData.add(0, EXCEL_HEADER);
+            }
+            dbHelper.changeTableName(commonTableName, tableName);
 
-        removeFirstThree(list);
-
-        excelListData.addAll(list);
-        if (excelListData.size() > 0) {
-            excelListData.add(0, EXCEL_HEADER);
+            mExcelAdapter = new
+                    ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
+            ListView excelListView;
+            excelListView = (ListView) findViewById(R.id.lv_excel_display);
+            excelListView.setEmptyView(findViewById(R.id.tv_empty_excel));
+            excelListView.setAdapter(mExcelAdapter);
+            excelListView.setOnItemClickListener(this);
+        } else {
+            SharedPreferences.Editor editor = pre.edit();
+            editor.putBoolean(ConstantStr.IS_USER_CHANGED,false);
+            editor.apply();
         }
-        dbHelper.changeTableName(commonTableName, tableName);
 
-        mExcelAdapter = new
-                ExcelAdapter(ExcelDisplayActivity.this, R.layout.list_item_excel_display, excelListData);
-        ListView excelListView;
-        excelListView = (ListView) findViewById(R.id.lv_excel_display);
-        excelListView.setEmptyView(findViewById(R.id.tv_empty_excel));
-        excelListView.setAdapter(mExcelAdapter);
-        excelListView.setOnItemClickListener(this);
+
     }
 
     private void removeFirstThree(List<TableCourseMultiline> list) {
