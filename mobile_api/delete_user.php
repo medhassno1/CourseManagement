@@ -7,7 +7,7 @@
 error_reporting(0);
 require_once './classes/class_delete_user.php';
 $tableName = $_POST["tableName"];
-$workNumber = $_POST["workNumber"];
+$workNumber = $_POST["workName"];
 
 session_start();
 $ident = $_SESSION['id'];

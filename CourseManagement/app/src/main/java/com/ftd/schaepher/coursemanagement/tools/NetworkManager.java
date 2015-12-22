@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class NetworkManager {
     // 服务器基础地址，指向存放api的文件夹
     private static final String URL_BASE = "http://139.129.39.29/Teacher_class_systemDemo(alpha)/Teacher_class_syetemDemo/mobile_api/";
+//    private static final String URL_BASE = "http://114.215.153.57/TeacherClass/Teacher_class_systemDemo(alpha)/Teacher_class_syetemDemo/mobile_api/";
     // 创建创建表格并且插入数据（发布新任务）
     public static final String CREATE_TABLE = URL_BASE + "create_table.php";
     // 删除任务
@@ -61,11 +62,11 @@ public class NetworkManager {
         client.newCall(request).enqueue(callback);
     }
 
-    // 异步的post
+    // 异步的post，删除用户
     public static void deleteServerUser(String tableName, String workNumber, ResponseCallback callback) {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
-                .add("workName", workNumber)
+                .add("workNumber", workNumber)
                 .build();
         Request request = new Request.Builder()
                 .url(DELETE_USER)
@@ -93,7 +94,7 @@ public class NetworkManager {
         }
     }
 
-    // 同步的post
+    // 同步的post，更新用户
     public static String updateUserData(String tableName, String jsonData,
                                         String manageMajor, String actionURL) throws IOException {
         if (manageMajor == null) {

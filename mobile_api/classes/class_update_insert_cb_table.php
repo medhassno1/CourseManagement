@@ -14,16 +14,21 @@ class UpdateInsertCbTable
             $jsonArry = json_decode($jsonData, true);
             foreach ($jsonArry as $row) {
                 $sql = "UPDATE $tableName SET timePeriod='$row[timePeriod]',teacherName ='$row[teacherName]',remark='$row[remark]' WHERE courseName = '$row[courseName]'";
-                mysql_query($sql);
+                if(mysql_query($sql)){
+                    echo 'true';
+                } else {
+		    echo 'false';
+		}
             }
-            $tcTableName = substr($tableName, 3);
-            if ($ident == 'user_department_head') {
-                $statement = "UPDATE task_info SET taskState='1'WHERE relativeTable='$tcTableName'";
+           
+            // $tcTableName = substr($tableName, 3);
+            // if ($ident == 'user_department_head') {
+            //     $statement = "UPDATE task_info SET taskState='1'WHERE relativeTable='$tcTableName'";
 
-            } else {
-                $statement = "UPDATE task_info SET taskState='2'WHERE relativeTable='$tcTableName'";
-            }
-            mysql_query($statement);
+            // } else {
+            //     $statement = "UPDATE task_info SET taskState='2'WHERE relativeTable='$tcTableName'";
+            // }
+            // mysql_query($statement);
         }
     }
 }
