@@ -74,6 +74,7 @@ public class TaskListActivity extends AppCompatActivity
     private PopupWindow popupWindow;
     private ProgressDialog mProgress;
     private ArrayAdapter<String> spinnerAdapter;
+    private TextView tvListEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +86,9 @@ public class TaskListActivity extends AppCompatActivity
         actionBar.setTitle("报课任务列表");
         setNavViewConfig();
         setSupportDoubleBackExit(true);
+        tvListEmpty =(TextView)findViewById(R.id.tv_empty_listview);
         mListView = (ListView) findViewById(R.id.lv_task_list);
-        mListView.setEmptyView(findViewById(R.id.tv_empty_listview));
+        mListView.setEmptyView(tvListEmpty);
         refreshableView = (RefreshableView) findViewById(R.id.refreshTask_view);
         dbHelper = new CourseDBHelper(TaskListActivity.this);
         taskListData = dbHelper.findAll(TableTaskInfo.class);
@@ -172,6 +174,14 @@ public class TaskListActivity extends AppCompatActivity
                 if (list != null) {
                     Loger.w(TAG, "jsonList" + list.toString());
                     dbHelper.insertAll(list);
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            tvListEmpty.setText("无报课任务");
+//                            mListView.deferNotifyDataSetChanged();
+                        }
+                    });
                 }
 
                 runOnUiThread(new Runnable() {
@@ -200,11 +210,13 @@ public class TaskListActivity extends AppCompatActivity
         if (taskListData != null) {
             taskListData.clear();
         }
-        String year = selectedTerm.substring(0, 4);
-        String semester = selectedTerm.substring(4, 6);
-        List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
-                "year=\"" + year + "\" and semester=\"" + semester + "\"");
-        taskListData.addAll(list);
+        if (!selectedTerm.equals("学期")){
+            String year = selectedTerm.substring(0, 4);
+            String semester = selectedTerm.substring(4, 6);
+            List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
+                    "year=\"" + year + "\" and semester=\"" + semester + "\"");
+            taskListData.addAll(list);
+        }
     }
 
     // 显示任务列表数据
@@ -315,8 +327,13 @@ public class TaskListActivity extends AppCompatActivity
     public void refreshSpinner() {
         List<String> semesterList = dbHelper.getSemesterList();
         spinnerAdapter.clear();
-        spinnerAdapter.addAll(semesterList);
-        if (spinnerAdapter != null) {
+        if (!semesterList.isEmpty()){
+            spinnerAdapter.addAll(semesterList);
+            if (spinnerAdapter != null) {
+                spinnerAdapter.notifyDataSetChanged();
+            }
+        } else {
+            spinnerAdapter.add("学期");
             spinnerAdapter.notifyDataSetChanged();
         }
     }
