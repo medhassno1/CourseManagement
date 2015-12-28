@@ -1,7 +1,6 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -233,8 +232,13 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
      */
     private TableUserTeacher getUITeacherData() {
         TableUserTeacher teacher = new TableUserTeacher();
-        teacher.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        teacher.setPassword(edtTxPassword.getText().toString().trim());
+        String workNumber = edtTxTeacherNumber.getText().toString().trim();
+        teacher.setWorkNumber(workNumber);
+        String password = edtTxPassword.getText().toString().trim();
+        if (password.isEmpty()) {
+            password = workNumber;
+        }
+        teacher.setPassword(password);
         teacher.setName(edtTxTeacherName.getText().toString().trim());
         teacher.setDepartment(edtTxDepartment.getText().toString().trim());
         teacher.setTelephone(edtTxPhoneNumber.getText().toString().trim());
@@ -247,8 +251,13 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
      */
     private TableUserDepartmentHead getUIDepartmentHeadData() {
         TableUserDepartmentHead departmentHead = new TableUserDepartmentHead();
-        departmentHead.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        departmentHead.setPassword(edtTxPassword.getText().toString().trim());
+        String workNumber = edtTxTeacherNumber.getText().toString().trim();
+        departmentHead.setWorkNumber(workNumber);
+        String password = edtTxPassword.getText().toString().trim();
+        if (password.isEmpty()) {
+            password = workNumber;
+        }
+        departmentHead.setPassword(password);
         departmentHead.setName(edtTxTeacherName.getText().toString().trim());
         departmentHead.setDepartment(edtTxDepartment.getText().toString().trim());
         departmentHead.setTelephone(edtTxPhoneNumber.getText().toString().trim());
@@ -281,8 +290,13 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
      */
     private TableUserTeachingOffice getUITeachingOfficeData() {
         TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
-        teachingOffice.setWorkNumber(edtTxTeacherNumber.getText().toString().trim());
-        teachingOffice.setPassword(edtTxPassword.getText().toString().trim());
+        String workNumber = edtTxTeacherNumber.getText().toString().trim();
+        teachingOffice.setWorkNumber(workNumber);
+        String password = edtTxPassword.getText().toString().trim();
+        if (password.isEmpty()) {
+            password = workNumber;
+        }
+        teachingOffice.setPassword(password);
         teachingOffice.setName(edtTxTeacherName.getText().toString().trim());
         teachingOffice.setTelephone(edtTxPhoneNumber.getText().toString().trim());
         teachingOffice.setEmail(edtTxEmail.getText().toString().trim());
@@ -290,16 +304,23 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     }
 
     private boolean isAllWrite() {
+        boolean isAllOk = true;
+
         if (edtTxTeacherNumber.getText().toString().trim().equals("")) {
             edtTxTeacherNumber.setError("工号不能为空");
-        } else if (edtTxPassword.getText().toString().trim().equals("")) {
-            edtTxPassword.setError("密码不能为空");
-        } else if (edtTxTeacherName.getText().toString().trim().equals("")) {
-            edtTxTeacherName.setError("姓名不能为空");
-        } else {
-            return true;
+            isAllOk = false;
         }
-        return false;
+
+//        if (edtTxPassword.getText().toString().trim().equals("")) {
+//            edtTxPassword.setError("密码不能为空");
+//            isAllOk = false;
+//        }
+
+        if (edtTxTeacherName.getText().toString().trim().equals("")) {
+            edtTxTeacherName.setError("姓名不能为空");
+            isAllOk = false;
+        }
+        return isAllOk;
     }
 
     //提交数据到服务器

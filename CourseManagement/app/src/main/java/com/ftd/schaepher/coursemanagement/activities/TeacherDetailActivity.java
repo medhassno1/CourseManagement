@@ -103,6 +103,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     edtTxPassword.setText(Information.getPassword());
                     edtTxTeacherName.setText(Information.getName());
                     edtTxPhoneNumber.setText(Information.getTelephone());
+                    edtTxEmail.setText(Information.getEmail());
                     edtTxDepartment.setVisibility(View.GONE);
                 }
             }
@@ -147,10 +148,11 @@ public class TeacherDetailActivity extends AppCompatActivity {
     }
 
     private void initUserPermission() {
+        // 都不允许修改工号
+        edtTxTeacherNumber.setEnabled(false);
         if (!userIdentity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             edtTxDepartment.setEnabled(false);
             edtTxMajor.setEnabled(false);
-            edtTxTeacherNumber.setEnabled(false);
         }
     }
 
@@ -287,9 +289,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 if (queryIdentity.equals(ConstantStr.ID_TEACHER)) {
                     try {
                         Loger.i("updateTeacher", "开始发送服务器");
-                        NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHER,
+                        String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHER,
                                 JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
-                        Loger.i("updateTeacher", "发送服务器结束，开始插入本地数据库");
+                        Loger.i("updateTeacher", result);
                         dbHelper.update(user);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -298,18 +300,21 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     List<TableManageMajor> manageMajorList = getUIManageMajorData();
                     try {
                         // 系负责人表
-                        NetworkManager.updateUserData(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
-                                JsonTools.getJsonString(user), JsonTools.getJsonString(manageMajorList), NetworkManager.UPDATE_USER_DATA);
+                        String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                                JsonTools.getJsonString(user),
+                                JsonTools.getJsonString(manageMajorList), NetworkManager.UPDATE_USER_DATA);
+                        Loger.i("updateTeacher", result);
                         dbHelper.update(user);
                         dbHelper.updateAll(manageMajorList);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else {
+                } else if (queryIdentity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
                     try {
                         // 教学办
-                        NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                        String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                 JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
+                        Loger.i("updateTeacher", result);
                         dbHelper.update(user);
                     } catch (Exception e) {
                         e.printStackTrace();
