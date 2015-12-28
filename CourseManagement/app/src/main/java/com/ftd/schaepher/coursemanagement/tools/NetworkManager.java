@@ -100,6 +100,9 @@ public class NetworkManager {
         if (manageMajor == null) {
             manageMajor = " ";
         }
+        Loger.w("update",tableName);
+        Loger.w("updateInfo",jsonData);
+        Loger.w("updateURL",actionURL);
         RequestBody formBody = new FormEncodingBuilder()
                 .add("tableName", tableName)
                 .add("jsonData", jsonData)

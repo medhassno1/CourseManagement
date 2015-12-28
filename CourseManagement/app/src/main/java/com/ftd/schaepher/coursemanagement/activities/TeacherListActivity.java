@@ -64,13 +64,8 @@ public class TeacherListActivity extends AppCompatActivity
 
     private Toolbar mToolbar;
     private EditText eSearch;
-    private Runnable eChanged = new Runnable() {
-        @Override
-        public void run() {
-            // 搜索栏
-            String data = eSearch.getText().toString();
-        }
-    };
+    private Runnable eChanged;
+
     private RefreshableView refreshableView;
     private ImageView ivDeleteText;
     private TextView tvOwnName;
@@ -91,6 +86,9 @@ public class TeacherListActivity extends AppCompatActivity
     private TeacherOfficeAdapter officeAdapter;
     private String identity;
     private CourseDBHelper dbHelper;
+    private TextView tvListEmptyTeacher;
+    private TextView tvListEmptyDepartment;
+    private TextView tvListEmptyOffice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +107,15 @@ public class TeacherListActivity extends AppCompatActivity
         isSupportDoubleBackExit = true;
         mProgress = new ProgressDialog(TeacherListActivity.this);
 
-        setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
-        setIvDeleteTextOnClick(); // 设置叉叉的监听器
+//        eChanged = new Runnable() {
+//            @Override
+//            public void run() {
+//                // 搜索栏
+//                String data = eSearch.getText().toString();
+//            }
+//        };
+//        setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
+//        setIvDeleteTextOnClick(); // 设置叉叉的监听器
 
         initUserInformation();
         refreshTeacherListData();
@@ -151,12 +156,17 @@ public class TeacherListActivity extends AppCompatActivity
 
     // 初始化教师列表界面的控件
     private void initTeacherListView() {
+        tvListEmptyTeacher = (TextView) findViewById(R.id.tv_empty_teacher);
         teacherListView = (MoreListView) findViewById(R.id.lv_teacher_list);
-        teacherListView.setEmptyView(findViewById(R.id.tv_empty_teacher));
+        teacherListView.setEmptyView(tvListEmptyTeacher);
+
+        tvListEmptyDepartment = (TextView) findViewById(R.id.tv_empty_department);
         departmentListView = (MoreListView) findViewById(R.id.lv_department_list);
-        departmentListView.setEmptyView(findViewById(R.id.tv_empty_department));
+        departmentListView.setEmptyView(tvListEmptyDepartment);
+
+        tvListEmptyOffice = (TextView) findViewById(R.id.tv_empty_office);
         officeListView = (MoreListView) findViewById(R.id.lv_office_list);
-        officeListView.setEmptyView(findViewById(R.id.tv_empty_office));
+        officeListView.setEmptyView(tvListEmptyOffice);
 
         if (teacherListData != null) {
             teacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
@@ -198,7 +208,14 @@ public class TeacherListActivity extends AppCompatActivity
                                 e.printStackTrace();
                             }
                             dbHelper.deleteAll(TableUserTeacher.class);
-                            if (list != null) { dbHelper.insertAll(list); }
+                            if (list != null) { dbHelper.insertAll(list); } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tvListEmptyTeacher.setText("该用户列表为空");
+                                    }
+                                });
+                            }
 
                             TeacherListActivity.this.runOnUiThread(new Runnable() {
                                 @Override
@@ -234,6 +251,13 @@ public class TeacherListActivity extends AppCompatActivity
                             if (list != null) {
                                 Loger.w("jsonList1", list.toString());
                                 dbHelper.insertAll(list);
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tvListEmptyDepartment.setText("该用户列表为空");
+                                    }
+                                });
                             }
 
                             TeacherListActivity.this.runOnUiThread(new Runnable() {
@@ -292,7 +316,15 @@ public class TeacherListActivity extends AppCompatActivity
                             if (list != null) {
                                 Loger.w("jsonList1", list.toString());
                                 dbHelper.insertAll(list);
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tvListEmptyOffice.setText("该用户列表为空");
+                                    }
+                                });
                             }
+
                             TeacherListActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

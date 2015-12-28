@@ -48,10 +48,10 @@ class UpdateUser
                 if ($ident == 'user_teaching_office') {
                     foreach ($jsonArry as $row) {
                         $sql = "UPDATE $tableName SET password='$row[password]',name ='$row[name]',telephone='$row[telephone]',email='$row[email]' WHERE workNumber = '$row[workNumber]'";
-                        mysqli_query($con, $sql);
+                        mysql_query($sql);
                     }
                 } else {
-                    echo "??????";
+                    echo "false";
                 }
             }
         }
