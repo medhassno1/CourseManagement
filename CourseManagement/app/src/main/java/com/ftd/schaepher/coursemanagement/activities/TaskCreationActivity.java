@@ -277,7 +277,7 @@ public class TaskCreationActivity extends AppCompatActivity
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        edtTxDepartmentDeadline.setText(String.format("%d-%d-%d", year, monthOfYear + 1, dayOfMonth));
+                        edtTxDepartmentDeadline.setText(String.format("%d%d%d", year, monthOfYear + 1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
@@ -286,7 +286,7 @@ public class TaskCreationActivity extends AppCompatActivity
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        edtTxTeacherDeadline.setText(String.format("%d-%d-%d", year, monthOfYear + 1, dayOfMonth));
+                        edtTxTeacherDeadline.setText(String.format("%d%d%d", year, monthOfYear + 1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
@@ -346,7 +346,7 @@ public class TaskCreationActivity extends AppCompatActivity
         wvSelectTermDay.setSelection(0);
 
         new AlertDialog.Builder(this)
-                .setTitle("选择学期")
+                .setTitle("选择学年学期")
                 .setView(wheelView)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
