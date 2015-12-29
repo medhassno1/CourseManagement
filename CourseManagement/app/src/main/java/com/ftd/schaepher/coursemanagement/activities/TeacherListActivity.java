@@ -107,15 +107,7 @@ public class TeacherListActivity extends AppCompatActivity
         isSupportDoubleBackExit = true;
         mProgress = new ProgressDialog(TeacherListActivity.this);
 
-//        eChanged = new Runnable() {
-//            @Override
-//            public void run() {
-//                // 搜索栏
-//                String data = eSearch.getText().toString();
-//            }
-//        };
-//        setSearchTextChanged(); // 设置eSearch搜索框的文本改变时监听器
-//        setIvDeleteTextOnClick(); // 设置叉叉的监听器
+//        setSearchTextChanged();
 
         initUserInformation();
         refreshTeacherListData();
@@ -208,7 +200,9 @@ public class TeacherListActivity extends AppCompatActivity
                                 e.printStackTrace();
                             }
                             dbHelper.deleteAll(TableUserTeacher.class);
-                            if (list != null) { dbHelper.insertAll(list); } else {
+                            if (list != null) {
+                                dbHelper.insertAll(list);
+                            } else {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -473,45 +467,18 @@ public class TeacherListActivity extends AppCompatActivity
 
             @Override
             public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-                //这个应该是在改变的时候会做的动作吧，具体还没用到过。
             }
 
             @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-                //这是文本框改变之前会执行的动作
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
             }
 
-            /**这是文本框改变之后 会执行的动作
-             * 因为我们要做的就是，在文本框改变的同时，我们的listview的数据也进行相应的变动，
-             * 并且如一的显示在界面上。所以这里我们就需要加上数据的修改的动作了。
-             */
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() == 0) {
-                    ivDeleteText.setVisibility(View.GONE); // 当文本框为空时，则叉叉消失
-                } else {
-                    ivDeleteText.setVisibility(View.VISIBLE); // 当文本框不为空时，出现叉叉
-                }
 
-                myHandler.post(eChanged);
             }
         });
 
-    }
-
-    /**
-     * 设置叉叉的点击事件，即清空功能
-     */
-    private void setIvDeleteTextOnClick() {
-        ivDeleteText = (ImageView) findViewById(R.id.ivDeleteText);
-        ivDeleteText.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                eSearch.setText("");
-            }
-        });
     }
 
     @Override

@@ -131,7 +131,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             excelListView.setOnItemClickListener(this);
         } else {
             SharedPreferences.Editor editor = pre.edit();
-            editor.putBoolean(ConstantStr.IS_USER_CHANGED,false);
+            editor.putBoolean(ConstantStr.IS_USER_CHANGED, false);
             editor.apply();
         }
 
@@ -363,7 +363,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             edtTxDialogNote.setEnabled(false);
         }
 
-        if (taskState.equals("0")&&identity.equals(ConstantStr.ID_TEACHER)){
+        if (taskState.equals("0") && identity.equals(ConstantStr.ID_TEACHER)) {
             edtTxDialogTeacher.setFocusable(false);
             edtTxDialogTeacher.setEnabled(false);
             String name = dbHelper.findById(workNumber, TableUserTeacher.class).getName();
@@ -411,7 +411,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 if (hasCommitted) {
                     showForbidCommitDialog("您已进行过提交，不能再次提交！");
                 } else {
-                    showCommitTaskDialog("是否提交报课", "一旦提交将不能再次修改报课信息！");
+                    showCommitTaskDialog("是否提交报课", "请注意，一旦提交您对该表选择的报课信息将不能再次修改或补充！");
                 }
 //                }
                 return true;
@@ -648,10 +648,10 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     @Override
     public void onBackPressed() {
-        if (!hasCommitted && identity.equals(ConstantStr.ID_TEACHER)) {
+        if (!hasCommitted && identity.equals(ConstantStr.ID_TEACHER) && (taskState.equals("0"))) {
             final SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);
             commitTaskDialog.message("退出将清除所有修改")
-                    .title("提示")
+                    .title("请注意")
                     .positiveAction("确定")
                     .positiveActionClickListener(new View.OnClickListener() {
                         @Override
