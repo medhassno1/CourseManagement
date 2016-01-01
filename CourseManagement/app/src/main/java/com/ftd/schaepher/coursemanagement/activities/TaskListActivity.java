@@ -86,14 +86,15 @@ public class TaskListActivity extends AppCompatActivity
         actionBar.setTitle("报课任务列表");
         setNavViewConfig();
         setSupportDoubleBackExit(true);
-        tvListEmpty =(TextView)findViewById(R.id.tv_empty_listview);
+        tvListEmpty = (TextView) findViewById(R.id.tv_empty_listview);
         mListView = (ListView) findViewById(R.id.lv_task_list);
         mListView.setEmptyView(tvListEmpty);
         refreshableView = (RefreshableView) findViewById(R.id.refreshTask_view);
-        dbHelper = new CourseDBHelper(TaskListActivity.this);
-        taskListData = dbHelper.findAll(TableTaskInfo.class);
         spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
         mProgress = new ProgressDialog(TaskListActivity.this);
+
+        dbHelper = new CourseDBHelper(TaskListActivity.this);
+        taskListData = dbHelper.findAll(TableTaskInfo.class);
 
         try {
             getServerData();
@@ -120,7 +121,6 @@ public class TaskListActivity extends AppCompatActivity
         super.onResume();
         setSpinnerData();
         initUserInformation();
-
     }
 
     // 初始化当前用户的数据
@@ -159,6 +159,7 @@ public class TaskListActivity extends AppCompatActivity
 
     // 从服务器获取数据
     private void getServerData() throws IOException {
+        Loger.w("GetServerData", "true");
         String tableName = ConstantStr.TABLE_TASK_INFO;
         NetworkManager.getJsonString(tableName, new NetworkManager.ResponseCallback() {
             @Override
@@ -174,24 +175,26 @@ public class TaskListActivity extends AppCompatActivity
                 if (list != null) {
                     Loger.w(TAG, "jsonList" + list.toString());
                     dbHelper.insertAll(list);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (spinnerAdapter == null) {
+                                setSpinnerData();
+                            } else {
+                                refreshSpinner();
+                            }
+                            onItemSelectedListener.onItemSelected(spinnerSelectTerm, null, 0, 0);
+                            mListView.deferNotifyDataSetChanged();
+                        }
+                    });
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             tvListEmpty.setText("无报课任务");
-//                            mListView.deferNotifyDataSetChanged();
                         }
                     });
                 }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshSpinner();
-                        displayTaskList();
-                    }
-                });
-
             }
 
             @Override
@@ -199,6 +202,23 @@ public class TaskListActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    // 显示任务列表数据
+    private void displayTaskList() {
+        if (selectedTerm != null) {
+            getDataByTerm(selectedTerm);
+        }
+        if (mTaskAdapter != null) {
+            mTaskAdapter.notifyDataSetChanged();
+        } else {
+            mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
+            mListView.setAdapter(mTaskAdapter);
+            mListView.setOnItemClickListener(this);
+            if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
+                mListView.setOnItemLongClickListener(this);
+            }
+        }
     }
 
     /**
@@ -210,27 +230,14 @@ public class TaskListActivity extends AppCompatActivity
         if (taskListData != null) {
             taskListData.clear();
         }
-        if (!selectedTerm.equals("学期")){
+        if (!selectedTerm.equals("学期")) {
             String year = selectedTerm.substring(0, 4);
             String semester = selectedTerm.substring(4, 6);
             List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
                     "year=\"" + year + "\" and semester=\"" + semester + "\"");
             taskListData.addAll(list);
         }
-    }
-
-    // 显示任务列表数据
-    private void displayTaskList() {
-        if (selectedTerm != null) {
-            getDataByTerm(selectedTerm);
-        }
-        mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
-        mListView.setAdapter(mTaskAdapter);
-        mListView.setOnItemClickListener(this);
-        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
-            mListView.setOnItemLongClickListener(this);
-        }
-        Loger.i("TAG", "显示数据");
+        Loger.w("GetDataByTerm", taskListData.toString());
     }
 
     // 点击任务列表项跳转操作
@@ -327,7 +334,7 @@ public class TaskListActivity extends AppCompatActivity
     public void refreshSpinner() {
         List<String> semesterList = dbHelper.getSemesterList();
         spinnerAdapter.clear();
-        if (!semesterList.isEmpty()){
+        if (!semesterList.isEmpty()) {
             spinnerAdapter.addAll(semesterList);
             if (spinnerAdapter != null) {
                 spinnerAdapter.notifyDataSetChanged();
@@ -336,6 +343,7 @@ public class TaskListActivity extends AppCompatActivity
             spinnerAdapter.add("学期");
             spinnerAdapter.notifyDataSetChanged();
         }
+        displayTaskList();
     }
 
     private android.widget.AdapterView.OnItemSelectedListener
@@ -343,8 +351,8 @@ public class TaskListActivity extends AppCompatActivity
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedTerm = (String) parent.getItemAtPosition(position);
-            getDataByTerm(selectedTerm);
 
+            getDataByTerm(selectedTerm);
             if (mTaskAdapter != null) {
                 mTaskAdapter.notifyDataSetChanged();
             } else {
@@ -378,8 +386,10 @@ public class TaskListActivity extends AppCompatActivity
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if (spinnerAdapter == null) {
+                                        setSpinnerData();
+                                    }
                                     refreshSpinner();
-                                    setSpinnerData();
                                     if (mProgress.isShowing()) {
                                         mProgress.cancel();
                                     }
