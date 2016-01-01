@@ -3,6 +3,7 @@ package com.ftd.schaepher.coursemanagement.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -109,42 +110,39 @@ public class TeacherListActivity extends AppCompatActivity
 
 //        setSearchTextChanged();
 
-        initUserInformation();
-        refreshTeacherListData();
-        initTeacherListView();
-
         Loger.i("jsonList1", "开始执行onCreate()");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getServerTeacherData();
+        if (teacherListData == null && departmentListData == null && officeListData == null) {
+            asyncTask.execute();
+        }
+        initThisUserInformation();
     }
 
-    // 左滑菜单初始配置
-    private void setNavViewConfig() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
-        tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
-                .findViewById(R.id.nav_own_name);
-        navigationView.getMenu().findItem(R.id.nav_teacher_list).setChecked(true);
-        navigationView.setNavigationItemSelectedListener(this);
+    private void initThisUserInformation() {
+        String ownName = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_NAME, "");
+        tvOwnName.setText(ownName);
     }
 
-    // 初始化教师列表数据
-    private void refreshTeacherListData() {
-        //从本地数据库获取教师数据
-        teacherListData = dbHelper.findAll(TableUserTeacher.class);
-        officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
-        departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
-    }
+    private AsyncTask asyncTask = new AsyncTask() {
+        @Override
+        protected Object doInBackground(Object[] params) {
+            teacherListData = dbHelper.findAll(TableUserTeacher.class);
+            officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+            departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+            return null;
+        }
 
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            initTeacherListView();
+        }
+    };
 
     // 初始化教师列表界面的控件
     private void initTeacherListView() {
@@ -160,191 +158,212 @@ public class TeacherListActivity extends AppCompatActivity
         officeListView = (MoreListView) findViewById(R.id.lv_office_list);
         officeListView.setEmptyView(tvListEmptyOffice);
 
-        if (teacherListData != null) {
-            teacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
-            teacherListView.setAdapter(teacherAdapter);
-            teacherListView.setOnItemClickListener(this);
-        }
-        if (departmentListData != null) {
-            departmentAdapter =
-                    new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
-            departmentListView.setAdapter(departmentAdapter);
-            departmentListView.setOnItemClickListener(this);
-        }
         if (officeListData != null) {
             officeAdapter =
                     new TeacherOfficeAdapter(this, R.layout.list_item_teacher, officeListData);
             officeListView.setAdapter(officeAdapter);
             officeListView.setOnItemClickListener(this);
         }
+
+        if (departmentListData != null) {
+            departmentAdapter =
+                    new DepartmentHeadAdapter(this, R.layout.list_item_teacher, departmentListData);
+            departmentListView.setAdapter(departmentAdapter);
+            departmentListView.setOnItemClickListener(this);
+        }
+
+        if (teacherListData != null) {
+            teacherAdapter = new TeacherAdapter(this, R.layout.list_item_teacher, teacherListData);
+            teacherListView.setAdapter(teacherAdapter);
+            teacherListView.setOnItemClickListener(this);
+        }
+
         if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             teacherListView.setOnItemLongClickListener(this);
             departmentListView.setOnItemLongClickListener(this);
             officeListView.setOnItemLongClickListener(this);
         }
-    }
 
-    private void getServerTeacherData() {
-        Loger.i("jsonList1", "开始执行getServerTeacherData()");
         try {
-            NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHER,
-                    new NetworkManager.ResponseCallback() {
-                        @Override
-                        public void onResponse(Response response) throws IOException {
-                            //从服务器获取教师数据，并更新到本地数据库
-                            List list = null;
-                            try {
-                                list = JsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
-                                Loger.w("jsonList1", list.toString());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            dbHelper.deleteAll(TableUserTeacher.class);
-                            if (list != null) {
-                                dbHelper.insertAll(list);
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvListEmptyTeacher.setText("该用户列表为空");
-                                    }
-                                });
-                            }
-
-                            TeacherListActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //从本地数据库获取教师数据
-                                    teacherAdapter.clear();
-                                    teacherListData = dbHelper.findAll(TableUserTeacher.class);
-                                    teacherAdapter.addAll(teacherListData);
-                                    teacherAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(Request request, IOException e) {
-
-                        }
-                    });
-
-            NetworkManager.getJsonString(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
-                    new NetworkManager.ResponseCallback() {
-                        @Override
-                        public void onResponse(Response response) throws IOException {
-                            //从服务器获取系负责人数据，并更新到本地数据库
-                            List list = null;
-                            try {
-                                list = JsonTools.getJsonList(response.body().string(), TableUserDepartmentHead.class);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                            dbHelper.deleteAll(TableUserDepartmentHead.class);
-                            if (list != null) {
-                                Loger.w("jsonList1", list.toString());
-                                dbHelper.insertAll(list);
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvListEmptyDepartment.setText("该用户列表为空");
-                                    }
-                                });
-                            }
-
-                            TeacherListActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
-                                    departmentAdapter.clear();
-                                    departmentAdapter.addAll(departmentListData);
-                                    departmentAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(Request request, IOException e) {
-
-                        }
-                    });
-
-            NetworkManager.getJsonString(ConstantStr.TABLE_MANAGE_MAJOR,
-                    new NetworkManager.ResponseCallback() {
-                        @Override
-                        public void onResponse(Response response) throws IOException {
-                            //从服务器获取系负责人专业数据，并更新到本地数据库
-                            List list = null;
-                            try {
-                                list = JsonTools.getJsonList(response.body().string(), TableManageMajor.class);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            dbHelper.deleteAll(TableManageMajor.class);
-                            if (list != null) {
-                                Loger.i("jsonList1", list.toString());
-                                dbHelper.insertAll(list);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Request request, IOException e) {
-
-                        }
-                    });
-
-            NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHING_OFFICE,
-                    new NetworkManager.ResponseCallback() {
-                        @Override
-                        public void onResponse(Response response) throws IOException {
-                            //从服务器获取教学办数据，并更新到本地数据库
-                            List list = null;
-                            try {
-                                list = JsonTools.getJsonList(response.body().string(), TableUserTeachingOffice.class);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            dbHelper.deleteAll(TableUserTeachingOffice.class);
-                            if (list != null) {
-                                Loger.w("jsonList1", list.toString());
-                                dbHelper.insertAll(list);
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvListEmptyOffice.setText("该用户列表为空");
-                                    }
-                                });
-                            }
-
-                            TeacherListActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
-                                    officeAdapter.clear();
-                                    officeAdapter.addAll(officeListData);
-                                    officeAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(Request request, IOException e) {
-
-                        }
-                    });
-
+            getServerUserData();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void initUserInformation() {
-        String ownName = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
-                .getString(ConstantStr.USER_NAME, "");
-        tvOwnName.setText(ownName);
+    private void getServerUserData() throws IOException {
+        Loger.i("jsonList1", "开始执行getServerTeacherData()");
+        getServerTeacherData();
+        getServerDepartmentData();
+        getServerOfficeData();
+    }
+
+    private void getServerTeacherData() throws IOException {
+        NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHER,
+                new NetworkManager.ResponseCallback() {
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        //从服务器获取教师数据，并更新到本地数据库
+                        List list = null;
+                        try {
+                            list = JsonTools.getJsonList(response.body().string(), TableUserTeacher.class);
+                            Loger.w("jsonList1", list.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        dbHelper.deleteAll(TableUserTeacher.class);
+                        if (list != null) {
+                            dbHelper.insertAll(list);
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvListEmptyTeacher.setText("该用户列表为空");
+                                }
+                            });
+                        }
+                        teacherListData = dbHelper.findAll(TableUserTeacher.class);
+                        TeacherListActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //从本地数据库获取教师数据
+                                teacherAdapter.clear();
+                                teacherAdapter.addAll(teacherListData);
+                                teacherAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+
+                    }
+                });
+    }
+
+    private void getServerDepartmentData() throws IOException {
+        NetworkManager.getJsonString(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                new NetworkManager.ResponseCallback() {
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        //从服务器获取系负责人数据，并更新到本地数据库
+                        List list = null;
+                        try {
+                            list = JsonTools.getJsonList(response.body().string(), TableUserDepartmentHead.class);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        dbHelper.deleteAll(TableUserDepartmentHead.class);
+                        if (list != null) {
+                            Loger.w("jsonList1", list.toString());
+                            dbHelper.insertAll(list);
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvListEmptyDepartment.setText("该用户列表为空");
+                                }
+                            });
+                        }
+                        departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+                        TeacherListActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                departmentAdapter.clear();
+                                departmentAdapter.addAll(departmentListData);
+                                departmentAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+
+                    }
+                });
+
+        NetworkManager.getJsonString(ConstantStr.TABLE_MANAGE_MAJOR,
+                new NetworkManager.ResponseCallback() {
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        //从服务器获取系负责人专业数据，并更新到本地数据库
+                        List list = null;
+                        try {
+                            list = JsonTools.getJsonList(response.body().string(), TableManageMajor.class);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        dbHelper.deleteAll(TableManageMajor.class);
+                        if (list != null) {
+                            Loger.i("jsonList1", list.toString());
+                            dbHelper.insertAll(list);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+
+                    }
+                });
+    }
+
+    private void getServerOfficeData() throws IOException {
+        NetworkManager.getJsonString(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                new NetworkManager.ResponseCallback() {
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        //从服务器获取教学办数据，并更新到本地数据库
+                        List list = null;
+                        try {
+                            list = JsonTools.getJsonList(response.body().string(), TableUserTeachingOffice.class);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        dbHelper.deleteAll(TableUserTeachingOffice.class);
+                        if (list != null) {
+                            Loger.w("jsonList1", list.toString());
+                            dbHelper.insertAll(list);
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvListEmptyOffice.setText("该用户列表为空");
+                                }
+                            });
+                        }
+                        officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+
+                        TeacherListActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                officeAdapter.clear();
+                                officeAdapter.addAll(officeListData);
+                                officeAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+
+                    }
+                });
+    }
+
+    // 左滑菜单初始配置
+    private void setNavViewConfig() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_teacher_list);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_teacher_list);
+        tvOwnName = (TextView) navigationView.inflateHeaderView(R.layout.nav_header_base)
+                .findViewById(R.id.nav_own_name);
+        navigationView.getMenu().findItem(R.id.nav_teacher_list).setChecked(true);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     //添加标题栏上的按钮图标
@@ -529,12 +548,13 @@ public class TeacherListActivity extends AppCompatActivity
                             Bundle bundle = (Bundle) tvDelete.getTag();
                             String tableName = bundle.getString("tableName");
                             String workNumber = bundle.getString("workNumber");
+                            int position = bundle.getInt("position");
                             NetworkManager.deleteServerUser(tableName, workNumber,
-                                    new MyResponse(tableName, workNumber));
+                                    new MyResponse(tableName, workNumber,position));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Loger.d("delete", "程序崩溃");
-                            clossProcess();
+                            closeProcess();
                         }
                     }
                 }.start();
@@ -547,11 +567,13 @@ public class TeacherListActivity extends AppCompatActivity
     class MyResponse implements NetworkManager.ResponseCallback {
         private String tableName;
         private String workNumber;
+        private int position;
 
-        public MyResponse(String tableName, String workNumber) {
+        public MyResponse(String tableName, String workNumber,int position) {
             super();
             this.tableName = tableName;
             this.workNumber = workNumber;
+            this.position = position;
         }
 
         @Override
@@ -562,26 +584,42 @@ public class TeacherListActivity extends AppCompatActivity
                 sendToast("删除成功！");
                 try {
                     Loger.d("delete", "tableName:" + tableName + "|||workNumber:" + workNumber);
-                    dbHelper.deleteByID(Class.forName(GlobalMap.get(tableName)), workNumber);
+                    Class clazz = Class.forName(GlobalMap.get(tableName));
+                    dbHelper.deleteByID(clazz, workNumber);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (tableName){
+                                case ConstantStr.TABLE_USER_TEACHER:
+                                    teacherAdapter.remove(teacherListData.get(position));
+                                    teacherAdapter.notifyDataSetChanged();
+                                    break;
+                                case ConstantStr.TABLE_USER_DEPARTMENT_HEAD:
+                                    departmentAdapter.remove(departmentListData.get(position));
+                                    departmentAdapter.notifyDataSetChanged();
+                                    break;
+                                case ConstantStr.TABLE_USER_TEACHING_OFFICE:
+                                    officeAdapter.remove(officeListData.get(position));
+                                    officeAdapter.notifyDataSetChanged();
+                                    break;
+                            }
+                        }
+                    });
+
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        onResume();
-                    }
-                });
             } else {
                 sendToast("删除失败");
             }
-            clossProcess();
+            closeProcess();
         }
 
         @Override
         public void onFailure(Request request, IOException e) {
 
         }
+
     }
 
     @Override
@@ -600,14 +638,17 @@ public class TeacherListActivity extends AppCompatActivity
             case R.id.lv_office_list:
                 bundle.putString("tableName", ConstantStr.ID_TEACHING_OFFICE);
                 bundle.putString("workNumber", officeListData.get(position).getWorkNumber());
+                bundle.putInt("position", position);
                 break;
             case R.id.lv_department_list:
                 bundle.putString("tableName", ConstantStr.ID_DEPARTMENT_HEAD);
                 bundle.putString("workNumber", departmentListData.get(position).getWorkNumber());
+                bundle.putInt("position", position);
                 break;
             case R.id.lv_teacher_list:
                 bundle.putString("tableName", ConstantStr.ID_TEACHER);
                 bundle.putString("workNumber", teacherListData.get(position).getWorkNumber());
+                bundle.putInt("position", position);
                 break;
             default:
                 break;
@@ -618,7 +659,7 @@ public class TeacherListActivity extends AppCompatActivity
         return true;
     }
 
-    private void clossProcess() {
+    private void closeProcess() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -635,17 +676,6 @@ public class TeacherListActivity extends AppCompatActivity
             public void run() {
                 Toast.makeText(TeacherListActivity.this, message,
                         Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void refreshListView() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                officeAdapter.notifyDataSetChanged();
-                departmentAdapter.notifyDataSetChanged();
-                teacherAdapter.notifyDataSetChanged();
             }
         });
     }
