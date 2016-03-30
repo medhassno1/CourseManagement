@@ -3,23 +3,15 @@ package com.ftd.schaepher.coursemanagement.tools;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Handler;
+import android.os.Environment;
 import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ProgressBar;
-
-import com.ftd.schaepher.coursemanagement.R;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,115 +21,65 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class UpdateManager {
 
-    private Context mContext;
-
-    private int versionCode;
-    private int updateVersionCode;
-    //返回的安装包url
-    private String apkUrl ;
-    //提示语
-    private String updateMsg = "有最新的软件包哦，亲快下载吧~";
-
-    private Dialog noticeDialog;
-
-    private Dialog downloadDialog;
-    /* 下载包安装路径 */
-    private static final String savePath = "/sdcard/updatedemo/";
-
-    private static final String saveFileName = savePath + "UpdateDemoRelease.apk";
-
-    /* 进度条与通知ui刷新的handler和msg常量 */
-    private ProgressBar mProgress;
-
-
-    private static final int DOWN_UPDATE = 1;
-
-    private static final int DOWN_OVER = 2;
-
-    private int progress;
-
-    private Thread downLoadThread;
-
+    private Context context;
+    private JSONObject json;
+    private ProgressDialog proDialog;
+    private static final String savePath = Environment.getExternalStorageDirectory()
+            .getAbsolutePath() + "/Download/";
     private boolean interceptFlag = false;
 
-    private Handler mHandler = new Handler(){
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case DOWN_UPDATE:
-                    mProgress.setProgress(progress);
-                    break;
-                case DOWN_OVER:
-
-                    installApk();
-                    break;
-                default:
-                    break;
-            }
-        };
-    };
-
     public UpdateManager(Context context) {
-        this.mContext = context;
+        this.context = context;
     }
 
-    //外部接口让主Activity调用
-    public void updateVersion(){
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    String version = NetworkManager.updateApk();
-                    JSONObject json = new JSONObject(version);
-                    updateVersionCode = Integer.parseInt(json.getString("versionCode"));
-                    apkUrl = json.getString("updateApkURL");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                if(needUpdate()){
-                    showNoticeDialog();
-                }
-            }
-
-        }.start();
-
-    }
-
-
-    //判断是否需要版本更新
-    private boolean needUpdate(){
-        versionCode = getVersionCode();
-        if(updateVersionCode>versionCode){
-            return true;
+    // 外部接口让主Activity调用
+    public void updateVersion() {
+        float serverVersionCode = 0;
+        try {
+            String version = NetworkManager.updateApk();
+            Loger.d("VersionDataFromServer", version);
+            json = new JSONObject(version);
+            serverVersionCode = Float.parseFloat(json.getString("serverVersionCode"));
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            return;
         }
-        return false;
+
+        float localVersionCode = getLocalVersionCode();
+        if (serverVersionCode > localVersionCode) {
+            showNoticeDialog(localVersionCode, serverVersionCode);
+        }
     }
+
 
     //获取当前版本号
-    private int getVersionCode(){
-        versionCode = 0;
+    private float getLocalVersionCode() {
+        float versionCode = 0;
         try {
-            versionCode = mContext.getPackageManager().getPackageInfo(
-                    mContext.getPackageName(), 0).versionCode;
+            versionCode = context.getPackageManager().getPackageInfo(
+                    context.getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         return versionCode;
     }
 
-    private void showNoticeDialog(){
+    private void showNoticeDialog(float localVersionCode, float serverVersionCode) {
+        //提示语
+        String updateMsg = "软件有更新，是否更新？" +
+                "\n当前版本为：" + localVersionCode +
+                "\n最新版本为：" + serverVersionCode;
+
         Looper.prepare();
-        AlertDialog.Builder builder = new Builder(mContext);
-        builder.setTitle("软件版本更新");
+
+        AlertDialog.Builder builder = new Builder(context);
+        builder.setTitle("更新");
         builder.setMessage(updateMsg);
-        builder.setPositiveButton("下载", new OnClickListener() {
+        builder.setPositiveButton("更新", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -150,101 +92,95 @@ public class UpdateManager {
                 dialog.dismiss();
             }
         });
-        noticeDialog = builder.create();
+
+        Dialog noticeDialog = builder.create();
         noticeDialog.show();
         Looper.loop();
     }
 
-    private void showDownloadDialog(){
-        AlertDialog.Builder builder = new Builder(mContext);
-        builder.setTitle("软件版本更新");
+    private void showDownloadDialog() {
 
-        final LayoutInflater inflater = LayoutInflater.from(mContext);
-        View v = inflater.inflate(R.layout.progress, null);
-        mProgress = (ProgressBar)v.findViewById(R.id.progress);
-
-        builder.setView(v);
-        builder.setNegativeButton("取消", new OnClickListener() {
+        proDialog = new ProgressDialog(context);
+        proDialog.setTitle("更新");
+        proDialog.setMessage("正在下载最新版本...");
+        proDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        proDialog.setMax(100);
+        proDialog.setButton(ProgressDialog.BUTTON_NEGATIVE, "取消", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 interceptFlag = true;
             }
         });
-        downloadDialog = builder.create();
-        downloadDialog.show();
+        proDialog.show();
 
         downloadApk();
     }
 
-    private Runnable mdownApkRunnable = new Runnable() {
+    private void downloadApk() {
+        Thread downLoadThread = new Thread(downApkRunnable);
+        downLoadThread.start();
+    }
+
+    private Runnable downApkRunnable = new Runnable() {
         @Override
         public void run() {
             try {
-                URL url = new URL(apkUrl);
+                String serverApkUrl = json.getString("apkURL");
+                URL url = new URL(serverApkUrl);
 
-                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.connect();
                 int length = conn.getContentLength();
                 InputStream is = conn.getInputStream();
 
                 File file = new File(savePath);
-                if(!file.exists()){
+                if (!file.exists()) {
                     file.mkdir();
                 }
-                String apkFile = saveFileName;
-                File ApkFile = new File(apkFile);
-                FileOutputStream fos = new FileOutputStream(ApkFile);
+                Loger.e("路径", file.getPath());
+                String downloadDir = file.getAbsolutePath();
+                String apkName = json.getString("apkName");
+
+                File apkFile = new File(downloadDir, apkName);
+                FileOutputStream fos = new FileOutputStream(apkFile);
 
                 int count = 0;
                 byte buf[] = new byte[1024];
 
-                do{
-                    int numread = is.read(buf);
-                    count += numread;
-                    progress =(int)(((float)count / length) * 100);
-                    //更新进度
-                    mHandler.sendEmptyMessage(DOWN_UPDATE);
-                    if(numread <= 0){
-                        //下载完成通知安装
-                        mHandler.sendEmptyMessage(DOWN_OVER);
+                do {
+                    int numRead = is.read(buf);
+                    count += numRead;
+                    int proDownloading = (int) (((float) count / length) * 100);
+                    proDialog.setProgress(proDownloading);
+                    if (numRead <= 0) {
+                        proDialog.dismiss();
                         break;
                     }
-                    fos.write(buf,0,numread);
-                }while(!interceptFlag);//点击取消就停止下载.
+                    fos.write(buf, 0, numRead);
+                } while (!interceptFlag); // 点击取消就停止下载.
 
                 fos.close();
                 is.close();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch(IOException e){
+                if (!interceptFlag) {
+                    installApk(apkFile);
+                }
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
 
         }
     };
 
-    /**
-     * 下载apk
-     * @param url
-     */
-
-    private void downloadApk(){
-        downLoadThread = new Thread(mdownApkRunnable);
-        downLoadThread.start();
-    }
-    /**
-     * 安装apk
-     * @param url
-     */
-    private void installApk(){
-        File apkfile = new File(saveFileName);
-        if (!apkfile.exists()) {
+    private void installApk(File apkFile) {
+        if (!apkFile.exists()) {
             return;
         }
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setDataAndType(Uri.parse("file://" + apkfile.toString()), "application/vnd.android.package-archive");
-        mContext.startActivity(i);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(apkFile);
+        Loger.e("uri", uri.toString());
+        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        context.startActivity(intent);
 
     }
 }
