@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemLongClickListener, View.OnClickListener {
-    //    删除任务还没做
+
     private static final String TAG = "TaskListActivity";
     private Toolbar mToolbar;
     private TextView tvOwnName;
@@ -67,7 +67,7 @@ public class TaskListActivity extends AppCompatActivity
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
-    private SharedPreferences.Editor selfInforEditor;
+    private SharedPreferences.Editor selfInfoEditor;
     private TaskAdapter mTaskAdapter;
     private ListView mListView;
     private TextView tvDelete;
@@ -75,7 +75,7 @@ public class TaskListActivity extends AppCompatActivity
     private PopupWindow popupWindow;
     private ProgressDialog mProgress;
     private ArrayAdapter<String> spinnerAdapter;
-    private UpdateManager mUpdateManager;
+
     private TextView tvListEmpty;
 
     @Override
@@ -156,9 +156,9 @@ public class TaskListActivity extends AppCompatActivity
                 break;
         }
         tvOwnName.setText(selfName);
-        selfInforEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
-        selfInforEditor.putString(ConstantStr.USER_NAME, selfName);
-        selfInforEditor.apply();
+        selfInfoEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
+        selfInfoEditor.putString(ConstantStr.USER_NAME, selfName);
+        selfInfoEditor.apply();
     }
 
     // 从服务器获取数据
@@ -576,7 +576,13 @@ public class TaskListActivity extends AppCompatActivity
     }
 
     public void updateApk(){
-        mUpdateManager = new UpdateManager(TaskListActivity.this);
-        mUpdateManager.updateVersion();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                UpdateManager mUpdateManager = new UpdateManager(TaskListActivity.this);
+                mUpdateManager.updateVersion();
+            }
+        }).start();
+
     }
 }
