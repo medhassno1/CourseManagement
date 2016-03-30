@@ -17,7 +17,6 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
-import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -146,7 +145,6 @@ public class LoginActivity extends AppCompatActivity
                 @Override
                 public void onResponse(Response response) throws IOException {
                     String result = response.body().string();
-                    Loger.d(TAG, result);
                     progress.cancel();
                     if (result.startsWith("{")) {
                         // 判断是否更换账号

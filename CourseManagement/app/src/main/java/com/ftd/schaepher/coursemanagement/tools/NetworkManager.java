@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class NetworkManager {
     // 服务器基础地址，指向存放api的文件夹
     private static final String URL_BASE = "http://139.129.39.29/TeacherClass/Teacher_class_systemDemo(alpha)/Teacher_class_syetemDemo/mobile_api/";
-//    private static final String URL_BASE = "http://114.215.153.57/TeacherClass/Teacher_class_systemDemo(alpha)/Teacher_class_syetemDemo/mobile_api/";
+
     // 创建创建表格并且插入数据（发布新任务）
     public static final String CREATE_TABLE = URL_BASE + "create_table.php";
     // 删除任务
@@ -39,6 +39,8 @@ public class NetworkManager {
     public static final String INSERT_OR_UPDATE_CB_TABLE = URL_BASE + "update_insert_cb_table.php";
     // 更新用户信息
     public static final String UPDATE_USER_DATA = URL_BASE + "update_user.php";
+    //更新APK
+    public  static final String UPDATE_APK = URL_BASE + "update_apk.php";
 
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -164,6 +166,19 @@ public class NetworkManager {
                 .build();
 
         client.newCall(request).enqueue(callback);
+    }
+
+    //版本更新
+    public static String updateApk() throws IOException{
+        Request request = new Request.Builder()
+                .url(UPDATE_APK)
+                .build();
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            return response.body().string();
+        } else {
+            throw new IOException("Unexpected code " + response);
+        }
     }
 
     // 回调接口

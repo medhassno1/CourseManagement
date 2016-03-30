@@ -36,6 +36,7 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.UpdateManager;
 import com.ftd.schaepher.coursemanagement.widget.RefreshableView;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -74,6 +75,7 @@ public class TaskListActivity extends AppCompatActivity
     private PopupWindow popupWindow;
     private ProgressDialog mProgress;
     private ArrayAdapter<String> spinnerAdapter;
+    private UpdateManager mUpdateManager;
     private TextView tvListEmpty;
 
     @Override
@@ -98,6 +100,7 @@ public class TaskListActivity extends AppCompatActivity
 
         try {
             getServerData();
+            updateApk();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -114,6 +117,7 @@ public class TaskListActivity extends AppCompatActivity
                 refreshableView.finishRefreshing();
             }
         }, 0);
+
     }
 
     @Override
@@ -569,5 +573,10 @@ public class TaskListActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void updateApk(){
+        mUpdateManager = new UpdateManager(TaskListActivity.this);
+        mUpdateManager.updateVersion();
     }
 }
