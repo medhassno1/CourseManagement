@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,9 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +37,7 @@ import java.util.List;
  * 教师信息界面
  */
 public class TeacherDetailActivity extends AppCompatActivity {
-    //  删除教师还没做
+
     private EditText edtTxTeacherNumber;
     private EditText edtTxPassword;
     private EditText edtTxTeacherName;
@@ -41,22 +45,24 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private EditText edtTxDepartment;
     private EditText edtTxMajor;
     private EditText edtTxEmail;
-    private ActionBar mActionBar;
+
     private String userIdentity;
+    private String queryIdentity;
 
     private CourseDBHelper dbHelper;
-    private String queryWorkNumber;
-    private String queryIdentity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_detail);
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_teacher_detail);
-        setSupportActionBar(mToolbar);
-        mActionBar = getSupportActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle("用户信息");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_teacher_detail);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("用户信息");
+        }
+
         dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
 
         edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_workNumber);
@@ -69,6 +75,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
         initTeacherData();
         initUserPermission();
+
     }
 
     /**
@@ -81,6 +88,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         boolean isQueryingSelf = intent.getBooleanExtra("isQueryingSelf", true);
 
+        String queryWorkNumber;
         if (isQueryingSelf) {
             queryIdentity = userIdentity;
             queryWorkNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
@@ -93,6 +101,12 @@ public class TeacherDetailActivity extends AppCompatActivity {
         setUserData(queryIdentity, queryWorkNumber);
     }
 
+    /**
+     * 将用户的信息显示到界面
+     *
+     * @param queryIdentity   当前用户的身份
+     * @param queryWorkNumber 被查询信息的用户的工号
+     */
     private void setUserData(String queryIdentity, String queryWorkNumber) {
         switch (queryIdentity) {
             case ConstantStr.ID_TEACHING_OFFICE: {
@@ -106,18 +120,22 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     edtTxEmail.setText(Information.getEmail());
                     edtTxDepartment.setVisibility(View.GONE);
                 }
+                break;
             }
-            break;
+
             case ConstantStr.ID_DEPARTMENT_HEAD: {
                 TableUserDepartmentHead Information =
                         dbHelper.findById(queryWorkNumber, TableUserDepartmentHead.class);
                 List<TableManageMajor> manageMajorList =
-                        dbHelper.findAllByWhere(TableManageMajor.class, "workNumber = '" + queryWorkNumber + "'");
+                        dbHelper.findAllByWhere(TableManageMajor.class,
+                                "workNumber = '" + queryWorkNumber + "'");
+
                 String majorText = "";
                 for (int i = 0; i < manageMajorList.size(); i++) {
                     String major = transferMajorNameToChinese(manageMajorList.get(i).getMajor());
                     majorText = majorText + major + "\n";
                 }
+
                 if (Information != null) {
                     edtTxTeacherNumber.setText(Information.getWorkNumber());
                     edtTxPassword.setText(Information.getPassword());
@@ -128,8 +146,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
                     edtTxMajor.setText(majorText);
                 }
+                break;
             }
-            break;
+
             case ConstantStr.ID_TEACHER: {
                 TableUserTeacher Information =
                         dbHelper.findById(queryWorkNumber, TableUserTeacher.class);
@@ -140,8 +159,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
                     edtTxPhoneNumber.setText(Information.getTelephone());
                     edtTxDepartment.setText(Information.getDepartment());
                 }
+                break;
             }
-            break;
             default:
                 break;
         }
@@ -150,6 +169,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private void initUserPermission() {
         // 都不允许修改工号
         edtTxTeacherNumber.setEnabled(false);
+
+        // 只有教学办能修改系负责人所在专业和所负责专业
         if (!userIdentity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             edtTxDepartment.setEnabled(false);
             edtTxMajor.setEnabled(false);
@@ -158,6 +179,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
     /**
      * 从界面获取数据
+     *
+     * @return Object对象，根据情况再进行转换
      */
     private Object getUserData() {
 
@@ -200,15 +223,15 @@ public class TeacherDetailActivity extends AppCompatActivity {
      * 从界面获取系负责人专业表数据
      */
     private List<TableManageMajor> getUIManageMajorData() {
-        List manageMajorList = new ArrayList();
+        List<TableManageMajor> manageMajorList = new ArrayList<>();
         String majorText = edtTxMajor.getText().toString().trim();
         String workNumber = edtTxTeacherNumber.getText().toString().trim();
         String[] majors = majorText.split("\n");
-        for (int i = 0; i < majors.length; i++) {
-            if (majors[i] != null && majors[i].length() != 0) {
+        for (String major : majors) {
+            if (major != null && major.length() != 0) {
                 TableManageMajor manageMajor = new TableManageMajor();
                 manageMajor.setWorkNumber(workNumber);
-                manageMajor.setMajor(majors[i]);
+                manageMajor.setMajor(major);
 
                 manageMajorList.add(manageMajor);
             }
@@ -231,7 +254,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return true;
-            case R.id.action_modify_infomation:
+            case R.id.action_modify_infomation: {
                 new AlertDialog.Builder(this)
                         .setTitle("提示")
                         .setMessage("是否确认修改")
@@ -239,7 +262,8 @@ public class TeacherDetailActivity extends AppCompatActivity {
                                 (android.R.string.ok, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-
+                                        // 如果是修改自己的信息，需要同时更新到本地
+                                        // 否则菜单上的名字不会改变
                                         if (queryIdentity.equals(userIdentity)) {
                                             String tvName =
                                                     edtTxTeacherName.getText().toString().trim();
@@ -257,7 +281,13 @@ public class TeacherDetailActivity extends AppCompatActivity {
                                         progress.setCancelable(false);
                                         progress.show();
 
-                                        submitToServer();
+                                        new Thread() {
+                                            @Override
+                                            public void run() {
+                                                submitToServer(queryIdentity);
+                                                finish();
+                                            }
+                                        }.start();
 
                                         progress.cancel();
 
@@ -272,6 +302,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
                                 })
                         .show();
                 return true;
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -279,50 +310,54 @@ public class TeacherDetailActivity extends AppCompatActivity {
     }
 
     /**
-     * 提交数据到服务器
+     * 提交需要更新的用户数据到服务器
+     * @param queryIdentity 要更新的用户的身份
      */
-    private void submitToServer() {
-        new Thread() {
-            @Override
-            public void run() {
-                Object user = getUserData();
-                if (queryIdentity.equals(ConstantStr.ID_TEACHER)) {
-                    try {
-                        Loger.i("updateTeacher", "开始发送服务器");
-                        String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHER,
-                                JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
-                        Loger.i("updateTeacher", result);
-                        dbHelper.update(user);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (queryIdentity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
-                    List<TableManageMajor> manageMajorList = getUIManageMajorData();
-                    try {
-                        // 系负责人表
-                        String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
-                                JsonTools.getJsonString(user),
-                                JsonTools.getJsonString(manageMajorList), NetworkManager.UPDATE_USER_DATA);
-                        Loger.i("updateTeacher", result);
-                        dbHelper.update(user);
-                        dbHelper.updateAll(manageMajorList);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (queryIdentity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
-                    try {
-                        // 教学办
-                        String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHING_OFFICE,
-                                JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
-                        Loger.i("updateTeacher", result);
-                        dbHelper.update(user);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+    private void submitToServer(String queryIdentity) {
+        Object user = getUserData();
+        switch (queryIdentity) {
+
+            case ConstantStr.ID_TEACHER:
+                try {
+                    Loger.i("updateTeacher", "开始发送服务器");
+                    String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHER,
+                            JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
+                    Loger.i("updateTeacher", result);
+                    dbHelper.update(user);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                finish();
-            }
-        }.start();
+                break;
+
+            case ConstantStr.ID_DEPARTMENT_HEAD:
+                List<TableManageMajor> manageMajorList = getUIManageMajorData();
+                try {
+                    String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                            JsonTools.getJsonString(user),
+                            JsonTools.getJsonString(manageMajorList), NetworkManager.UPDATE_USER_DATA);
+                    Loger.i("updateTeacher", result);
+                    dbHelper.update(user);
+                    dbHelper.updateAll(manageMajorList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case ConstantStr.ID_TEACHING_OFFICE:
+                try {
+                    String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                            JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
+                    Loger.i("updateTeacher", result);
+                    dbHelper.update(user);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            default:
+                break;
+        }
+
     }
 
     @Override
@@ -354,5 +389,4 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 return string;
         }
     }
-
 }
