@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * （根据身份验证为user_teaching_office可用）
  * 传入tableName和workNumer删除用户信息
@@ -12,6 +12,7 @@ $workNumber = $_POST["workNumber"];
 session_start();
 $ident = $_SESSION['id'];
 
-$deleteUser=new DeleteUser();
-$deleteUser->deleteU($tableName,$ident,$workNumber);
+$deleteUser = new DeleteUser();
+$deleteUser->deleteU($tableName, $ident, $workNumber);
 
+?>

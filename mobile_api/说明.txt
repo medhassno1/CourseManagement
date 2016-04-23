@@ -1,45 +1,45 @@
-creat_table:ä¼ å…¥tableNameï¼ˆæ ¹æ®èº«ä»½éªŒè¯ä¸ºuser_teaching_officeå¯ç”¨ï¼‰åˆ›å»ºä»»åŠ¡åˆ—è¡¨ï¼ˆåŒ…æ‹¬å¤šè¡Œå’Œå•è¡Œï¼‰
+creat_table:´«ÈëtableName£¨¸ù¾İÉí·İÑéÖ¤Îªuser_teaching_office¿ÉÓÃ£©´´½¨ÈÎÎñÁĞ±í£¨°üÀ¨¶àĞĞºÍµ¥ĞĞ£©
 
-delete_task:ä¼ å…¥tableNameï¼ˆæ ¹æ®èº«ä»½éªŒè¯ä¸ºuser_teaching_officeå¯ç”¨ï¼‰ æ ¹æ®å¤šè¡Œè¡¨çš„è¡¨ååˆ é™¤ä»»åŠ¡è¡¨ä¸­çš„ä»»åŠ¡åŠç›¸å¯¹åº”çš„å•è¡Œå’Œå¤šè¡Œè¡¨ï¼‰
+delete_task:´«ÈëtableName£¨¸ù¾İÉí·İÑéÖ¤Îªuser_teaching_office¿ÉÓÃ£© ¸ù¾İ¶àĞĞ±íµÄ±íÃûÉ¾³ıÈÎÎñ±íÖĞµÄÈÎÎñ¼°Ïà¶ÔÓ¦µÄµ¥ĞĞºÍ¶àĞĞ±í£©
 
-delete_user:ä¼ å…¥tableNameå’ŒworkNumerï¼ˆæ ¹æ®èº«ä»½éªŒè¯ä¸ºuser_teaching_officeå¯ç”¨ï¼‰åˆ é™¤ç”¨æˆ·ä¿¡æ¯ï¼Œå¦‚æœæ˜¯åˆ é™¤ç³»è´Ÿè´£äººï¼Œåˆ™åˆ é™¤department_head_majors
+delete_user:´«ÈëtableNameºÍworkNumer£¨¸ù¾İÉí·İÑéÖ¤Îªuser_teaching_office¿ÉÓÃ£©É¾³ıÓÃ»§ĞÅÏ¢£¬Èç¹ûÊÇÉ¾³ıÏµ¸ºÔğÈË£¬ÔòÉ¾³ıdepartment_head_majors
 
-insert_table:ä¼ å…¥tableNameï¼Œæ’å…¥æ•°æ®åˆ°tableName
+insert_table:´«ÈëtableName£¬²åÈëÊı¾İµ½tableName
 
-login:ç™»é™†
+login:µÇÂ½
 
-query_by_table_nameï¼šä¼ å…¥tableNameï¼Œæ ¹æ®è¡¨åæŸ¥è¯¢è¡¨ä¸­æ‰€æœ‰çš„ä¿¡æ¯
-
-
-query_teacher_select_courses:ä¼ å…¥jsonDataå’ŒworkNumber,æ ¹æ®workNUmberæŸ¥è¯¢æŠ¥è¯¾æƒ…å†µï¼Œå…ˆä»ä»»åŠ¡åˆ—è¡¨ä¸­æŸ¥è¯¢ä»»åŠ¡çš„taskStateï¼Œå¦‚æœå·²å®Œæˆï¼Œå°±åœ¨å•è¡Œè¡¨ä¸­æŸ¥è¯¢ï¼Œå¦åˆ™åœ¨å¤šè¡Œè¡¨ä¸­æŸ¥è¯¢
-
-insert_tc_update_bc: *ä¼ å…¥tableNameå’ŒjsonDataï¼Œæ’å…¥æ•°æ®åˆ°å¤šè¡Œè¡¨ï¼Œå¹¶åœ¨å•è¡Œè¡¨å†…è¿›è¡Œæ›´æ–°
+query_by_table_name£º´«ÈëtableName£¬¸ù¾İ±íÃû²éÑ¯±íÖĞËùÓĞµÄĞÅÏ¢
 
 
-update_manager_major:ä¼ å…¥jsonData,æ›´æ–°ç³»è´Ÿè´£äººæ‰€è´Ÿè´£ç³»è¡¨
+query_teacher_select_courses:´«ÈëjsonDataºÍworkNumber,¸ù¾İworkNUmber²éÑ¯±¨¿ÎÇé¿ö£¬ÏÈ´ÓÈÎÎñÁĞ±íÖĞ²éÑ¯ÈÎÎñµÄtaskState£¬Èç¹ûÒÑÍê³É£¬¾ÍÔÚµ¥ĞĞ±íÖĞ²éÑ¯£¬·ñÔòÔÚ¶àĞĞ±íÖĞ²éÑ¯
+
+insert_tc_update_bc: *´«ÈëtableNameºÍjsonData£¬²åÈëÊı¾İµ½¶àĞĞ±í£¬²¢ÔÚµ¥ĞĞ±íÄÚ½øĞĞ¸üĞÂ
 
 
-update_insert_cb_tableï¼šä¼ å…¥jsonDataå’ŒtableNameï¼Œç”±ç³»è´Ÿè´£äººå’Œæ•™å­¦åŠæ›´æ–°å•è¡Œè¡¨ï¼Œå·²å‘é€è¿‡æ¥çš„æ•°æ®ä¸ºå‡†æ›´æ–°æ•´ä¸ªå­—æ®µ
-
-update_user_office:ä¼ å…¥jsonDataå’ŒtableNameï¼Œï¼ˆæ ¹æ®èº«ä»½éªŒè¯ä¸ºuser_teaching_officeå¯ç”¨ï¼‰æ›´æ–°æ•™å­¦åŠç”¨æˆ·è¡¨
-
-update_user_teacher_departmentï¼šä¼ å…¥jsonDataå’ŒtableNameï¼Œæ ¹æ®èº«ä»½éªŒè¯æ›´æ–°æ•™å¸ˆå’Œç³»è´Ÿè´£äººç”¨æˆ·è¡¨ï¼Œèº«ä»½ä¸ºuser_teaching_officeåˆ™æœ‰æƒåˆ©ä¿®æ”¹departmentï¼Œå¦åˆ™ä¸èƒ½ä¿®æ”¹
+update_manager_major:´«ÈëjsonData,¸üĞÂÏµ¸ºÔğÈËËù¸ºÔğÏµ±í
 
 
-è²Œä¼¼PHP 5.3ä¸æ”¯æŒä½¿ç”¨foreachéå†æ•°æ®åº“æœç´¢ç»“æœ
+update_insert_cb_table£º´«ÈëjsonDataºÍtableName£¬ÓÉÏµ¸ºÔğÈËºÍ½ÌÑ§°ì¸üĞÂµ¥ĞĞ±í£¬ÒÑ·¢ËÍ¹ıÀ´µÄÊı¾İÎª×¼¸üĞÂÕû¸ö×Ö¶Î
 
-ä»¥ä¸‹æ˜¯å¤±è´¥çš„ï¼š
+update_user_office:´«ÈëjsonDataºÍtableName£¬£¨¸ù¾İÉí·İÑéÖ¤Îªuser_teaching_office¿ÉÓÃ£©¸üĞÂ½ÌÑ§°ìÓÃ»§±í
+
+update_user_teacher_department£º´«ÈëjsonDataºÍtableName£¬¸ù¾İÉí·İÑéÖ¤¸üĞÂ½ÌÊ¦ºÍÏµ¸ºÔğÈËÓÃ»§±í£¬Éí·İÎªuser_teaching_officeÔòÓĞÈ¨ÀûĞŞ¸Ädepartment£¬·ñÔò²»ÄÜĞŞ¸Ä
+
+
+Ã²ËÆPHP 5.3²»Ö§³ÖÊ¹ÓÃforeach±éÀúÊı¾İ¿âËÑË÷½á¹û
+
+ÒÔÏÂÊÇÊ§°ÜµÄ£º
 
 $search = mysql_query($sql);
 foreach ($search as $row) {
     $output[] = $row;
 }
 
-æ”¹æˆï¼š
+¸Ä³É£º
 
 $search = mysql_query($sql);
 while ($row = mysql_fetch_assoc($search)) {
     $output[] = $row;
 }
 
-å°±æˆåŠŸäº†
+¾Í³É¹¦ÁË

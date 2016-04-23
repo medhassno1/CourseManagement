@@ -1,16 +1,15 @@
-<?php
+<?php 
+error_reporting(0);
 require_once 'trans.php';
-class CreateTable
-{
-    public function create($tableName = "", $ident = "",$jsonData = "")
-    {
-		$con = mysql_connect("localhost", "root", "");
-		mysql_select_db('teacher_class_system',$con);
+class CreateTable {
+    public function create($tableName = "", $ident = "", $jsonData = "") {
+        $con = mysql_connect("localhost", "root", "");
+        mysql_select_db('teacher_class_system', $con);
         if (!$con) {
-            die('Could not connect: ' . mysql_error());
+            die('Could not connect: '.mysql_error());
         } else {
             if ($ident == "user_teaching_office") {
-                mysql_query( "SET NAMES utf8");
+                mysql_query("SET NAMES utf8");
 
                 $sql = "CREATE TABLE IF NOT EXISTS $tableName (
    			insertTime  int(10),
@@ -36,8 +35,8 @@ class CreateTable
                     echo "false";
                 }
 
-		$cbTableName = 'cb_' . $tableName;
-            	$sql = "CREATE TABLE IF NOT EXISTS $cbTableName (
+                $cbTableName = 'cb_'.$tableName;
+                $sql = "CREATE TABLE IF NOT EXISTS $cbTableName (
      			insertTime   int(10),
      			grade   varchar(40) COLLATE utf8_unicode_ci,
      			major   varchar(30) COLLATE utf8_unicode_ci,
@@ -54,22 +53,23 @@ class CreateTable
    			PRIMARY KEY (  grade  ,  major  ,  people  ,  courseName  ,  courseType  ,  courseCredit  ,  courseHour  ,  practiceHour  ,  onMachineHour  ,  timePeriod  ,  teacherName  ,  remark  ),
    			KEY   insertTime   (  insertTime  )
  			) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
-            	if (mysql_query( $sql)) {
-                echo "true";
+                if (mysql_query($sql)) {
+                    echo "true";
 
-                $jsonArry = json_decode($jsonData, true);
-                    foreach ($jsonArry as $row) {
+                    $jsonArry = json_decode($jsonData, true);
+                    foreach($jsonArry as $row) {
                         $statement = "INSERT INTO $cbTableName (insertTime,grade,major,people,courseName,courseType,courseCredit,courseHour,practiceHour,onMachineHour,timePeriod,teacherName,remark) VALUES('$row[insertTime]','$row[grade]','$row[major]','$row[people]','$row[courseName]','$row[courseType]','$row[courseCredit]','$row[courseHour]','$row[practiceHour]','$row[onMachineHour]','$row[timePeriod]','$row[teacherName]','$row[remark]') ";
 
                         $sql = mysql_query($statement);
                     }
-            	} else {
-                	echo "false";
-            	}
+                } else {
+                    echo "false";
+                }
             } else {
-                	echo "??????";
+                echo "false";
             }
         }
     }
 
 }
+?>
