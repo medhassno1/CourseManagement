@@ -33,7 +33,6 @@ public class LoginActivity extends AppCompatActivity
 
     private static final String TAG = "LoginActivity";
 
-    private Button btnLogin;
     private EditText edtTxWorkNumber;
     private EditText edtTxPassWord;
     private RadioGroup rdoGroup;
@@ -44,9 +43,6 @@ public class LoginActivity extends AppCompatActivity
     private String workNumber;
     private String password;
     private String identity;
-    private String workNumberPre;
-
-    private SharedPreferences.Editor informationEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +52,13 @@ public class LoginActivity extends AppCompatActivity
         edtTxWorkNumber = (EditText) findViewById(R.id.edtTx_login_workNumber);
         edtTxPassWord = (EditText) findViewById(R.id.edtTx_login_password);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_check_identity);
-        btnLogin = (Button) findViewById(R.id.btn_login);
         layoutWorkNumber = (TextInputLayout) findViewById(R.id.inputLayout_login_workNumber);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
-        informationEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
-
         edtTxWorkNumber.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
+
+        Button btnLogin = (Button) findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(this);
 
         autoSetWorkNumber();
@@ -75,10 +70,10 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的账号
      */
     private void autoSetWorkNumber() {
-        workNumberPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
-        workNumber = workNumberPre;
-        if (!workNumber.equals("")) {
-            edtTxWorkNumber.setText(workNumber);
+        String workNumberPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_WORK_NUMBER, "");
+        if (!workNumberPre.equals("")) {
+            edtTxWorkNumber.setText(workNumberPre);
         }
     }
 
@@ -147,7 +142,12 @@ public class LoginActivity extends AppCompatActivity
                     String result = response.body().string();
                     progress.cancel();
                     if (result.startsWith("{")) {
+                        SharedPreferences sharedPre =
+                                getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+                        SharedPreferences.Editor informationEditor = sharedPre.edit();
+
                         // 判断是否更换账号
+                        String workNumberPre = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
                         if (!workNumber.equals(workNumberPre)) {
                             informationEditor.putBoolean(ConstantStr.IS_USER_CHANGED, true);
                         }

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -49,14 +50,11 @@ public class TaskCreationActivity extends AppCompatActivity
     private EditText edtTxTeacherDeadline;
     private EditText edtTxTaskName;
     private EditText edtTxTaskTeam;
-    //    private EditText edtTxTaskRemark;
     private ImageView imgvFileImg;
     private TextView tvFileName;
-    private Button btnImportFile;
     private ProgressDialog progress;
     private CourseDBHelper dbHelper;
     private String filePath;
-    private String fileName;
     private String tableCourseName;
     private String year;
     private String semester;
@@ -72,8 +70,10 @@ public class TaskCreationActivity extends AppCompatActivity
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_add_task);
         setSupportActionBar(mToolbar);
         ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle("发布报课任务");
+        if (mActionBar != null){
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setTitle("发布报课任务");
+        }
         initWidgetAndListener();
 
         dbHelper = new CourseDBHelper(TaskCreationActivity.this);
@@ -85,8 +85,7 @@ public class TaskCreationActivity extends AppCompatActivity
         edtTxTeacherDeadline = (EditText) findViewById(R.id.edtTx_add_task_teacher_deadline);
         edtTxTaskName = (EditText) findViewById(R.id.edtTx_add_task_name);
         edtTxTaskTeam = (EditText) findViewById(R.id.edtTx_add_task_team);
-//        edtTxTaskRemark = (EditText) findViewById(R.id.edtTx_add_task_note);
-        btnImportFile = (Button) findViewById(R.id.btn_add_task_import_file);
+        Button btnImportFile = (Button) findViewById(R.id.btn_add_task_import_file);
         imgvFileImg = (ImageView) findViewById(R.id.imgv_add_task_file_img);
         tvFileName = (TextView) findViewById(R.id.tv_add_task_file_name);
 
@@ -119,6 +118,7 @@ public class TaskCreationActivity extends AppCompatActivity
             case android.R.id.home:
                 finish();
                 return true;
+
             case R.id.action_release_task:
                 if (!isPassValidate()) {
                     return true;
@@ -173,6 +173,7 @@ public class TaskCreationActivity extends AppCompatActivity
                     }
                 });
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -239,7 +240,7 @@ public class TaskCreationActivity extends AppCompatActivity
         return courseList;
     }
 
-    // 获取即将发布的任务的信息,未完成（哪里未完成？发布到服务器？）
+    // 获取即将发布的任务的信息
     private TableTaskInfo createTaskInformation() {
         TableTaskInfo newTask = new TableTaskInfo();
         newTask.setYear(year);
@@ -247,7 +248,6 @@ public class TaskCreationActivity extends AppCompatActivity
         newTask.setTaskState("0");
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
-//        newTask.setRemark(edtTxTaskRemark.getText().toString());
         newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + year + semester);
         return newTask;
     }
@@ -277,7 +277,8 @@ public class TaskCreationActivity extends AppCompatActivity
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        edtTxDepartmentDeadline.setText(String.format("%d%d%d", year, monthOfYear + 1, dayOfMonth));
+                        edtTxDepartmentDeadline.setText(String.format(Locale.CHINA,
+                                "%d%d%d", year, monthOfYear + 1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
@@ -286,7 +287,8 @@ public class TaskCreationActivity extends AppCompatActivity
                 new DatePickerDialog(TaskCreationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        edtTxTeacherDeadline.setText(String.format("%d%d%d", year, monthOfYear + 1, dayOfMonth));
+                        edtTxTeacherDeadline.setText(String.format(Locale.CHINA,
+                                "%d%d%d", year, monthOfYear + 1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
@@ -371,7 +373,7 @@ public class TaskCreationActivity extends AppCompatActivity
         if (resultCode == RESULT_OK) {
             imgvFileImg.setVisibility(View.VISIBLE);
             filePath = data.getStringExtra("fileName");
-            fileName = filePath.split("/")[filePath.split("/").length - 1];
+            String fileName = filePath.split("/")[filePath.split("/").length - 1];
             tvFileName.setText(fileName);
             Loger.d("filePath", filePath);
         }
