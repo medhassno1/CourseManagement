@@ -1,7 +1,6 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -48,6 +47,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
     private RadioButton rdoBtnTeacher;
     private RadioButton rdoBtnDepartment;
     private RadioButton rdoBtnOffice;
+    private String identity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,28 +59,39 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("添加用户");
 
+        identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_IDENTITY, null);
+
         initView();
 
-        rdoGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                RadioButton rdoBtn = (RadioButton) findViewById(checkedId);
-                if (rdoBtn == rdoBtnOffice) {
-                    edtTxDepartment.setVisibility(View.GONE);
-                    edtTxMajor.setVisibility(View.GONE);
-                    selectedIdentity = ConstantStr.ID_TEACHING_OFFICE;
-                } else if (rdoBtn == rdoBtnDepartment) {
-                    edtTxDepartment.setVisibility(View.VISIBLE);
-                    edtTxMajor.setVisibility(View.VISIBLE);
-                    selectedIdentity = ConstantStr.ID_DEPARTMENT_HEAD;
-                } else {
-                    edtTxDepartment.setVisibility(View.VISIBLE);
-                    edtTxMajor.setVisibility(View.GONE);
-                    selectedIdentity = ConstantStr.ID_TEACHER;
+        if(identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)){
+            rdoGroup.setVisibility(View.GONE);
+            edtTxDepartment.setVisibility(View.VISIBLE);
+            edtTxMajor.setVisibility(View.GONE);
+            selectedIdentity = ConstantStr.ID_TEACHER;
+        }else{
+            rdoGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    RadioButton rdoBtn = (RadioButton) findViewById(checkedId);
+                    if (rdoBtn == rdoBtnOffice) {
+                        edtTxDepartment.setVisibility(View.GONE);
+                        edtTxMajor.setVisibility(View.GONE);
+                        selectedIdentity = ConstantStr.ID_TEACHING_OFFICE;
+                    } else if (rdoBtn == rdoBtnDepartment) {
+                        edtTxDepartment.setVisibility(View.VISIBLE);
+                        edtTxMajor.setVisibility(View.VISIBLE);
+                        selectedIdentity = ConstantStr.ID_DEPARTMENT_HEAD;
+                    } else {
+                        edtTxDepartment.setVisibility(View.VISIBLE);
+                        edtTxMajor.setVisibility(View.GONE);
+                        selectedIdentity = ConstantStr.ID_TEACHER;
+                    }
                 }
-            }
-        });
-        rdoBtnTeacher.setChecked(true);
+            });
+            rdoBtnTeacher.setChecked(true);
+        }
+
 
     }
 

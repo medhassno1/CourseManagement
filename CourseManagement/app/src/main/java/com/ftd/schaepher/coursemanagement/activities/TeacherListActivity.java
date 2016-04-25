@@ -92,6 +92,7 @@ public class TeacherListActivity extends AppCompatActivity
     private String identity;
     private CourseDBHelper dbHelper;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -324,7 +325,7 @@ public class TeacherListActivity extends AppCompatActivity
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)||identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)){
             getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
             MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
             addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input)
