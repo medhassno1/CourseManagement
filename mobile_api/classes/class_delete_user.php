@@ -1,5 +1,4 @@
 <?php 
-error_reporting(0);
 require_once 'trans.php';
 class DeleteUser {
     public function deleteU($tableName = "", $ident = "", $workNumber = "") {
@@ -12,16 +11,16 @@ class DeleteUser {
                 if ($tableName == 'user_department_head') {
                     $cascade = "DELETE FROM department_head_majors WHERE workNumber = '$workNumber'";
                     if (mysql_query($cascade)) {
-                        echo 'true';
+                        $sql = "DELETE FROM $tableName WHERE workNumber = '$workNumber'";
+                        if (mysql_query($sql)) {
+                            echo 'true';
+                        } else {
+                            echo 'false';
+                        }
                     } else {
                         echo 'false';
                     }
-                    $sql = "DELETE FROM $tableName WHERE workNumber = '$workNumber'";
-                    if (mysql_query($sql)) {
-                        echo 'true';
-                    } else {
-                        echo 'false';
-                    }
+
                 } else {
                     $sql = "DELETE FROM $tableName WHERE workNumber = '$workNumber'";
                     if (mysql_query($sql)) {
@@ -37,4 +36,3 @@ class DeleteUser {
         }
     }
 }
-?>
