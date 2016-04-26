@@ -48,6 +48,7 @@ public class FileSelectActivity extends AppCompatActivity
     private ArrayList<File> rootFileList;
     private String identity;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
