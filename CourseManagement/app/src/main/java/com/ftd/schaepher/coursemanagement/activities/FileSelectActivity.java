@@ -30,6 +30,7 @@ import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,6 +45,7 @@ public class FileSelectActivity extends AppCompatActivity
     private FileListAdapter mFileAdapter;
     private TextView tvItemCount;
     private ProgressDialog progress;
+    private ArrayList<File> rootFileList;
     private String identity;
 
     @Override
@@ -68,10 +70,17 @@ public class FileSelectActivity extends AppCompatActivity
         tvItemCount = (TextView) findViewById(R.id.item_count);
         lvFileList.setOnItemClickListener(this);
 
-        String sdCardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-        Loger.i("path", sdCardRoot);
-        File folder = new File(sdCardRoot);
-        initData(folder);
+        File sdCard = Environment.getExternalStorageDirectory().getAbsoluteFile();
+        Loger.i("path", sdCard.getAbsolutePath());
+        File folderStorage = new File("/storage/");
+        if (folderStorage.exists()) {
+            initData(folderStorage);
+        } else if (sdCard.canRead()) {
+            initData(sdCard);
+        } else {
+            File folder = new File("/mnt/");
+            initData(folder);
+        }
     }
 
 
@@ -83,14 +92,14 @@ public class FileSelectActivity extends AppCompatActivity
             files.add(folder.getParentFile());
         }
         File[] filterFiles = folder.listFiles();
-        tvItemCount.setText(filterFiles.length + "项");
-        if (null != filterFiles && filterFiles.length > 0) {
-            for (File file : filterFiles) {
-                files.add(file);
-            }
+        if (filterFiles != null) {
+            tvItemCount.setText(filterFiles.length + "项");
+            files.addAll(Arrays.asList(filterFiles));
+            mFileAdapter = new FileListAdapter(this, files, isRoot);
+            lvFileList.setAdapter(mFileAdapter);
+        } else if (!folder.canRead()) {
+            Toast.makeText(this, "抱歉，无访问权限", Toast.LENGTH_LONG).show();
         }
-        mFileAdapter = new FileListAdapter(this, files, isRoot);
-        lvFileList.setAdapter(mFileAdapter);
     }
 
     @Override

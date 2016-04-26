@@ -23,15 +23,12 @@ import jxl.read.biff.BiffException;
  * Created by Schaepher on 2015/10/27.
  */
 public class ExcelTools {
-    public Context context;
-    public Sheet sheet;
-    public String path = "mnt/sdcard/course.xls";
+    private Context context;
+    private Sheet sheet;
+    private String path;
     private List<TableUserTeacher> teacherList;
     private List<TableUserTeachingOffice> officeList;
     private List<TableUserDepartmentHead> departmentList;
-
-    public ExcelTools() {
-    }
 
     public ExcelTools(Context con) {
         context = con;

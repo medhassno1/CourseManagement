@@ -32,7 +32,9 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/tv_course_name"
@@ -41,7 +43,9 @@
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/tv_sum"
@@ -49,44 +53,51 @@
             android:textSize="20sp"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"/>
+            android:layout_marginRight="8dp"
+            android:gravity="center"/>
 
         <TextView
             android:id="@+id/tv_type"
             android:text="选修类型"
             android:textSize="20sp"
-            android:layout_width="90dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"/>
         <TextView
             android:id="@+id/tv_credit"
             android:text="学分"
             android:textSize="20sp"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"/>
+            android:layout_marginRight="8dp"
+            android:gravity="center"/>
         <TextView
             android:id="@+id/tv_class_hour"
             android:text="学时"
             android:textSize="20sp"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"/>
+            android:layout_marginRight="8dp"
+            android:gravity="center"/>
         <TextView
             android:id="@+id/tv_experiment_hour"
             android:text="实验学时"
             android:textSize="20sp"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"/>
+            android:layout_marginRight="8dp"
+            android:gravity="center"/>
         <TextView
             android:id="@+id/tv_computer_hour"
             android:text="上机学时"
             android:textSize="20sp"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"/>
+            android:layout_marginRight="8dp"
+            android:gravity="center"/>
         <TextView
             android:id="@+id/tv_from_to_end"
             android:text="起讫周序"
@@ -94,7 +105,9 @@
             android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"/>
         <TextView
             android:id="@+id/tv_teacher"
             android:text="任课教师"
@@ -102,14 +115,18 @@
             android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"/>
         <TextView
             android:id="@+id/tv_note"
             android:text="备注"
             android:textSize="20sp"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"/>
     </LinearLayout>
     <!--<ImageView-->
         <!--android:layout_width="match_parent"-->

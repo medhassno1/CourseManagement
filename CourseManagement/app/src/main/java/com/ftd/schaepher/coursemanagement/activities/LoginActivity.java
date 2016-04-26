@@ -17,7 +17,6 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
-import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -34,7 +33,6 @@ public class LoginActivity extends AppCompatActivity
 
     private static final String TAG = "LoginActivity";
 
-    private Button btnLogin;
     private EditText edtTxWorkNumber;
     private EditText edtTxPassWord;
     private RadioGroup rdoGroup;
@@ -46,8 +44,6 @@ public class LoginActivity extends AppCompatActivity
     private String password;
     private String identity;
 
-    private SharedPreferences.Editor informationEditor;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,14 +52,13 @@ public class LoginActivity extends AppCompatActivity
         edtTxWorkNumber = (EditText) findViewById(R.id.edtTx_login_workNumber);
         edtTxPassWord = (EditText) findViewById(R.id.edtTx_login_password);
         rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup_check_identity);
-        btnLogin = (Button) findViewById(R.id.btn_login);
         layoutWorkNumber = (TextInputLayout) findViewById(R.id.inputLayout_login_workNumber);
         layoutPassWord = (TextInputLayout) findViewById(R.id.inputLayout_login_password);
 
-        informationEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
-
         edtTxWorkNumber.setOnFocusChangeListener(this);
         edtTxPassWord.setOnFocusChangeListener(this);
+
+        Button btnLogin = (Button) findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(this);
 
         autoSetWorkNumber();
@@ -75,9 +70,10 @@ public class LoginActivity extends AppCompatActivity
      * 自动输入保存的账号
      */
     private void autoSetWorkNumber() {
-        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
-        if (!workNumber.equals("")) {
-            edtTxWorkNumber.setText(workNumber);
+        String workNumberPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_WORK_NUMBER, "");
+        if (!workNumberPre.equals("")) {
+            edtTxWorkNumber.setText(workNumberPre);
         }
     }
 
@@ -144,10 +140,18 @@ public class LoginActivity extends AppCompatActivity
                 @Override
                 public void onResponse(Response response) throws IOException {
                     String result = response.body().string();
-                    Loger.d(TAG, result);
                     progress.cancel();
                     if (result.startsWith("{")) {
-//                        这里应该改为获取服务器个人数据，并存储到数据库中
+                        SharedPreferences sharedPre =
+                                getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+                        SharedPreferences.Editor informationEditor = sharedPre.edit();
+
+                        // 判断是否更换账号
+                        String workNumberPre = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
+                        if (!workNumber.equals(workNumberPre)) {
+                            informationEditor.putBoolean(ConstantStr.IS_USER_CHANGED, true);
+                        }
+
                         informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
                         informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);
                         informationEditor.apply();

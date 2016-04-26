@@ -36,6 +36,7 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.UpdateManager;
 import com.ftd.schaepher.coursemanagement.widget.RefreshableView;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -54,7 +55,7 @@ import java.util.regex.Pattern;
 public class TaskListActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemLongClickListener, View.OnClickListener {
-    //    删除任务还没做
+
     private static final String TAG = "TaskListActivity";
     private Toolbar mToolbar;
     private TextView tvOwnName;
@@ -66,7 +67,7 @@ public class TaskListActivity extends AppCompatActivity
     private CourseDBHelper dbHelper;
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
-    private SharedPreferences.Editor selfInforEditor;
+    private SharedPreferences.Editor selfInfoEditor;
     private TaskAdapter mTaskAdapter;
     private ListView mListView;
     private TextView tvDelete;
@@ -74,6 +75,8 @@ public class TaskListActivity extends AppCompatActivity
     private PopupWindow popupWindow;
     private ProgressDialog mProgress;
     private ArrayAdapter<String> spinnerAdapter;
+
+    private TextView tvListEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,16 +88,19 @@ public class TaskListActivity extends AppCompatActivity
         actionBar.setTitle("报课任务列表");
         setNavViewConfig();
         setSupportDoubleBackExit(true);
+        tvListEmpty = (TextView) findViewById(R.id.tv_empty_listview);
         mListView = (ListView) findViewById(R.id.lv_task_list);
-        mListView.setEmptyView(findViewById(R.id.tv_empty_listview));
+        mListView.setEmptyView(tvListEmpty);
         refreshableView = (RefreshableView) findViewById(R.id.refreshTask_view);
-        dbHelper = new CourseDBHelper(TaskListActivity.this);
-        taskListData = dbHelper.findAll(TableTaskInfo.class);
         spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
         mProgress = new ProgressDialog(TaskListActivity.this);
 
+        dbHelper = new CourseDBHelper(TaskListActivity.this);
+        taskListData = dbHelper.findAll(TableTaskInfo.class);
+
         try {
             getServerData();
+            updateApk();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,6 +117,7 @@ public class TaskListActivity extends AppCompatActivity
                 refreshableView.finishRefreshing();
             }
         }, 0);
+
     }
 
     @Override
@@ -118,7 +125,6 @@ public class TaskListActivity extends AppCompatActivity
         super.onResume();
         setSpinnerData();
         initUserInformation();
-
     }
 
     // 初始化当前用户的数据
@@ -150,13 +156,14 @@ public class TaskListActivity extends AppCompatActivity
                 break;
         }
         tvOwnName.setText(selfName);
-        selfInforEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
-        selfInforEditor.putString(ConstantStr.USER_NAME, selfName);
-        selfInforEditor.apply();
+        selfInfoEditor = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).edit();
+        selfInfoEditor.putString(ConstantStr.USER_NAME, selfName);
+        selfInfoEditor.apply();
     }
 
     // 从服务器获取数据
     private void getServerData() throws IOException {
+        Loger.w("GetServerData", "true");
         String tableName = ConstantStr.TABLE_TASK_INFO;
         NetworkManager.getJsonString(tableName, new NetworkManager.ResponseCallback() {
             @Override
@@ -172,26 +179,26 @@ public class TaskListActivity extends AppCompatActivity
                 if (list != null) {
                     Loger.w(TAG, "jsonList" + list.toString());
                     dbHelper.insertAll(list);
-                }
-
-                if (mTaskAdapter != null) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            refreshSpinner();
-                            mTaskAdapter.notifyDataSetChanged();
+                            if (spinnerAdapter == null) {
+                                setSpinnerData();
+                            } else {
+                                refreshSpinner();
+                            }
+                            onItemSelectedListener.onItemSelected(spinnerSelectTerm, null, 0, 0);
+                            mListView.deferNotifyDataSetChanged();
                         }
                     });
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            refreshSpinner();
-                            displayTaskList();
+                            tvListEmpty.setText("无报课任务");
                         }
                     });
                 }
-
             }
 
             @Override
@@ -199,6 +206,23 @@ public class TaskListActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    // 显示任务列表数据
+    private void displayTaskList() {
+        if (selectedTerm != null) {
+            getDataByTerm(selectedTerm);
+        }
+        if (mTaskAdapter != null) {
+            mTaskAdapter.notifyDataSetChanged();
+        } else {
+            mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
+            mListView.setAdapter(mTaskAdapter);
+            mListView.setOnItemClickListener(this);
+            if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
+                mListView.setOnItemLongClickListener(this);
+            }
+        }
     }
 
     /**
@@ -210,22 +234,14 @@ public class TaskListActivity extends AppCompatActivity
         if (taskListData != null) {
             taskListData.clear();
         }
-        String year = selectedTerm.substring(0, 4);
-        String semester = selectedTerm.substring(4, 6);
-        List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
-                "year=\"" + year + "\" and semester=\"" + semester + "\"");
-        taskListData.addAll(list);
-    }
-
-    // 显示任务列表数据
-    private void displayTaskList() {
-        mTaskAdapter = new TaskAdapter(this, R.layout.list_item_task, taskListData);
-        mListView.setAdapter(mTaskAdapter);
-        mListView.setOnItemClickListener(this);
-        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
-            mListView.setOnItemLongClickListener(this);
+        if (!selectedTerm.equals("学期")) {
+            String year = selectedTerm.substring(0, 4);
+            String semester = selectedTerm.substring(4, 6);
+            List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
+                    "year=\"" + year + "\" and semester=\"" + semester + "\"");
+            taskListData.addAll(list);
         }
-        Loger.i("TAG", "显示数据");
+        Loger.w("GetDataByTerm", taskListData.toString());
     }
 
     // 点击任务列表项跳转操作
@@ -322,10 +338,16 @@ public class TaskListActivity extends AppCompatActivity
     public void refreshSpinner() {
         List<String> semesterList = dbHelper.getSemesterList();
         spinnerAdapter.clear();
-        spinnerAdapter.addAll(semesterList);
-        if (spinnerAdapter != null) {
+        if (!semesterList.isEmpty()) {
+            spinnerAdapter.addAll(semesterList);
+            if (spinnerAdapter != null) {
+                spinnerAdapter.notifyDataSetChanged();
+            }
+        } else {
+            spinnerAdapter.add("学期");
             spinnerAdapter.notifyDataSetChanged();
         }
+        displayTaskList();
     }
 
     private android.widget.AdapterView.OnItemSelectedListener
@@ -333,8 +355,8 @@ public class TaskListActivity extends AppCompatActivity
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedTerm = (String) parent.getItemAtPosition(position);
-            getDataByTerm(selectedTerm);
 
+            getDataByTerm(selectedTerm);
             if (mTaskAdapter != null) {
                 mTaskAdapter.notifyDataSetChanged();
             } else {
@@ -368,8 +390,10 @@ public class TaskListActivity extends AppCompatActivity
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if (spinnerAdapter == null) {
+                                        setSpinnerData();
+                                    }
                                     refreshSpinner();
-                                    setSpinnerData();
                                     if (mProgress.isShowing()) {
                                         mProgress.cancel();
                                     }
@@ -549,5 +573,16 @@ public class TaskListActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void updateApk(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                UpdateManager mUpdateManager = new UpdateManager(TaskListActivity.this);
+                mUpdateManager.updateVersion();
+            }
+        }).start();
+
     }
 }

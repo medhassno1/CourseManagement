@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * 传入tableName，插入数据到tableName
  */

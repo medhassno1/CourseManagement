@@ -1,4 +1,4 @@
-﻿<?php
+<?php 
 error_reporting(0);
 require_once './classes/class_query_teacher_select_courses.php';
 require_once './classes/class_query_table_name.php';
@@ -9,13 +9,13 @@ $workNumber = $_POST["workNumber"];
 session_start();
 $ident = $_SESSION["id"];
 
-if($ident == "user_teacher"){
-	$queryTeachers = new QueryTeacherSelectCourses();
-	$queryTeachers->queryTeacher($tableName, $workNumber, $ident);
+if ($ident == "user_teacher") {
+    $queryTeachers = new QueryTeacherSelectCourses();
+    $queryTeachers->queryTeacher($tableName, $workNumber);
 } else {
-	$query = new QueryTableName();
-	$tableName = "cb_".$tableName;
-	$query->queryT($tableName);
+    $query = new QueryTableName();
+    $tableName = "cb_".$tableName;
+    $query->queryT($tableName);
 }
 
 

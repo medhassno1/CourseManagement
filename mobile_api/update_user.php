@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * 传入jsonData和tableName，根据身份验证更新系负责人用户表
  * 身份为user_teaching_office则有权利修改department，否则不能修改
