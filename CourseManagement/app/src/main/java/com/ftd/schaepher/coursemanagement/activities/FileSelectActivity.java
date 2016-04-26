@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.adapter.FileListAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
@@ -45,6 +46,8 @@ public class FileSelectActivity extends AppCompatActivity
     private TextView tvItemCount;
     private ProgressDialog progress;
     private ArrayList<File> rootFileList;
+    private String identity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,9 @@ public class FileSelectActivity extends AppCompatActivity
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle("选择文件");
+
+        identity = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE)
+                .getString(ConstantStr.USER_IDENTITY, null);
 
         initView();
     }
@@ -167,6 +173,7 @@ public class FileSelectActivity extends AppCompatActivity
                                             excelTools.readTeacherExcel();
                                             List<TableUserTeacher> teachersList = excelTools.getTeacherList();
                                             List<TableUserTeachingOffice> teachingOfficeList = excelTools.getOfficeList();
+                                            List<TableUserDepartmentHead> departmentHeadList = excelTools.getDepartmentList();
 
                                             Loger.i("dataList1", "开始输出数据");
                                             Loger.i("dataList", teachersList.toString());
@@ -174,19 +181,37 @@ public class FileSelectActivity extends AppCompatActivity
                                             // 导入职工表
                                             CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
                                             try {
-                                                Loger.i("dataList1", "开始导入教师数据");
-                                                NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
-                                                        JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
-                                                dbHelper.deleteAll(TableUserTeacher.class);
-                                                dbHelper.insertAll(teachersList);
-                                                Loger.i("dataList1", "开始导入教学办数据");
-                                                NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
-                                                        JsonTools.getJsonString(teachingOfficeList), NetworkManager.INSERT_TABLE);
-                                                dbHelper.deleteAll(TableUserTeachingOffice.class);
-                                                dbHelper.insertAll(teachingOfficeList);
+                                                //系负责人只能添加教师
+                                                if(identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)){
+                                                    Loger.i("dataList1", "开始导入教师数据");
+                                                    NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                                            JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
+                                                    dbHelper.deleteAll(TableUserTeacher.class);
+                                                    dbHelper.insertAll(teachersList);
 
-                                                closeProgress();
-                                                finish();
+                                                    closeProgress();
+                                                    finish();
+                                                }else{
+                                                    Loger.i("dataList1", "开始导入教师数据");
+                                                    NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
+                                                            JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
+                                                    dbHelper.deleteAll(TableUserTeacher.class);
+                                                    dbHelper.insertAll(teachersList);
+                                                    Loger.i("dataList1", "开始导入系主任数据");
+                                                    NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
+                                                            JsonTools.getJsonString(departmentHeadList), NetworkManager.INSERT_TABLE);
+                                                    dbHelper.deleteAll(TableUserDepartmentHead.class);
+                                                    dbHelper.insertAll(departmentHeadList);
+                                                    Loger.i("dataList1", "开始导入教学办数据");
+                                                    NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
+                                                            JsonTools.getJsonString(teachingOfficeList), NetworkManager.INSERT_TABLE);
+                                                    dbHelper.deleteAll(TableUserTeachingOffice.class);
+                                                    dbHelper.insertAll(teachingOfficeList);
+
+                                                    closeProgress();
+                                                    finish();
+                                                }
+
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                                 showError();

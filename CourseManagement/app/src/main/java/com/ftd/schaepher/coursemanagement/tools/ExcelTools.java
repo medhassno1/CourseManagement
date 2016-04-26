@@ -28,6 +28,8 @@ public class ExcelTools {
     private String path;
     private List<TableUserTeacher> teacherList;
     private List<TableUserTeachingOffice> officeList;
+    private List<TableUserDepartmentHead> departmentList;
+
 
     public ExcelTools(Context con) {
         context = con;
@@ -124,7 +126,7 @@ public class ExcelTools {
                     }
                 }
                 for (int i = beginRows; i <= rows; i++) {
-                    if (getCellValue(i, 5).contains("教师") || getCellValue(i, 5).contains("系主任")) {
+                    if (getCellValue(i, 5).contains("教师") ) {
                         TableUserTeacher teacher = new TableUserTeacher();
                         teacher.setWorkNumber(getCellValue(i, 1));  // 导入教师信息
                         teacher.setPassword(getCellValue(i, 1));    // 默认密码为工号
@@ -132,6 +134,14 @@ public class ExcelTools {
                         teacher.setSex(getCellValue(i, 3));
                         teacher.setBirthday(getCellValue(i, 4));
                         teacherList.add(teacher);
+                    }else if(getCellValue(i, 5).contains("系主任")){
+                        TableUserDepartmentHead departmentHead = new TableUserDepartmentHead();
+                        departmentHead.setWorkNumber(getCellValue(i, 1));
+                        departmentHead.setPassword(getCellValue(i, 1));
+                        departmentHead.setName(getCellValue(i, 2));
+                        departmentHead.setSex(getCellValue(i, 3));
+                        departmentHead.setBirthday(getCellValue(i, 4));
+                        departmentList.add(departmentHead);
                     } else {
                         TableUserTeachingOffice teachingOffice = new TableUserTeachingOffice();
                         teachingOffice.setWorkNumber(getCellValue(i, 1));   // 导入系负责人信息
@@ -157,6 +167,11 @@ public class ExcelTools {
     public List<TableUserTeachingOffice> getOfficeList(){
         return officeList;
     }
+
+    public List<TableUserDepartmentHead> getDepartmentList(){
+        return departmentList;
+    }
+
 
     /**
      * 获取表格i行j列的单元格的值

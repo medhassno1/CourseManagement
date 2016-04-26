@@ -60,7 +60,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private EditText edtTxDialogNote;
     private EditText edtTxDialogTeacher;
 
-    private static final TableCourseMultiline EXCEL_HEADER = new TableCourseMultiline("年级", "专业", "专业人数",
+    private static final TableCourseMultiline EXCEL_HEADER = new TableCourseMultiline("序号","年级", "专业", "专业人数",
             "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
             "任课教师", "备注");
 
@@ -597,6 +597,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             if (convertView == null) {
                 view = LayoutInflater.from(getContext()).inflate(resourceId, null);
                 mViewHolder = new viewHolder();
+                mViewHolder.tvNumber = (TextView) view.findViewById(R.id.tv_number);
                 mViewHolder.tvGrade = (TextView) view.findViewById(R.id.tv_grade);
                 mViewHolder.tvMajor = (TextView) view.findViewById(R.id.tv_major);
                 mViewHolder.tvSum = (TextView) view.findViewById(R.id.tv_sum);
@@ -614,6 +615,13 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 view = convertView;
                 mViewHolder = (viewHolder) view.getTag();
             }
+
+            //数据源excelListData第0行为列名，第一行开始才是数据
+            if(courseCur.getInsertTime().matches("[0-9]+")){
+                mViewHolder.tvNumber.setText((Integer.parseInt(courseCur.getInsertTime()) - 3) + "");
+            }else{
+                mViewHolder.tvNumber.setText(courseCur.getInsertTime());
+            }
             mViewHolder.tvGrade.setText(courseCur.getGrade());
             mViewHolder.tvMajor.setText(courseCur.getMajor());
             mViewHolder.tvSum.setText(courseCur.getPeople());
@@ -630,6 +638,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         }
 
         class viewHolder {
+            TextView tvNumber;
             TextView tvGrade;
             TextView tvMajor;
             TextView tvSum;
