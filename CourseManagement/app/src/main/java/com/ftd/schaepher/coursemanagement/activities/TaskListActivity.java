@@ -36,6 +36,7 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.ftd.schaepher.coursemanagement.tools.UpdateManager;
 import com.ftd.schaepher.coursemanagement.widget.RefreshableView;
 import com.squareup.okhttp.Request;
@@ -45,8 +46,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by sxq on 2015/10/31.
@@ -276,54 +275,6 @@ public class TaskListActivity extends AppCompatActivity
         return true;
     }
 
-    // 任务名映射
-    public static String transferTableNameToChinese(String string) {
-        StringBuilder strTaskName = new StringBuilder();
-        Pattern pattern = Pattern.compile("[a-zA-Z_]*");
-        Matcher matcher = pattern.matcher(string);
-        if (matcher.find()) {
-            strTaskName.append(matcher.group());
-        }
-//        Loger.d("TAG", strTaskName.toString());
-        switch (strTaskName.toString()) {
-            case "tc_com_exc":
-                return "计算机（卓越班）";
-            case "tc_com_nor":
-                return "计算机专业";
-            case "tc_com_ope":
-                return "计算机（实验班）";
-            case "tc_inf_sec":
-                return "信息安全专业";
-            case "tc_math_nor":
-                return "数学类";
-            case "tc_math_ope":
-                return "数学类（实验班）";
-            case "tc_net_pro":
-                return "网络工程专业";
-            case "tc_soft_pro":
-                return "软件工程专业";
-            default:
-                return null;
-        }
-    }
-
-    // 任务状态映射
-    public static String taskStateMap(String string) {
-        if (string == null) {
-            return null;
-        }
-        switch (string) {
-            case "0":
-                return "进行中";
-            case "1":
-                return "审核中";
-            case "2":
-                return "已结束";
-            default:
-                return null;
-        }
-    }
-
     // 下拉选项框初始化
     private void setSpinnerData() {
         spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item);
@@ -450,8 +401,8 @@ public class TaskListActivity extends AppCompatActivity
                 viewHolder = (TaskAdapter.viewHolder) view.getTag();
             }
 
-            viewHolder.taskState.setText(taskStateMap(task.getTaskState()));
-            viewHolder.taskName.setText(transferTableNameToChinese(task.getRelativeTable()));
+            viewHolder.taskState.setText(TransferUtils.stateCode2Zh(task.getTaskState()));
+            viewHolder.taskName.setText(TransferUtils.en2Zh(task.getRelativeTable()));
             return view;
         }
 

@@ -29,6 +29,7 @@ import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.ftd.schaepher.coursemanagement.widget.WheelView;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
@@ -248,7 +249,7 @@ public class TaskCreationActivity extends AppCompatActivity
         newTask.setTaskState("0");
         newTask.setDepartmentDeadline(edtTxDepartmentDeadline.getText().toString());
         newTask.setTeacherDeadline(edtTxTeacherDeadline.getText().toString());
-        newTask.setRelativeTable(transferTaskNameToEnglish(edtTxTaskName.getText().toString()) + year + semester);
+        newTask.setRelativeTable(TransferUtils.zh2En(edtTxTaskName.getText().toString()) + year + semester);
         return newTask;
     }
 
@@ -278,7 +279,7 @@ public class TaskCreationActivity extends AppCompatActivity
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         edtTxDepartmentDeadline.setText(String.format(Locale.CHINA,
-                                "%d%d%d", year, monthOfYear + 1, dayOfMonth));
+                                "%d%02d%02d", year, monthOfYear + 1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
@@ -288,15 +289,13 @@ public class TaskCreationActivity extends AppCompatActivity
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         edtTxTeacherDeadline.setText(String.format(Locale.CHINA,
-                                "%d%d%d", year, monthOfYear + 1, dayOfMonth));
+                                "%d%02d%02d", year, monthOfYear + 1, dayOfMonth));
                     }
                 }, year, month, day).show();
                 break;
 
             case R.id.edtTx_add_task_name:
-                // 这里数据尽可能分离
-                simpleDialog.items(new String[]{"计算机（实验班）", "计算机（卓越班）", "计算机专业",
-                        "软件工程专业", "数学类（实验班）", "数学类", "网络工程专业", "信息安全专业"}, 0)
+                simpleDialog.items(getResources().getStringArray(R.array.major_name), 0)
                         .title("选择专业")
                         .positiveAction("确认")
                         .negativeAction("取消")
@@ -376,30 +375,6 @@ public class TaskCreationActivity extends AppCompatActivity
             String fileName = filePath.split("/")[filePath.split("/").length - 1];
             tvFileName.setText(fileName);
             Loger.d("filePath", filePath);
-        }
-    }
-
-    // 任务名映射
-    public String transferTaskNameToEnglish(String string) {
-        switch (string) {
-            case "计算机（卓越班）":
-                return "tc_com_exc";
-            case "计算机专业":
-                return "tc_com_nor";
-            case "计算机（实验班）":
-                return "tc_com_ope";
-            case "信息安全专业":
-                return "tc_inf_sec";
-            case "数学类":
-                return "tc_math_nor";
-            case "数学类（实验班）":
-                return "tc_math_ope";
-            case "网络工程专业":
-                return "tc_net_pro";
-            case "软件工程专业":
-                return "tc_soft_pro";
-            default:
-                return "";
         }
     }
 }

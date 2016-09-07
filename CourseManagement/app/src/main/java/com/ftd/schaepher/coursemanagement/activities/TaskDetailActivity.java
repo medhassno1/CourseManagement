@@ -19,6 +19,7 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.rey.material.app.SimpleDialog;
 
 import java.io.File;
@@ -99,8 +100,8 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTaskTerm.setText(taskTerm);
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
         tvTeacherDeadline.setText(task.getTeacherDeadline());
-        tvTaskState.setText(TaskListActivity.taskStateMap(task.getTaskState()));
-        taskName = TaskListActivity.transferTableNameToChinese(task.getRelativeTable());
+        tvTaskState.setText(TransferUtils.stateCode2Zh(task.getTaskState()));
+        taskName = TransferUtils.en2Zh(task.getRelativeTable());
         tvTaskName.setText(taskName);
     }
 

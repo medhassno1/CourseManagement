@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--数计学院信息-->
+    
+
+    <!-- 数计学院所有报课的专业名称   顺序和下面的数据库表名称必须一致 -->
+    <string-array name="major_name">
+        <item>软件工程</item>
+        <item>计算机类、计算机科学与技术</item>
+        <item>计算机科学与技术(实验班)</item>
+        <item>计算机科学与技术(卓越班)</item>
+        <item>网络工程</item>
+        <item>信息安全</item>
+        <item>数学类、数学与应用数学、信息与计算科学(实验班)</item>
+        <item>数学类（实验班）、数学与应用数学（实验班）、信息与计算科学（实验班）</item>
+    </string-array>
+
+    <!-- 数计学院所有报课的专业对应的数据库表的名称   顺序和上面的数据库表名称必须一致-->
+    <string-array name="table_name">
+        <item>tc_soft_pro</item>
+        <item>tc_com_nor</item>
+        <item>tc_com_ope</item>
+        <item>tc_com_exc</item>
+        <item>tc_net_pro</item>
+        <item>tc_inf_sec</item>
+        <item>tc_math_nor</item>
+        <item>tc_infocom_ope</item>
+    </string-array>
+    
+    <!--数计学院所有系名称-->
+    <string-array name="department_name">
+        <item>计算机系</item>
+        <item>软件工程系</item>
+        <item>数学系</item>
+        <item>网络工程系</item>
+        <item>信息安全系</item>
+    </string-array>
+</resources>

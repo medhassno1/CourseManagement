@@ -30,6 +30,7 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.rey.material.app.SimpleDialog;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -78,7 +79,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         tableName = getIntent().getStringExtra("tableName");
         commonTableName = TableCourseMultiline.class.getSimpleName();
         hasCommitted = true;
-        actionBar.setTitle(TaskListActivity.transferTableNameToChinese(tableName));
+        actionBar.setTitle(TransferUtils.en2Zh(tableName));
 
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         workNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");

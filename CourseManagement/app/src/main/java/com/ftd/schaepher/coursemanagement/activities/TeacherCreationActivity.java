@@ -163,7 +163,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         final SimpleDialog simpleDialog = new SimpleDialog(TeacherCreationActivity.this);
         switch (v.getId()) {
             case R.id.edtTx_teacher_creation_department:
-                simpleDialog.items(new String[]{"计算机系", "软件工程系", "数学系", "网络工程系", "信息安全系"}, 0)
+                simpleDialog.items(getResources().getStringArray(R.array.department_name), 0)
                         .title("所属系")
                         .positiveAction("确认")
                         .negativeAction("取消")
@@ -185,9 +185,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
 
             case R.id.edtTx_teacher_creation_major:
 //                这里尝试取消默认选择第一个
-                simpleDialog.multiChoiceItems(new String[]
-                        {"计算机（实验班）", "计算机（卓越班）", "计算机专业", "软件工程专业",
-                                "数学类（实验班）", "数学类", "网络工程专业", "信息安全专业"}, 0)
+                simpleDialog.multiChoiceItems(getResources().getStringArray(R.array.major_name), 0)
                         .title("所负责专业")
                         .positiveAction("确认")
                         .negativeAction("取消")
