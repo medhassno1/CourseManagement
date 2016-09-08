@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:orientation="vertical"
+              android:layout_height="match_parent"
+              android:paddingTop="@dimen/activity_vertical_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/list_item_padding"
+        android:weightSum="2"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/list_item_padding"
+            android:text="学期"/>
+
+        <TextView
+            android:id="@+id/tv_task_term"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/list_item_padding"
+            tools:text="201602"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_department_deadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_task_term"
+        android:gravity="center_vertical"
+        android:weightSum="2"
+        android:layout_margin="@dimen/list_item_padding"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/list_item_padding"
+            android:gravity="bottom"
+            android:text="系审核截止时间"/>
+
+        <EditText
+            android:id="@+id/edtTx_task_department_deadline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="false"
+            android:visibility="visible"
+            tools:text="201602"/>
+
+        <TextView
+            android:id="@+id/tv_task_department_deadline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="201602"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2"
+        android:layout_margin="@dimen/list_item_padding"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/list_item_padding"
+            android:gravity="bottom"
+            android:text="教师申报截止时间"/>
+
+        <EditText
+            android:id="@+id/edtTx_task_teacher_deadline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/list_item_padding"
+            android:clickable="true"
+            android:focusable="false"
+            tools:text="201602"/>
+
+    </LinearLayout>
+
+</LinearLayout>

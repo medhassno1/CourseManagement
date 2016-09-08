@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -402,6 +403,20 @@ public class TaskListActivity extends AppCompatActivity
             }
 
             viewHolder.taskState.setText(TransferUtils.stateCode2Zh(task.getTaskState()));
+            switch (task.getTaskState()){
+                case "0":
+                    viewHolder.taskState.setTextColor(Color.RED);
+                    break;
+                case "1":
+                    viewHolder.taskState.setTextColor(Color.GREEN);
+                    break;
+                case "2":
+                    viewHolder.taskState.setTextColor(Color.GRAY);
+                    break;
+                default:
+                    viewHolder.taskState.setTextColor(Color.RED);
+                    break;
+            }
             viewHolder.taskName.setText(TransferUtils.en2Zh(task.getRelativeTable()));
             return view;
         }
