@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
+import com.ftd.schaepher.coursemanagement.adapter.PreviewAdapter;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
@@ -48,6 +49,8 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 
     private static final String TAG = "ExcelDisplayActivity::";
     private List<TableCourseMultiline> excelListData;
+    private List<TableCourseMultiline> previewMajorList;
+
     private CourseDBHelper dbHelper;
     private String tableName;
     private String workNumber;
@@ -74,6 +77,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         excelListData = new ArrayList<>();
+        previewMajorList = new ArrayList<>();
         dbHelper = new CourseDBHelper(this);
 
         tableName = getIntent().getStringExtra("tableName");
@@ -274,7 +278,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark(edtTxDialogNote.getText().toString());
                                 courseModify.setTeacherName(edtTxDialogTeacher.getText().toString());
                                 courseModify.setWorkNumber(workNumber);
-
+                                previewMajorList.add(excelListData.get(position));
                                 if (!identity.equals(ConstantStr.ID_TEACHER)) {
                                     postOneLineToServer(courseModify);
                                 } else {
@@ -300,7 +304,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark("");
                                 courseModify.setTeacherName("");
                                 courseModify.setWorkNumber("");
-
+                                for (TableCourseMultiline c:previewMajorList){
+                                    if (c.getCourseName().equals(excelListData.get(position).getCourseName())) {
+                                        previewMajorList.remove(c);
+                                        break;
+                                    }
+                                }
                                 if (!identity.equals(ConstantStr.ID_TEACHER)) {
                                     postOneLineToServer(courseModify);
                                 } else {
@@ -409,10 +418,11 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
 //                } else if (taskState.equals("1")) {
 //                    showForbidCommitDialog("报课信息正在审核中，请等待...");
 //                } else {
+
                 if (hasCommitted) {
                     showForbidCommitDialog("您已进行过提交，不能再次提交！");
                 } else {
-                    showCommitTaskDialog("是否提交报课", "请注意，一旦提交您对该表选择的报课信息将不能再次修改或补充！");
+                    showPreviewDialog();
                 }
 //                }
                 return true;
@@ -436,6 +446,33 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    private void showPreviewDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_preview_commit, null, false);
+        ListView previewListView = (ListView) view.findViewById(R.id.lv_preview_commit);
+        PreviewAdapter adapter = new PreviewAdapter(this, previewMajorList);
+        previewListView.setAdapter(adapter);
+        previewListView.setEmptyView(view.findViewById(R.id.empty_view));
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("您申报的课程")
+                .setView(view)
+                .setPositiveButton("提交", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showCommitTaskDialog("是否提交报课", "请注意，一旦提交您对该表选择的报课信息将不能再次修改或补充！");
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 
     private void showCommitTaskDialog(String title, String message) {
         final SimpleDialog commitTaskDialog = new SimpleDialog(ExcelDisplayActivity.this);

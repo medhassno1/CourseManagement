@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
@@ -134,8 +135,26 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
         tvTeacherDeadline.setText(task.getTeacherDeadline());
         tvTaskState.setText(TransferUtils.stateCode2Zh(task.getTaskState()));
+        initTaskStateColor();
         taskName = TransferUtils.en2Zh(task.getRelativeTable());
         tvTaskName.setText(taskName);
+    }
+
+    private void initTaskStateColor() {
+        switch (task.getTaskState()){
+            case "0":
+                tvTaskState.setTextColor(Color.RED);
+                break;
+            case "1":
+                tvTaskState.setTextColor(Color.GREEN);
+                break;
+            case "2":
+                tvTaskState.setTextColor(Color.GRAY);
+                break;
+            default:
+                tvTaskState.setTextColor(Color.RED);
+                break;
+        }
     }
 
     @Override
