@@ -41,6 +41,8 @@ public class NetworkManager {
     public static final String UPDATE_USER_DATA = URL_BASE + "update_user.php";
     //更新APK
     public  static final String UPDATE_APK = URL_BASE + "update_apk.php";
+    //更新TaskInfo表（修改截止时间）
+    public static final String UPDATE_TASK_INFO = URL_BASE + "update_info_teacherDeadline.php";
 
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -180,6 +182,20 @@ public class NetworkManager {
             throw new IOException("Unexpected code " + response);
         }
     }
+
+    // 异步post，修改taskInfo表
+    public static void updateTaskInfo(String jsonData, ResponseCallback callback) {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("jsonData", jsonData)
+                .build();
+        Request request = new Request.Builder()
+                .url(UPDATE_TASK_INFO)
+                .post(formBody)
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+
+
 
     // 回调接口
     public interface ResponseCallback extends Callback {

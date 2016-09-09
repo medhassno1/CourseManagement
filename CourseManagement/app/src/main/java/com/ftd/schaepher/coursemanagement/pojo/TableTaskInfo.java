@@ -17,6 +17,15 @@ public class TableTaskInfo {
     private String teacherDeadline;
     private String taskState;
 
+    public TableTaskInfo(TableTaskInfo task) {
+        this.relativeTable = task.relativeTable;
+        this.year = task.year;
+        this.semester = task.semester;
+        this.departmentDeadline = task.departmentDeadline;
+        this.teacherDeadline = task.teacherDeadline;
+        this.taskState = task.taskState;
+    }
+
     public TableTaskInfo() {
     }
 

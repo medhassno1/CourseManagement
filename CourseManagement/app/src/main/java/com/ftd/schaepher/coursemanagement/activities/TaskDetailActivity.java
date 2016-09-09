@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,9 +28,13 @@ import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.rey.material.app.SimpleDialog;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,6 +73,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
     private String relativeTable;
     private TableTaskInfo task;
+    private TableTaskInfo editedTask;
     private CourseDBHelper dbHelper;
     private String tableName;
     private String filePath;
@@ -141,7 +147,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initTaskStateColor() {
-        switch (task.getTaskState()){
+        switch (task.getTaskState()) {
             case "0":
                 tvTaskState.setTextColor(Color.RED);
                 break;
@@ -335,7 +341,9 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 startActivity(intent);
                 break;
             case R.id.cardv_task_info:
-                showTaskEditDialog();
+                if (!task.getTaskState().equals(2)) {
+                    showTaskEditDialog();
+                }
                 break;
             default:
                 break;
@@ -354,7 +362,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         final int month = calendar.get(Calendar.MONTH);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
         termTv.setText(tvTaskTerm.getText());
-        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)){
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
             depDeadlineEdt.setVisibility(View.VISIBLE);
             depDeadlineEdt.setText(tvDepartmentDeadline.getText());
             depDeadlineTv.setVisibility(View.GONE);
@@ -394,7 +402,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        updateTaskInfo(depDeadlineEdt.getText().toString(), teacherDeadlineEdt.getText().toString());
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -407,5 +415,40 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         dialog.show();
     }
 
+    private void updateTaskInfo(final String departmentDL, final String teacherDL) {
+        editedTask = new TableTaskInfo(task);
+        editedTask.setDepartmentDeadline(departmentDL);
+        editedTask.setTeacherDeadline(teacherDL);
+        NetworkManager.updateTaskInfo(JsonTools.getJsonString(editedTask), new NetworkManager.ResponseCallback() {
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (response.body() != null) {
+                    if (response.body().string().equals("true")) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dbHelper.update(editedTask);
+                                tvDepartmentDeadline.setText(departmentDL);
+                                tvTeacherDeadline.setText(teacherDL);
+                                Toast.makeText(TaskDetailActivity.this,"修改成功",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(TaskDetailActivity.this,"修改失败",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            }
 
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.d("!!!!!!!!!!!!!!", "error");
+            }
+        });
+
+    }
 }
