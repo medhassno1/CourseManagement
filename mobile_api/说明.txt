@@ -8,7 +8,7 @@ insert_table:传入tableName，插入数据到tableName
 
 login:登陆
 
-query_by_table_name：传入tableName，根据表名查询表中所有的信息
+query_by_table_name：用于系负责人查看表，传入tableName和workNumber，先查询表的状态，如果正在进行则需要进行判断是否有权限查看，如果已完成则直接根据表名查询表中所有的信息
 
 
 query_teacher_select_courses:传入jsonData和workNumber,根据workNUmber查询报课情况，先从任务列表中查询任务的taskState，如果已完成，就在单行表中查询，否则在多行表中查询
@@ -43,3 +43,4 @@ while ($row = mysql_fetch_assoc($search)) {
 }
 
 就成功了
+cb合并后的表

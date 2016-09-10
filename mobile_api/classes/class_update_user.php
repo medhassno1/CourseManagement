@@ -9,7 +9,7 @@ class UpdateUser {
             die('Could not connect: '.mysql_error());
         } else {
             mysql_query("SET NAMES utf8");
-            $jsonArry = json_decode($jsonData, true);
+            $jsonArry = json_decode($jsonData, true);//对json进行解码
 
             if ($tableName == 'user_teacher' || $tableName == 'user_department_head') {
 
