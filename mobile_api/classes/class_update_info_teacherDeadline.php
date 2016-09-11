@@ -6,19 +6,20 @@ class UpdateTaskInfo
 {
     public function updateTeacherDeadline($ident = "", $jsonData = "")
     {
-        $con = mysqli_connect("localhost", "root", "", "teacher_class_system");
+        $con = mysql_connect("localhost", "root", "");
+        mysql_select_db('teacher_class_system', $con);
 
         if (!$con) {
             die('Could not connect: ' . mysql_error());
         } else {
-            mysqli_query($con, "SET NAMES utf8");
+            mysql_query("SET NAMES utf8");
             $jsonArry = json_decode($jsonData, true);
             if ($ident == 'user_department_head') {
 
                 foreach ($jsonArry as $row) {
                     if ($row[teacherDeadline] < $row[departmentDeadline]) {
                         $sql = "UPDATE task_info SET teacherDeadline='$row[teacherDeadline]' WHERE relativeTable = '$row[relativeTable]'";//task_info不用加单引号
-                        mysqli_query($con, $sql);
+                        mysql_query($sql);
                     }
                 }
             } else if ($ident == 'user_teaching_office') {
@@ -26,7 +27,7 @@ class UpdateTaskInfo
                 foreach ($jsonArry as $row) {
                     if ($row[teacherDeadline] < $row[departmentDeadline]) {
                         $sql = "UPDATE task_info SET teacherDeadline='$row[teacherDeadline]',departmentDeadline ='$row[departmentDeadline]' WHERE relativeTable = '$row[relativeTable]'";
-                        mysqli_query($con, $sql);
+                        mysql_query($sql);
                     }
                 }
             } else {
