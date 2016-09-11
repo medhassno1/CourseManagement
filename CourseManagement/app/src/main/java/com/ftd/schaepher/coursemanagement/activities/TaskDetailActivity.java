@@ -1,16 +1,25 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,16 +27,23 @@ import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
 import com.ftd.schaepher.coursemanagement.pojo.TableCourseMultiline;
 import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
+import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
+import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
+import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.rey.material.app.SimpleDialog;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import jxl.Sheet;
 import jxl.Workbook;
@@ -45,6 +61,8 @@ import jxl.write.WriteException;
  * 任务详情页面
  */
 public class TaskDetailActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private CardView cardvTaskInfo;
     private CardView cardvTaskDetail;
     private TextView tvDepartmentDeadline;
     private TextView tvTeacherDeadline;
@@ -55,6 +73,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
     private String relativeTable;
     private TableTaskInfo task;
+    private TableTaskInfo editedTask;
     private CourseDBHelper dbHelper;
     private String tableName;
     private String filePath;
@@ -63,6 +82,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private String taskName;
     //    private String workNumber;
     private String toTableName;
+    private String identity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +100,25 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         Loger.i("TAG", "relativeTable" + relativeTable);
         dbHelper = new CourseDBHelper(this);
         initWidgetValue();
+        initUserInformation();
+    }
+
+    // 初始化当前用户的数据
+    private void initUserInformation() {
+        SharedPreferences sharedPre =
+                getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
+
+        identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
+
+        switch (identity) {
+            case ConstantStr.ID_DEPARTMENT_HEAD:
+            case ConstantStr.ID_TEACHING_OFFICE:
+                cardvTaskInfo.setOnClickListener(this);
+                break;
+            case ConstantStr.ID_TEACHER:
+            default:
+                break;
+        }
     }
 
     // 初始化控件数据
@@ -91,6 +130,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTaskState = (TextView) findViewById(R.id.tv_task_detail_state);
         tvTaskName = (TextView) findViewById(R.id.tv_task_detail_name);
         cardvTaskDetail = (CardView) findViewById(R.id.cardv_task_detail);
+        cardvTaskInfo = (CardView) findViewById(R.id.cardv_task_info);
         cardvTaskDetail.setOnClickListener(this);
 
         Loger.d("relativeTable", relativeTable);
@@ -101,8 +141,26 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvDepartmentDeadline.setText(task.getDepartmentDeadline());
         tvTeacherDeadline.setText(task.getTeacherDeadline());
         tvTaskState.setText(TransferUtils.stateCode2Zh(task.getTaskState()));
+        initTaskStateColor();
         taskName = TransferUtils.en2Zh(task.getRelativeTable());
         tvTaskName.setText(taskName);
+    }
+
+    private void initTaskStateColor() {
+        switch (task.getTaskState()) {
+            case "0":
+                tvTaskState.setTextColor(Color.RED);
+                break;
+            case "1":
+                tvTaskState.setTextColor(Color.GREEN);
+                break;
+            case "2":
+                tvTaskState.setTextColor(Color.GRAY);
+                break;
+            default:
+                tvTaskState.setTextColor(Color.RED);
+                break;
+        }
     }
 
     @Override
@@ -167,6 +225,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
             }
         });
     }
+
     public void sendToast(final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -275,9 +334,121 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     // 点击查看文件跳转逻辑
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class);
-        intent.putExtra("tableName", task.getRelativeTable());
-        startActivity(intent);
+        switch (v.getId()) {
+            case R.id.cardv_task_detail:
+                Intent intent = new Intent(TaskDetailActivity.this, ExcelDisplayActivity.class);
+                intent.putExtra("tableName", task.getRelativeTable());
+                startActivity(intent);
+                break;
+            case R.id.cardv_task_info:
+                if (!task.getTaskState().equals(2)) {
+                    showTaskEditDialog();
+                }
+                break;
+            default:
+                break;
+        }
+
     }
 
+    private void showTaskEditDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_edit_task_info, null, false);
+        TextView termTv = (TextView) view.findViewById(R.id.tv_task_term);
+        final EditText depDeadlineEdt = (EditText) view.findViewById(R.id.edtTx_task_department_deadline);
+        TextView depDeadlineTv = (TextView) view.findViewById(R.id.tv_task_department_deadline);
+        final EditText teacherDeadlineEdt = (EditText) view.findViewById(R.id.edtTx_task_teacher_deadline);
+        final Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        termTv.setText(tvTaskTerm.getText());
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
+            depDeadlineEdt.setVisibility(View.VISIBLE);
+            depDeadlineEdt.setText(tvDepartmentDeadline.getText());
+            depDeadlineTv.setVisibility(View.GONE);
+            depDeadlineEdt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new DatePickerDialog(TaskDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            depDeadlineEdt.setText(String.format(Locale.CHINA,
+                                    "%d%02d%02d", year, monthOfYear + 1, dayOfMonth));
+                        }
+                    }, year, month, day).show();
+                }
+            });
+        } else if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
+            depDeadlineEdt.setVisibility(View.GONE);
+            depDeadlineTv.setVisibility(View.VISIBLE);
+            depDeadlineTv.setText(tvDepartmentDeadline.getText());
+        }
+        teacherDeadlineEdt.setText(tvTeacherDeadline.getText());
+        teacherDeadlineEdt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(TaskDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        teacherDeadlineEdt.setText(String.format(Locale.CHINA,
+                                "%d%02d%02d", year, monthOfYear + 1, dayOfMonth));
+                    }
+                }, year, month, day).show();
+            }
+        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("修改截止时间")
+                .setView(view)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        updateTaskInfo(depDeadlineEdt.getText().toString(), teacherDeadlineEdt.getText().toString());
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void updateTaskInfo(final String departmentDL, final String teacherDL) {
+        editedTask = new TableTaskInfo(task);
+        editedTask.setDepartmentDeadline(departmentDL);
+        editedTask.setTeacherDeadline(teacherDL);
+        NetworkManager.updateTaskInfo(JsonTools.getJsonString(editedTask), new NetworkManager.ResponseCallback() {
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (response.body() != null) {
+                    if (response.body().string().equals("true")) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dbHelper.update(editedTask);
+                                tvDepartmentDeadline.setText(departmentDL);
+                                tvTeacherDeadline.setText(teacherDL);
+                                Toast.makeText(TaskDetailActivity.this,"修改成功",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(TaskDetailActivity.this,"修改失败",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.d("!!!!!!!!!!!!!!", "error");
+            }
+        });
+
+    }
 }

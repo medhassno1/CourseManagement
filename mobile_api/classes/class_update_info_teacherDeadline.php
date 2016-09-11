@@ -21,6 +21,12 @@ class UpdateTaskInfo
                         $sql = "UPDATE task_info SET teacherDeadline='$row[teacherDeadline]' WHERE relativeTable = '$row[relativeTable]'";//task_info不用加单引号
                         mysql_query($sql);
                     }
+                        $sql = "UPDATE task_info SET teacherDeadline='$row[teacherDeadline]' WHERE  relativeTable = '$row[relativeTable]'";
+                        mysql_query($sql);
+						echo "true";
+                    }else {
+						echo "false";
+					}
                 }
             } else if ($ident == 'user_teaching_office') {
 
@@ -29,6 +35,12 @@ class UpdateTaskInfo
                         $sql = "UPDATE task_info SET teacherDeadline='$row[teacherDeadline]',departmentDeadline ='$row[departmentDeadline]' WHERE relativeTable = '$row[relativeTable]'";
                         mysql_query($sql);
                     }
+                        $sql = "UPDATE task_info SET  teacherDeadline='$row[teacherDeadline]',departmentDeadline ='$row[departmentDeadline]' WHERE relativeTable = '$row[relativeTable]'";
+                        mysql_query($sql);
+						echo "true";
+                    }else {
+						echo "false";
+					}
                 }
             } else {
                 echo "false";
