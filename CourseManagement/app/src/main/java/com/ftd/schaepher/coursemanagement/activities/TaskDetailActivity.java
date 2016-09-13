@@ -41,6 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -95,7 +96,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         mActionBar.setDisplayHomeAsUpEnabled(true);
         toTableName = TableCourseMultiline.class.getSimpleName();
 
-//        workNumber = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE).getString(ConstantStr.USER_WORK_NUMBER, "");
         relativeTable = getIntent().getStringExtra("relativeTable");
         Loger.i("TAG", "relativeTable" + relativeTable);
         dbHelper = new CourseDBHelper(this);
@@ -126,7 +126,6 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         tvTaskTerm = (TextView) findViewById(R.id.tv_task_detail_term);
         tvTeacherDeadline = (TextView) findViewById(R.id.tv_task_detail_teacher_deadline);
         tvDepartmentDeadline = (TextView) findViewById(R.id.tv_task_detail_department_deadline);
-//        tvTaskRemark = (TextView) findViewById(R.id.tv_task_detail_remark);
         tvTaskState = (TextView) findViewById(R.id.tv_task_detail_state);
         tvTaskName = (TextView) findViewById(R.id.tv_task_detail_name);
         cardvTaskDetail = (CardView) findViewById(R.id.cardv_task_detail);
@@ -355,17 +354,18 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_edit_task_info, null, false);
         TextView termTv = (TextView) view.findViewById(R.id.tv_task_term);
         final EditText depDeadlineEdt = (EditText) view.findViewById(R.id.edtTx_task_department_deadline);
-        TextView depDeadlineTv = (TextView) view.findViewById(R.id.tv_task_department_deadline);
         final EditText teacherDeadlineEdt = (EditText) view.findViewById(R.id.edtTx_task_teacher_deadline);
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
         final int month = calendar.get(Calendar.MONTH);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
         termTv.setText(tvTaskTerm.getText());
+        String depDeadlineStr = tvDepartmentDeadline.getText().toString();
+        depDeadlineEdt.setText(depDeadlineStr);
+        depDeadlineEdt.setEnabled(false);
+
         if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
-            depDeadlineEdt.setVisibility(View.VISIBLE);
-            depDeadlineEdt.setText(tvDepartmentDeadline.getText());
-            depDeadlineTv.setVisibility(View.GONE);
+            depDeadlineEdt.setEnabled(true);
             depDeadlineEdt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -378,12 +378,10 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                     }, year, month, day).show();
                 }
             });
-        } else if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
-            depDeadlineEdt.setVisibility(View.GONE);
-            depDeadlineTv.setVisibility(View.VISIBLE);
-            depDeadlineTv.setText(tvDepartmentDeadline.getText());
         }
-        teacherDeadlineEdt.setText(tvTeacherDeadline.getText());
+
+        String teacherDeadline = tvTeacherDeadline.getText().toString();
+        teacherDeadlineEdt.setText(teacherDeadline);
         teacherDeadlineEdt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -396,13 +394,27 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                 }, year, month, day).show();
             }
         });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("修改截止时间")
                 .setView(view)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        updateTaskInfo(depDeadlineEdt.getText().toString(), teacherDeadlineEdt.getText().toString());
+                        String depDeadline = depDeadlineEdt.getText().toString();
+                        String teacherDeadline = teacherDeadlineEdt.getText().toString();
+
+                        if (Integer.valueOf(depDeadline) > Integer.valueOf(teacherDeadline)) {
+                            updateTaskInfo(depDeadline, teacherDeadline);
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(TaskDetailActivity.this,
+                                            "截止日期必须小于审核日期", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -415,29 +427,31 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         dialog.show();
     }
 
-    private void updateTaskInfo(final String departmentDL, final String teacherDL) {
+    private void updateTaskInfo(final String depDeadline, final String teacherDeadline) {
         editedTask = new TableTaskInfo(task);
-        editedTask.setDepartmentDeadline(departmentDL);
-        editedTask.setTeacherDeadline(teacherDL);
+        editedTask.setDepartmentDeadline(depDeadline);
+        editedTask.setTeacherDeadline(teacherDeadline);
         NetworkManager.updateTaskInfo(JsonTools.getJsonString(editedTask), new NetworkManager.ResponseCallback() {
             @Override
             public void onResponse(Response response) throws IOException {
                 if (response.body() != null) {
-                    if (response.body().string().equals("true")) {
+                    String responseStr = response.body().string();
+                    Loger.d("updateTime", responseStr);
+                    if (responseStr.equals("true")) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 dbHelper.update(editedTask);
-                                tvDepartmentDeadline.setText(departmentDL);
-                                tvTeacherDeadline.setText(teacherDL);
-                                Toast.makeText(TaskDetailActivity.this,"修改成功",Toast.LENGTH_SHORT).show();
+                                tvDepartmentDeadline.setText(depDeadline);
+                                tvTeacherDeadline.setText(teacherDeadline);
+                                Toast.makeText(TaskDetailActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
                             }
                         });
                     } else {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(TaskDetailActivity.this,"修改失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(TaskDetailActivity.this, "修改失败", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
