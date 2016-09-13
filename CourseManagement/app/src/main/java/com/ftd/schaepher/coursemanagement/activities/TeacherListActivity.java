@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -42,7 +41,6 @@ import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.widget.MoreListView;
-import com.ftd.schaepher.coursemanagement.widget.RefreshableView;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -64,11 +62,7 @@ public class TeacherListActivity extends AppCompatActivity
     private static final int CLOSE_NAV = 1;
 
     private Toolbar mToolbar;
-    private EditText eSearch;
-    private Runnable eChanged;
 
-    private RefreshableView refreshableView;
-    private ImageView ivDeleteText;
     private TextView tvOwnName;
     private TextView tvDelete;
     private ListView teacherListView;
@@ -78,7 +72,6 @@ public class TeacherListActivity extends AppCompatActivity
     private ProgressDialog mProgress;
     private boolean isSupportDoubleBackExit;
     private long doubleBackTime;
-    private Handler myHandler = new Handler();
     private List<TableUserTeacher> teacherListData;
     private List<TableUserTeachingOffice> officeListData;
     private List<TableUserDepartmentHead> departmentListData;
@@ -118,7 +111,8 @@ public class TeacherListActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         if (teacherListData == null && departmentListData == null && officeListData == null) {
-            asyncTask.execute();
+            Loger.d("onResume", "true");
+            new RefreshAllData().execute();
         }
         initThisUserInformation();
     }
@@ -129,21 +123,46 @@ public class TeacherListActivity extends AppCompatActivity
         tvOwnName.setText(ownName);
     }
 
-    private AsyncTask asyncTask = new AsyncTask() {
+    class RefreshAllData extends AsyncTask<Void,Void,Void>{
+
         @Override
-        protected Object doInBackground(Object[] params) {
+        protected Void doInBackground(Void... params) {
             teacherListData = dbHelper.findAll(TableUserTeacher.class);
-            officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
             departmentListData = dbHelper.findAll(TableUserDepartmentHead.class);
+            officeListData = dbHelper.findAll(TableUserTeachingOffice.class);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (teacherAdapter != null) {
+                        teacherAdapter.clear();
+                        teacherAdapter.addAll(teacherListData);
+                        teacherAdapter.notifyDataSetChanged();
+                    }
+
+                    if (departmentAdapter != null) {
+                        departmentAdapter.clear();
+                        departmentAdapter.addAll(departmentListData);
+                        departmentAdapter.notifyDataSetChanged();
+                    }
+
+                    if (officeAdapter != null) {
+                        officeAdapter.clear();
+                        officeAdapter.addAll(officeListData);
+                        officeAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+
             return null;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
+        protected void onPostExecute(Void v) {
             initTeacherListView();
         }
-    };
+    }
+
 
     // 初始化教师列表界面的控件
     private void initTeacherListView() {
@@ -185,11 +204,7 @@ public class TeacherListActivity extends AppCompatActivity
             officeListView.setOnItemLongClickListener(this);
         }
 
-        try {
-            getServerUserData();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     private void getServerUserData() throws IOException {
@@ -231,6 +246,7 @@ public class TeacherListActivity extends AppCompatActivity
                                 teacherAdapter.clear();
                                 teacherAdapter.addAll(teacherListData);
                                 teacherAdapter.notifyDataSetChanged();
+                                sendToast("教师数据更新完毕");
                             }
                         });
                     }
@@ -274,6 +290,8 @@ public class TeacherListActivity extends AppCompatActivity
                                 departmentAdapter.clear();
                                 departmentAdapter.addAll(departmentListData);
                                 departmentAdapter.notifyDataSetChanged();
+                                sendToast("系负责人数据更新完毕");
+
                             }
                         });
                     }
@@ -341,6 +359,7 @@ public class TeacherListActivity extends AppCompatActivity
                                 officeAdapter.clear();
                                 officeAdapter.addAll(officeListData);
                                 officeAdapter.notifyDataSetChanged();
+                                sendToast("教学办数据更新完毕");
                             }
                         });
                     }
@@ -370,14 +389,17 @@ public class TeacherListActivity extends AppCompatActivity
     //添加标题栏上的按钮图标
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE)||identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)){
+        if (identity.equals(ConstantStr.ID_TEACHING_OFFICE) || identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
             getMenuInflater().inflate(R.menu.teacher_list_activity_actions, menu);
             MenuItem addTeacherItem = menu.findItem(R.id.action_add_teacher);
             addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_input)
                     .setOnMenuItemClickListener(this);
             addTeacherItem.getSubMenu().findItem(R.id.add_teacher_from_file)
                     .setOnMenuItemClickListener(this);
+
+            menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(this);
         }
+
         return true;
     }
 
@@ -452,11 +474,21 @@ public class TeacherListActivity extends AppCompatActivity
         intend.putExtra("teacherID", queryWorkNumber);
         intend.putExtra("teacherIdentity", queryIdentity);
         intend.putExtra("isQueryingSelf", false);
-        startActivity(intend);
+        startActivityForResult(intend, 0);
 
         Loger.i("parent", String.valueOf(parent));
         Loger.i("parent", position + "    " + id);
         Loger.i("parent", queryWorkNumber + "  " + queryIdentity);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+            if (resultCode == 1) {
+                new RefreshAllData().execute();
+            }
+        }
     }
 
     // 点击标题栏的子菜单事件
@@ -471,6 +503,12 @@ public class TeacherListActivity extends AppCompatActivity
                 intent.putExtra("isRequireImportTeacherFile", true);
                 startActivity(intent);
                 break;
+            case R.id.action_refresh:
+                try {
+                    getServerUserData();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             default:
                 break;
         }
@@ -481,7 +519,7 @@ public class TeacherListActivity extends AppCompatActivity
      * 设置搜索框的文本更改时的监听器
      */
     private void setSearchTextChanged() {
-        eSearch = (EditText) findViewById(R.id.etSearch);
+        EditText eSearch = (EditText) findViewById(R.id.etSearch);
 
         eSearch.addTextChangedListener(new TextWatcher() {
 
@@ -551,7 +589,7 @@ public class TeacherListActivity extends AppCompatActivity
                             String workNumber = bundle.getString("workNumber");
                             int position = bundle.getInt("position");
                             NetworkManager.deleteServerUser(tableName, workNumber,
-                                    new MyResponse(tableName, workNumber,position));
+                                    new MyResponse(tableName, workNumber, position));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Loger.d("delete", "程序崩溃");
@@ -570,7 +608,7 @@ public class TeacherListActivity extends AppCompatActivity
         private String workNumber;
         private int position;
 
-        public MyResponse(String tableName, String workNumber,int position) {
+        public MyResponse(String tableName, String workNumber, int position) {
             super();
             this.tableName = tableName;
             this.workNumber = workNumber;
@@ -590,7 +628,7 @@ public class TeacherListActivity extends AppCompatActivity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            switch (tableName){
+                            switch (tableName) {
                                 case ConstantStr.TABLE_USER_TEACHER:
                                     teacherAdapter.remove(teacherListData.get(position));
                                     teacherAdapter.notifyDataSetChanged();

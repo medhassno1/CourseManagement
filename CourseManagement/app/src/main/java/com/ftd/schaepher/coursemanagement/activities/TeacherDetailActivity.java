@@ -1,11 +1,8 @@
 package com.ftd.schaepher.coursemanagement.activities;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +22,8 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,7 +127,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
                 String majorText = "";
                 for (int i = 0; i < manageMajorList.size(); i++) {
-                    String major = transferMajorNameToChinese(manageMajorList.get(i).getMajor());
+                    String major = TransferUtils.en2Zh(manageMajorList.get(i).getMajor());
                     majorText = majorText + major + "\n";
                 }
 
@@ -163,7 +162,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     }
 
     private void initUserPermission() {
-        // 都不允许修改工号
+        // 任何身份都不允许修改工号
         edtTxTeacherNumber.setEnabled(false);
 
         // 只有教学办能修改系负责人所在专业和所负责专业
@@ -239,7 +238,7 @@ public class TeacherDetailActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.teacher_detail_activity_actions, menu);
         if (!userIdentity.equals(ConstantStr.ID_TEACHING_OFFICE)) {
-            menu.removeItem(R.id.action_modify_infomation);
+            menu.removeItem(R.id.action_modify_information);
         }
         return true;
     }
@@ -250,53 +249,35 @@ public class TeacherDetailActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return true;
-            case R.id.action_modify_infomation: {
-                new AlertDialog.Builder(this)
-                        .setTitle("提示")
-                        .setMessage("是否确认修改")
-                        .setPositiveButton
-                                (android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // 如果是修改自己的信息，需要同时更新到本地
-                                        // 否则菜单上的名字不会改变
-                                        if (queryIdentity.equals(userIdentity)) {
-                                            String tvName =
-                                                    edtTxTeacherName.getText().toString().trim();
+            case R.id.action_modify_information: {
+                // 修改自己的信息时，需要同时更新到导航菜单上
+                if (queryIdentity.equals(userIdentity)) {
+                    String tvName =
+                            edtTxTeacherName.getText().toString().trim();
 
-                                            SharedPreferences.Editor editor =
-                                                    getSharedPreferences(ConstantStr.USER_INFORMATION,
-                                                            MODE_PRIVATE).edit();
-                                            editor.putString(ConstantStr.USER_NAME, tvName);
-                                            editor.apply();
-                                        }
+                    SharedPreferences.Editor editor =
+                            getSharedPreferences(ConstantStr.USER_INFORMATION,
+                                    MODE_PRIVATE).edit();
+                    editor.putString(ConstantStr.USER_NAME, tvName);
+                    editor.apply();
+                }
 
-                                        ProgressDialog progress = new ProgressDialog(TeacherDetailActivity.this);
-                                        progress.setMessage("更新中...");
-                                        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                                        progress.setCancelable(false);
-                                        progress.show();
+                final ProgressDialog progress = new ProgressDialog(TeacherDetailActivity.this);
+                progress.setMessage("更新中...");
+                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progress.setCancelable(false);
+                progress.show();
 
-                                        new Thread() {
-                                            @Override
-                                            public void run() {
-                                                submitToServer(queryIdentity);
-                                                finish();
-                                            }
-                                        }.start();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        submitToServerAndUpdateLocal(queryIdentity);
+                        progress.cancel();
+                        setResult(1);
+                        finish();
+                    }
+                }.start();
 
-                                        progress.cancel();
-
-                                    }
-                                })
-                        .setNegativeButton
-                                (android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                })
-                        .show();
                 return true;
             }
             default:
@@ -307,9 +288,10 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
     /**
      * 提交需要更新的用户数据到服务器
+     *
      * @param queryIdentity 要更新的用户的身份
      */
-    private void submitToServer(String queryIdentity) {
+    private void submitToServerAndUpdateLocal(String queryIdentity) {
         Object user = getUserData();
         switch (queryIdentity) {
 
@@ -362,27 +344,4 @@ public class TeacherDetailActivity extends AppCompatActivity {
         dbHelper.close();
     }
 
-    // 专业名映射为中文
-    public String transferMajorNameToChinese(String string) {
-        switch (string) {
-            case "tc_com_exc":
-                return "计算机（卓越班）";
-            case "tc_com_nor":
-                return "计算机专业";
-            case "tc_com_ope":
-                return "计算机（实验班）";
-            case "tc_inf_sec":
-                return "信息安全专业";
-            case "tc_math_nor":
-                return "数学类";
-            case "tc_math_ope":
-                return "数学类（实验班）";
-            case "tc_net_pro":
-                return "网络工程专业";
-            case "tc_soft_pro":
-                return "软件工程专业";
-            default:
-                return string;
-        }
-    }
 }
