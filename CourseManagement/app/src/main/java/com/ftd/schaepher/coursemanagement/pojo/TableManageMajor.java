@@ -1,17 +1,19 @@
 package com.ftd.schaepher.coursemanagement.pojo;
 
-import net.tsz.afinal.annotation.sqlite.Id;
-import net.tsz.afinal.annotation.sqlite.Table;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Created by Schaepher on 2015/11/20.
+ * Created by Schaepher on 2016/09/16.
  * 系负责人及其所负责的专业
  */
-@Table(name = "TableManageMajor")
+@DatabaseTable(tableName = "TableManageMajor")
 public class TableManageMajor {
-    @Id
+    @DatabaseField(id = true)
     private transient int id;
+    @DatabaseField
     private String workNumber;
+    @DatabaseField
     private String major;
 
     public TableManageMajor() {

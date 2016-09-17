@@ -14,10 +14,12 @@ import android.widget.Toast;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.Person;
 import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.GlobalMap;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.j256.ormlite.dao.Dao;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -155,12 +157,29 @@ public class LoginActivity extends AppCompatActivity
                         informationEditor.putString(ConstantStr.USER_IDENTITY, identity);
                         informationEditor.putString(ConstantStr.USER_WORK_NUMBER, workNumber);
                         informationEditor.apply();
-                        CourseDBHelper dbHelper = new CourseDBHelper(LoginActivity.this);
+                        CourseDBHelper dbHelper = CourseDBHelper.getInstance(LoginActivity.this);
+
                         try {
                             String pojoClassName = GlobalMap.get(identity);
                             Class clazz = Class.forName(pojoClassName);
-                            Object user = JsonTools.getJsonObject(result, clazz);
-                            dbHelper.insertOrUpdate(user);
+                            Person user = (Person) JsonTools.getJsonObject(result, clazz);
+                            Dao dao = null;
+                            switch (identity)
+                            {
+                                case ConstantStr.ID_TEACHER:
+                                    dao = dbHelper.getTeacherDao();
+                                    break;
+                                case ConstantStr.ID_DEPARTMENT_HEAD:
+                                    dao = dbHelper.getDepartmentHeadDao();
+                                    break;
+                                case ConstantStr.ID_TEACHING_OFFICE:
+                                    dao = dbHelper.getOfficeDao();
+                                    break;
+                                default:
+                                    break;
+                            }
+                            user.setDao(dao);
+                            user.create();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -1,34 +1,50 @@
 package com.ftd.schaepher.coursemanagement.pojo;
 
-import net.tsz.afinal.annotation.sqlite.Id;
-import net.tsz.afinal.annotation.sqlite.Table;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Created by lenovo on 2015/11/2.
+ * Created by Schaepher on 2016/09/16.
  * 开课表，多行
  */
-@Table(name = "TableCourseMultiline")
+@DatabaseTable(tableName = "TableCourseMultiline")
 public class TableCourseMultiline {
-    @Id
+    @DatabaseField(id = true)
     private String courseName;
+    @DatabaseField
     private String insertTime;
+    @DatabaseField
     private String workNumber;
+    @DatabaseField
     private String grade;
+    @DatabaseField
     private String major;
+    @DatabaseField
     private String people;
+    @DatabaseField
     private String courseType;
+    @DatabaseField
     private String courseCredit;
+    @DatabaseField
     private String courseHour;
+    @DatabaseField
     private String practiceHour;
+    @DatabaseField
     private String onMachineHour;
+    @DatabaseField
     private String timePeriod;
+    @DatabaseField
     private String teacherName;
+    @DatabaseField
     private String remark;
 
     public TableCourseMultiline() {
     }
 
-    public TableCourseMultiline(String insertTime,String grade, String major, String people, String courseName, String courseType, String courseCredit, String courseHour, String practiceHour, String onMachineHour, String timePeriod, String teacherName, String remark) {
+    public TableCourseMultiline(String insertTime, String grade, String major, String people,
+                                String courseName, String courseType, String courseCredit,
+                                String courseHour, String practiceHour, String onMachineHour,
+                                String timePeriod, String teacherName, String remark) {
         this.insertTime = insertTime;
         this.grade = grade;
         this.major = major;

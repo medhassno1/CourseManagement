@@ -31,9 +31,11 @@ import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.ftd.schaepher.coursemanagement.widget.WheelView;
+import com.j256.ormlite.dao.Dao;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.Button;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -62,6 +64,10 @@ public class TaskCreationActivity extends AppCompatActivity
 
     private static final String[] SEMESTER = new String[]{"01", "02", "03", "04"};
 
+    private Dao<TableTaskInfo, String> taskInfoDao = null;
+    private Dao<TableCourseMultiline, String> courseMultilineDao = null;
+
+
     private List<String> termYear;
 
     @Override
@@ -77,7 +83,13 @@ public class TaskCreationActivity extends AppCompatActivity
         }
         initWidgetAndListener();
 
-        dbHelper = new CourseDBHelper(TaskCreationActivity.this);
+        dbHelper = CourseDBHelper.getInstance(this);
+        try {
+            taskInfoDao = dbHelper.getTaskInfoDao();
+            courseMultilineDao = dbHelper.getCourseMultilineDao();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // 初始化控件及绑定监听事件
@@ -144,7 +156,7 @@ public class TaskCreationActivity extends AppCompatActivity
                                 try {
                                     TableTaskInfo task = createTaskInformation();
                                     tableCourseName = task.getRelativeTable();
-                                    dbHelper.insert(task);
+                                    taskInfoDao.create(task);
                                     String json = JsonTools.getJsonString(task);
 
                                     String result = NetworkManager
@@ -226,7 +238,7 @@ public class TaskCreationActivity extends AppCompatActivity
     }
 
     // 从Excel表获取数据，并存入数据库
-    private List<TableCourseMultiline> readExcelToDB() {
+    private List<TableCourseMultiline> readExcelToDB() throws SQLException {
         String commonName = TableCourseMultiline.class.getSimpleName();
         dbHelper.dropTable(commonName);
         dbHelper.dropTable(tableCourseName);
@@ -236,7 +248,7 @@ public class TaskCreationActivity extends AppCompatActivity
         excelTools.setPath(filePath);
         List<TableCourseMultiline> courseList = excelTools.readCourseExcel();
 
-        dbHelper.insertAll(courseList);
+        courseMultilineDao.create(courseList);
         dbHelper.changeTableName(commonName, tableCourseName);
         return courseList;
     }

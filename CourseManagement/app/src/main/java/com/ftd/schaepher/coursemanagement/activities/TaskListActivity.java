@@ -40,10 +40,14 @@ import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
 import com.ftd.schaepher.coursemanagement.tools.UpdateManager;
 import com.ftd.schaepher.coursemanagement.widget.RefreshableView;
+import com.j256.ormlite.dao.CloseableIterator;
+import com.j256.ormlite.dao.Dao;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -65,6 +69,11 @@ public class TaskListActivity extends AppCompatActivity
     private String identity;
     private String selectedTerm;
     private CourseDBHelper dbHelper;
+    private Dao<TableTaskInfo, String> taskInfoDao = null;
+    private Dao<TableUserTeacher, String> teacherDao = null;
+    private Dao<TableUserDepartmentHead, String> departmentHeadDao = null;
+    private Dao<TableUserTeachingOffice, String> officeDao = null;
+
     private boolean isSupportDoubleBackExit;
     private long betweenDoubleBackTime;
     private SharedPreferences.Editor selfInfoEditor;
@@ -95,8 +104,21 @@ public class TaskListActivity extends AppCompatActivity
         spinnerSelectTerm = (Spinner) findViewById(R.id.spinner_select_term);
         mProgress = new ProgressDialog(TaskListActivity.this);
 
-        dbHelper = new CourseDBHelper(TaskListActivity.this);
-        taskListData = dbHelper.findAll(TableTaskInfo.class);
+        dbHelper = CourseDBHelper.getInstance(this);
+        try {
+            taskInfoDao = dbHelper.getTaskInfoDao();
+            teacherDao = dbHelper.getTeacherDao();
+            departmentHeadDao = dbHelper.getDepartmentHeadDao();
+            officeDao = dbHelper.getOfficeDao();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            taskListData = taskInfoDao.queryForAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         try {
             getServerData();
@@ -124,11 +146,15 @@ public class TaskListActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         setSpinnerData();
-        initUserInformation();
+        try {
+            initUserInformation();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // 初始化当前用户的数据
-    private void initUserInformation() {
+    private void initUserInformation() throws SQLException {
         String selfName = "";
         SharedPreferences sharedPre =
                 getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
@@ -138,18 +164,15 @@ public class TaskListActivity extends AppCompatActivity
 
         switch (identity) {
             case ConstantStr.ID_TEACHER:
-                TableUserTeacher teacher = dbHelper
-                        .findById(workNumber, TableUserTeacher.class);
+                TableUserTeacher teacher = teacherDao.queryForId(workNumber);
                 selfName = teacher == null ? "" : teacher.getName();
                 break;
             case ConstantStr.ID_TEACHING_OFFICE:
-                TableUserTeachingOffice office = dbHelper
-                        .findById(workNumber, TableUserTeachingOffice.class);
+                TableUserTeachingOffice office = officeDao.queryForId(workNumber);
                 selfName = office == null ? "" : office.getName();
                 break;
             case ConstantStr.ID_DEPARTMENT_HEAD:
-                TableUserDepartmentHead departmentHead = dbHelper
-                        .findById(workNumber, TableUserDepartmentHead.class);
+                TableUserDepartmentHead departmentHead = departmentHeadDao.queryForId(workNumber);
                 selfName = departmentHead == null ? "" : departmentHead.getName();
                 break;
             default:
@@ -169,16 +192,24 @@ public class TaskListActivity extends AppCompatActivity
             @Override
             public void onResponse(Response response) throws IOException {
                 String responseStr = response.body().string();
-                List list = null;
+                List taskList = null;
                 try {
-                    list = JsonTools.getJsonList(responseStr, TableTaskInfo.class);
+                    taskList = JsonTools.getJsonList(responseStr, TableTaskInfo.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                dbHelper.deleteAll(TableTaskInfo.class);
-                if (list != null) {
-                    Loger.w(TAG, "jsonList" + list.toString());
-                    dbHelper.insertAll(list);
+                try {
+                    taskInfoDao.deleteBuilder().delete();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (taskList != null) {
+                    Loger.w(TAG, "jsonList" + taskList.toString());
+                    try {
+                        taskInfoDao.create(taskList);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -237,9 +268,15 @@ public class TaskListActivity extends AppCompatActivity
         if (!selectedTerm.equals("学期")) {
             String year = selectedTerm.substring(0, 4);
             String semester = selectedTerm.substring(4, 6);
-            List<TableTaskInfo> list = dbHelper.findAllByWhere(TableTaskInfo.class,
-                    "year=\"" + year + "\" and semester=\"" + semester + "\"");
-            taskListData.addAll(list);
+            try {
+                List<TableTaskInfo> list = taskInfoDao.queryBuilder().where()
+                        .eq("year", year)
+                        .and()
+                        .eq("semester", semester).query();
+                taskListData.addAll(list);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         Loger.w("GetDataByTerm", taskListData.toString());
     }
@@ -288,7 +325,26 @@ public class TaskListActivity extends AppCompatActivity
 
     // 下拉选项框数据刷新
     public void refreshSpinner() {
-        List<String> semesterList = dbHelper.getSemesterList();
+        CloseableIterator<TableTaskInfo> iterable = null;
+        try {
+            iterable = taskInfoDao.queryBuilder()
+                    .distinct()
+                    .selectColumns("year", "semester")
+                    .orderBy("year", false).orderBy("semester", false)
+                    .iterator();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        List<String> semesterList = new ArrayList<>();
+        try {
+            while (iterable.hasNext()) {
+                String semester = iterable.current().getYear() + iterable.current().getSemester();
+                semesterList.add(semester);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         spinnerAdapter.clear();
         if (!semesterList.isEmpty()) {
             spinnerAdapter.addAll(semesterList);
@@ -337,7 +393,7 @@ public class TaskListActivity extends AppCompatActivity
                             String taskName = tvDelete.getTag().toString();
                             Loger.d("taskName", "tvDelete" + taskName);
                             NetworkManager.postToServerSync(taskName, "", NetworkManager.DELETE_TASK);
-                            dbHelper.deleteByID(TableTaskInfo.class, taskName);
+                            taskInfoDao.queryForId(taskName);
                             dbHelper.dropTable(taskName);
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -403,7 +459,7 @@ public class TaskListActivity extends AppCompatActivity
             }
 
             viewHolder.taskState.setText(TransferUtils.stateCode2Zh(task.getTaskState()));
-            switch (task.getTaskState()){
+            switch (task.getTaskState()) {
                 case "0":
                     viewHolder.taskState.setTextColor(Color.RED);
                     break;
@@ -541,7 +597,7 @@ public class TaskListActivity extends AppCompatActivity
         }
     }
 
-    public void updateApk(){
+    public void updateApk() {
         new Thread(new Runnable() {
             @Override
             public void run() {
