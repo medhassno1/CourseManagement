@@ -25,8 +25,10 @@ import com.ftd.schaepher.coursemanagement.tools.ConstantStr;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.j256.ormlite.dao.Dao;
 import com.rey.material.app.SimpleDialog;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,12 +66,12 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
 
         initView();
 
-        if(identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)){
+        if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
             rdoGroup.setVisibility(View.GONE);
             edtTxDepartment.setVisibility(View.VISIBLE);
             edtTxMajor.setVisibility(View.GONE);
             selectedIdentity = ConstantStr.ID_TEACHER;
-        }else{
+        } else {
             rdoGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -338,7 +340,21 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
         new Thread() {
             @Override
             public void run() {
-                CourseDBHelper dbHelper = new CourseDBHelper(TeacherCreationActivity.this);
+                CourseDBHelper dbHelper = CourseDBHelper.getInstance(TeacherCreationActivity.this);
+                Dao<TableUserTeacher, String> teacherDao = null;
+                Dao<TableUserDepartmentHead, String> departmentHeadDao = null;
+                Dao<TableUserTeachingOffice, String> officeDao = null;
+                Dao<TableManageMajor, Integer> manageMajorDao = null;
+                try {
+                    teacherDao = dbHelper.getTeacherDao();
+                    departmentHeadDao = dbHelper.getDepartmentHeadDao();
+                    officeDao = dbHelper.getOfficeDao();
+                    manageMajorDao = dbHelper.getManageMajorDao();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+
                 if (selectedIdentity.equals(ConstantStr.ID_TEACHER)) {
                     TableUserTeacher teacher = getUITeacherData();
                     try {
@@ -346,7 +362,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
                                 JsonTools.getJsonString(teacher), NetworkManager.INSERT_TABLE);
                         Loger.i("createTeacher", "发送服务器结束，开始插入本地数据库");
-                        dbHelper.insert(teacher);
+                        teacherDao.create(teacher);
                         Loger.i("createTeacher", "插入本地数据库结束");
                     } catch (Exception e) {
                         Toast.makeText(TeacherCreationActivity.this,
@@ -361,11 +377,11 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                         //系负责人表
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
                                 JsonTools.getJsonString(departmentHead), NetworkManager.INSERT_TABLE);
-                        dbHelper.insert(departmentHead);
+                        departmentHeadDao.create(departmentHead);
                         //系负责人专业表
                         NetworkManager.postToServerSync(ConstantStr.TABLE_MANAGE_MAJOR,
                                 JsonTools.getJsonString(manageMajorList), NetworkManager.INSERT_TABLE);
-                        dbHelper.insertAll(manageMajorList);
+                        manageMajorDao.create(manageMajorList);
                     } catch (Exception e) {
                         Toast.makeText(TeacherCreationActivity.this,
                                 "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();
@@ -378,7 +394,7 @@ public class TeacherCreationActivity extends AppCompatActivity implements View.O
                     try {
                         NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                 JsonTools.getJsonString(teachingOffice), NetworkManager.INSERT_TABLE);
-                        dbHelper.insert(teachingOffice);
+                        officeDao.create(teachingOffice);
                     } catch (Exception e) {
                         Toast.makeText(TeacherCreationActivity.this,
                                 "该工号已存在，请删除后再尝试", Toast.LENGTH_SHORT).show();

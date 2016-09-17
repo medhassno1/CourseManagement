@@ -1,20 +1,25 @@
 package com.ftd.schaepher.coursemanagement.pojo;
 
-import net.tsz.afinal.annotation.sqlite.Id;
-import net.tsz.afinal.annotation.sqlite.Table;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Created by sxq on 2015/10/31.
+ * Created by Schaepher on 2016/09/16.
  * 任务详情表
  */
-@Table(name = "TableTaskInfo")
+@DatabaseTable(tableName = "TableTaskInfo")
 public class TableTaskInfo {
-    @Id
+    @DatabaseField(id = true)
     private String relativeTable;
+    @DatabaseField
     private String year;
+    @DatabaseField
     private String semester;
+    @DatabaseField
     private String departmentDeadline;
+    @DatabaseField
     private String teacherDeadline;
+    @DatabaseField
     private String taskState;
 
     public TableTaskInfo(TableTaskInfo task) {

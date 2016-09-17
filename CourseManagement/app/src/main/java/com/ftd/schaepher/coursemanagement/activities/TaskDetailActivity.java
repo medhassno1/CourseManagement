@@ -32,6 +32,7 @@ import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
+import com.j256.ormlite.dao.Dao;
 import com.rey.material.app.SimpleDialog;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -41,7 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -76,6 +77,9 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
     private TableTaskInfo task;
     private TableTaskInfo editedTask;
     private CourseDBHelper dbHelper;
+    private Dao<TableTaskInfo, String> taskInfoDao = null;
+    private Dao<TableCourseMultiline, String> courseMultilineDao = null;
+
     private String tableName;
     private String filePath;
     private String excelTitle;
@@ -98,7 +102,15 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
 
         relativeTable = getIntent().getStringExtra("relativeTable");
         Loger.i("TAG", "relativeTable" + relativeTable);
-        dbHelper = new CourseDBHelper(this);
+        dbHelper = CourseDBHelper.getInstance(this);
+        try {
+            taskInfoDao = dbHelper.getTaskInfoDao();
+            courseMultilineDao = dbHelper.getCourseMultilineDao();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
         initWidgetValue();
         initUserInformation();
     }
@@ -133,7 +145,11 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         cardvTaskDetail.setOnClickListener(this);
 
         Loger.d("relativeTable", relativeTable);
-        task = dbHelper.findById(relativeTable, TableTaskInfo.class);
+        try {
+            task = taskInfoDao.queryForId(relativeTable);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         Loger.d("TAG", task.toString());
         taskTerm = task.getYear() + task.getSemester();
         tvTaskTerm.setText(taskTerm);
@@ -245,7 +261,7 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
         dbHelper.dropTable(toTableName);
         dbHelper.changeTableName(tableName, toTableName);
 
-        copyExcel(dbHelper.findAll(TableCourseMultiline.class));
+        copyExcel(courseMultilineDao.queryForAll());
 
         dbHelper.changeTableName(toTableName, tableName);
     }
@@ -441,7 +457,11 @@ public class TaskDetailActivity extends AppCompatActivity implements View.OnClic
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                dbHelper.update(editedTask);
+                                try {
+                                    taskInfoDao.update(editedTask);
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
                                 tvDepartmentDeadline.setText(depDeadline);
                                 tvTeacherDeadline.setText(teacherDeadline);
                                 Toast.makeText(TaskDetailActivity.this, "修改成功", Toast.LENGTH_SHORT).show();

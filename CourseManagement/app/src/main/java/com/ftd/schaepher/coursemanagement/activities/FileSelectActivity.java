@@ -27,8 +27,10 @@ import com.ftd.schaepher.coursemanagement.tools.ExcelTools;
 import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
+import com.j256.ormlite.dao.Dao;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +47,6 @@ public class FileSelectActivity extends AppCompatActivity
     private FileListAdapter mFileAdapter;
     private TextView tvItemCount;
     private ProgressDialog progress;
-    private ArrayList<File> rootFileList;
     private String identity;
 
 
@@ -179,34 +180,45 @@ public class FileSelectActivity extends AppCompatActivity
                                             Loger.i("dataList", teachersList.toString());
                                             Loger.i("dataList", teachingOfficeList.toString());
                                             // 导入职工表
-                                            CourseDBHelper dbHelper = new CourseDBHelper(FileSelectActivity.this);
+                                            CourseDBHelper dbHelper = CourseDBHelper
+                                                    .getInstance(FileSelectActivity.this);
+                                            Dao<TableUserTeacher, String> teacherDao = null;
+                                            Dao<TableUserDepartmentHead, String> departmentHeadDao = null;
+                                            Dao<TableUserTeachingOffice, String> officeDao = null;
+                                            try {
+                                                teacherDao = dbHelper.getTeacherDao();
+                                                departmentHeadDao = dbHelper.getDepartmentHeadDao();
+                                                officeDao = dbHelper.getOfficeDao();
+                                            } catch (SQLException e) {
+                                                e.printStackTrace();
+                                            }
                                             try {
                                                 //系负责人只能添加教师
-                                                if(identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)){
+                                                if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
                                                     Loger.i("dataList1", "开始导入教师数据");
                                                     NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
                                                             JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
-                                                    dbHelper.deleteAll(TableUserTeacher.class);
-                                                    dbHelper.insertAll(teachersList);
+                                                    teacherDao.create(teachersList);
 
                                                     closeProgress();
                                                     finish();
-                                                }else{
+                                                } else {
                                                     Loger.i("dataList1", "开始导入教师数据");
                                                     NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHER,
                                                             JsonTools.getJsonString(teachersList), NetworkManager.INSERT_TABLE);
-                                                    dbHelper.deleteAll(TableUserTeacher.class);
-                                                    dbHelper.insertAll(teachersList);
+                                                    teacherDao.deleteBuilder().delete();
+                                                    assert teacherDao.queryForAll().size() == 0;
+                                                    teacherDao.create(teachersList);
                                                     Loger.i("dataList1", "开始导入系主任数据");
                                                     NetworkManager.postToServerSync(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
                                                             JsonTools.getJsonString(departmentHeadList), NetworkManager.INSERT_TABLE);
-                                                    dbHelper.deleteAll(TableUserDepartmentHead.class);
-                                                    dbHelper.insertAll(departmentHeadList);
+                                                    departmentHeadDao.deleteBuilder().delete();
+                                                    departmentHeadDao.create(departmentHeadList);
                                                     Loger.i("dataList1", "开始导入教学办数据");
                                                     NetworkManager.postToServerSync(ConstantStr.TABLE_USER_TEACHING_OFFICE,
                                                             JsonTools.getJsonString(teachingOfficeList), NetworkManager.INSERT_TABLE);
-                                                    dbHelper.deleteAll(TableUserTeachingOffice.class);
-                                                    dbHelper.insertAll(teachingOfficeList);
+                                                    officeDao.deleteBuilder().delete();
+                                                    officeDao.create(teachingOfficeList);
 
                                                     closeProgress();
                                                     finish();

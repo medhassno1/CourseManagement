@@ -32,11 +32,13 @@ import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
+import com.j256.ormlite.dao.Dao;
 import com.rey.material.app.SimpleDialog;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +54,11 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private List<TableCourseMultiline> previewMajorList;
 
     private CourseDBHelper dbHelper;
+    private Dao<TableTaskInfo, String> taskInfoDao = null;
+    private Dao<TableCourseMultiline, String> courseMultilineDao = null;
+    private Dao<TableUserTeacher, String> teacherDao = null;
+
+
     private String tableName;
     private String workNumber;
     private String identity;
@@ -64,7 +71,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     private EditText edtTxDialogNote;
     private EditText edtTxDialogTeacher;
 
-    private static final TableCourseMultiline EXCEL_HEADER = new TableCourseMultiline("序号","年级", "专业", "专业人数",
+    private static final TableCourseMultiline EXCEL_HEADER = new TableCourseMultiline("序号", "年级", "专业", "专业人数",
             "课程名称", "选修类型", "学分", "学时", "实验学时", "上机学时", "起讫周序",
             "任课教师", "备注");
 
@@ -78,7 +85,16 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         actionBar.setDisplayHomeAsUpEnabled(true);
         excelListData = new ArrayList<>();
         previewMajorList = new ArrayList<>();
-        dbHelper = new CourseDBHelper(this);
+
+        dbHelper = CourseDBHelper.getInstance(this);
+        try {
+            taskInfoDao = dbHelper.getTaskInfoDao();
+            teacherDao = dbHelper.getTeacherDao();
+            courseMultilineDao = dbHelper.getCourseMultilineDao();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         tableName = getIntent().getStringExtra("tableName");
         commonTableName = TableCourseMultiline.class.getSimpleName();
@@ -88,7 +104,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         SharedPreferences sharedPre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         workNumber = sharedPre.getString(ConstantStr.USER_WORK_NUMBER, "");
         identity = sharedPre.getString(ConstantStr.USER_IDENTITY, "");
-        taskState = dbHelper.findById(tableName, TableTaskInfo.class).getTaskState();
+
+        try {
+            taskState = taskInfoDao.queryForId(tableName).getTaskState();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         getServerData();
     }
@@ -103,13 +124,14 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         }
     }
 
-    private void initListData() {
+    private void initListData() throws SQLException {
 
         if (excelListData != null) {
             excelListData.clear();
         }
         // 根据表名查找数据库对应表数据
         dbHelper.dropTable(commonTableName);
+
         try {
             dbHelper.changeTableName(tableName, commonTableName);
         } catch (Exception e) {
@@ -119,7 +141,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         List<TableCourseMultiline> list;
         SharedPreferences pre = getSharedPreferences(ConstantStr.USER_INFORMATION, MODE_PRIVATE);
         if (!pre.getBoolean(ConstantStr.IS_USER_CHANGED, false)) {
-            list = dbHelper.findAll(TableCourseMultiline.class);
+            list = courseMultilineDao.queryBuilder().orderBy("insertTime",true).query();
             removeFirstThree(list);
             excelListData.addAll(list);
             if (excelListData.size() > 0) {
@@ -177,19 +199,14 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         hasCommitted = responseStr.contains("\"workNumber\":\"" + workNumber + "\"");
                         Loger.d(TAG + "GetServerData", "HasCommitted: " + String.valueOf(hasCommitted));
 
-                        // 插入数据库
-                        dbHelper.dropTable(commonTableName);
                         try {
-                            dbHelper.changeTableName(tableName, commonTableName);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            dbHelper.dropTable(tableName);
                             dbHelper.createNewCourseTable();
+                            courseMultilineDao.create(list);
+                            dbHelper.changeTableName(commonTableName, tableName);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
                         }
-                        dbHelper.deleteAll(TableCourseMultiline.class);
-                        dbHelper.insertAll(list);
-
-
-                        dbHelper.changeTableName(commonTableName, tableName);
 
 
                         // 显示在界面上
@@ -210,7 +227,11 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    initListData();
+                                    try {
+                                        initListData();
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             });
                         }
@@ -232,13 +253,18 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position != 0) {
-            AlertDialog mAlertDialog = initRowWindow(position);
+            AlertDialog mAlertDialog = null;
+            try {
+                mAlertDialog = initRowWindow(position);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             mAlertDialog.show();
         }
     }
 
     // 初始化一行数据的窗口
-    public AlertDialog initRowWindow(final int position) {
+    public AlertDialog initRowWindow(final int position) throws SQLException {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(ExcelDisplayActivity.this);
         LayoutInflater mInflater = ExcelDisplayActivity.this.getLayoutInflater();
         final View alertDialogView = mInflater.inflate(R.layout.dialog_excel_modify, null);
@@ -284,7 +310,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 } else {
                                     dbHelper.dropTable(commonTableName);
                                     dbHelper.changeTableName(tableName, commonTableName);
-                                    dbHelper.update(courseModify);
+                                    courseMultilineDao.update(courseModify);
                                     dbHelper.changeTableName(commonTableName, tableName);
                                     onResume();
                                 }
@@ -304,7 +330,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 courseModify.setRemark("");
                                 courseModify.setTeacherName("");
                                 courseModify.setWorkNumber("");
-                                for (TableCourseMultiline c:previewMajorList){
+                                for (TableCourseMultiline c : previewMajorList) {
                                     if (c.getCourseName().equals(excelListData.get(position).getCourseName())) {
                                         previewMajorList.remove(c);
                                         break;
@@ -315,7 +341,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                                 } else {
                                     dbHelper.dropTable(commonTableName);
                                     dbHelper.changeTableName(tableName, commonTableName);
-                                    dbHelper.update(courseModify);
+                                    courseMultilineDao.update(courseModify);
                                     dbHelper.changeTableName(commonTableName, tableName);
                                     onResume();
                                 }
@@ -335,7 +361,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     // 设置弹窗的数据
-    private void initRowWindowData(int position, View v, boolean canNotBeChanged) {
+    private void initRowWindowData(int position, View v, boolean canNotBeChanged) throws SQLException {
         TextView tvDialogGrade = (TextView) v.findViewById(R.id.tv_dialog_grade);
         TextView tvDialogMajor = (TextView) v.findViewById(R.id.tv_dialog_major);
         TextView tvDialogNum = (TextView) v.findViewById(R.id.tv_dialog_sum);
@@ -376,7 +402,7 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
         if (taskState.equals("0") && identity.equals(ConstantStr.ID_TEACHER)) {
             edtTxDialogTeacher.setFocusable(false);
             edtTxDialogTeacher.setEnabled(false);
-            String name = dbHelper.findById(workNumber, TableUserTeacher.class).getName();
+            String name = teacherDao.queryForId(workNumber).getName();
             edtTxDialogTeacher.setText(name);
         }
     }
@@ -391,12 +417,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                     menu.findItem(R.id.action_commit_task).setVisible(true);
                 }
                 break;
-//            case ConstantStr.ID_DEPARTMENT_HEAD:
-//                menu.findItem(R.id.action_commit_check).setVisible(true);
-//                break;
-//            case ConstantStr.ID_TEACHING_OFFICE:
-//                menu.findItem(R.id.action_finish_task).setVisible(true);
-//                break;
             default:
                 break;
         }
@@ -412,36 +432,12 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 return true;
             case R.id.action_commit_task:
                 Loger.d("TAG", "commit task");
-                //点击提交报课逻辑
-//                if (taskState.equals("2")) {
-//                    showForbidCommitDialog("报课任务已结束，无法进行提交");
-//                } else if (taskState.equals("1")) {
-//                    showForbidCommitDialog("报课信息正在审核中，请等待...");
-//                } else {
-
                 if (hasCommitted) {
                     showForbidCommitDialog("您已进行过提交，不能再次提交！");
                 } else {
                     showPreviewDialog();
                 }
-//                }
                 return true;
-//            case R.id.action_commit_check:
-//                if (taskState.equals("2")) {
-//                    showForbidCommitDialog("报课任务已结束，无法进行提交");
-//                } else if (taskState.equals("1")) {
-//                    showForbidCommitDialog("您已进行过提交，不能再次提交！");
-//                } else {
-//                    showCommitTaskDialog("是否提交审核", "一旦提交将不能再次修改报课信息！");
-//                }
-//                return true;
-//            case R.id.action_finish_task:
-//                if (taskState.equals("2")) {
-//                    showForbidCommitDialog("报课任务已结束");
-//                } else {
-//                    showCommitTaskDialog("是否公开报课", "一旦公共将无法再进行修改！");
-//                }
-//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -532,10 +528,15 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                         String result = response.body().string();
                         Loger.w("oneLinePost", result);
                         if (result.equals("true")) {
-                            dbHelper.dropTable(commonTableName);
-                            dbHelper.changeTableName(tableName, commonTableName);
-                            dbHelper.update(course);
-                            dbHelper.changeTableName(commonTableName, tableName);
+                            try {
+                                dbHelper.dropTable(commonTableName);
+                                dbHelper.changeTableName(tableName, commonTableName);
+                                courseMultilineDao.update(course);
+                                dbHelper.changeTableName(commonTableName, tableName);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -555,16 +556,16 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
     }
 
     // 提交报课信息到服务器
-    private void postToServer() {
+    private void postToServer() throws SQLException {
         dbHelper.dropTable(commonTableName);
         dbHelper.changeTableName(tableName, commonTableName);
         if (identity.equals(ConstantStr.ID_TEACHER)) {
             List<TableCourseMultiline> commitData =
-                    dbHelper.findAllByWhere(TableCourseMultiline.class, "workNumber = '" + workNumber + "'");
+                    courseMultilineDao.queryForEq("workNumber", workNumber);
             Loger.d("commitData", String.valueOf(commitData));
             Loger.d("commitData", JsonTools.getJsonString(commitData));
             try {
-                String result = NetworkManager.postToServerSync(tableName,
+                NetworkManager.postToServerSync(tableName,
                         JsonTools.getJsonString(commitData), NetworkManager.SUBMIT_SELECTED_COURSE);
 
                 sendToast("提交成功");
@@ -574,26 +575,6 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
                 sendToast("提交失败，请重新提交");
             }
         }
-//        else {
-//            List<TableCourseMultiline> commitData = dbHelper.findAll(TableCourseMultiline.class);
-//            String cbTableName = "cb_" + tableName;
-//            try {
-//                String result = NetworkManager.postToServerSync(cbTableName,
-//                        JsonTools.getJsonString(commitData), NetworkManager.INSERT_OR_UPDATE_CB_TABLE);
-//                sendToast("提交成功");
-//                if (identity.equals(ConstantStr.ID_DEPARTMENT_HEAD)) {
-//                    TableTaskInfo task = new TableTaskInfo("1", tableName);
-//                    dbHelper.update(task);
-//                } else {
-//                    TableTaskInfo task = new TableTaskInfo("2", tableName);
-//                    dbHelper.update(task);
-//                }
-//                taskState = dbHelper.findById(tableName, TableTaskInfo.class).getTaskState();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                sendToast("提交失败，请重新提交");
-//            }
-//        }
         dbHelper.changeTableName(commonTableName, tableName);
     }
 
@@ -655,9 +636,9 @@ public class ExcelDisplayActivity extends AppCompatActivity implements AdapterVi
             }
 
             //数据源excelListData第0行为列名，第一行开始才是数据
-            if(courseCur.getInsertTime().matches("[0-9]+")){
+            if (courseCur.getInsertTime().matches("[0-9]+")) {
                 mViewHolder.tvNumber.setText((Integer.parseInt(courseCur.getInsertTime()) - 3) + "");
-            }else{
+            } else {
                 mViewHolder.tvNumber.setText(courseCur.getInsertTime());
             }
             mViewHolder.tvGrade.setText(courseCur.getGrade());

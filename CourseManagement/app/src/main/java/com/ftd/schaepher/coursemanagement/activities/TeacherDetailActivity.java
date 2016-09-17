@@ -14,7 +14,9 @@ import android.widget.EditText;
 
 import com.ftd.schaepher.coursemanagement.R;
 import com.ftd.schaepher.coursemanagement.db.CourseDBHelper;
+import com.ftd.schaepher.coursemanagement.pojo.Person;
 import com.ftd.schaepher.coursemanagement.pojo.TableManageMajor;
+import com.ftd.schaepher.coursemanagement.pojo.TableTaskInfo;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserDepartmentHead;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeacher;
 import com.ftd.schaepher.coursemanagement.pojo.TableUserTeachingOffice;
@@ -23,7 +25,9 @@ import com.ftd.schaepher.coursemanagement.tools.JsonTools;
 import com.ftd.schaepher.coursemanagement.tools.Loger;
 import com.ftd.schaepher.coursemanagement.tools.NetworkManager;
 import com.ftd.schaepher.coursemanagement.tools.TransferUtils;
+import com.j256.ormlite.dao.Dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +49,11 @@ public class TeacherDetailActivity extends AppCompatActivity {
     private String queryIdentity;
 
     private CourseDBHelper dbHelper;
+    private Dao<TableTaskInfo, String> taskInfoDao = null;
+    private Dao<TableUserTeacher, String> teacherDao = null;
+    private Dao<TableUserDepartmentHead, String> departmentHeadDao = null;
+    private Dao<TableUserTeachingOffice, String> officeDao = null;
+    Dao<TableManageMajor,Integer> manageMajorDao = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +67,16 @@ public class TeacherDetailActivity extends AppCompatActivity {
             actionBar.setTitle("用户信息");
         }
 
-        dbHelper = new CourseDBHelper(TeacherDetailActivity.this);
-
+        dbHelper = CourseDBHelper.getInstance(this);
+        try {
+            taskInfoDao = dbHelper.getTaskInfoDao();
+            teacherDao = dbHelper.getTeacherDao();
+            departmentHeadDao = dbHelper.getDepartmentHeadDao();
+            officeDao = dbHelper.getOfficeDao();
+            manageMajorDao = dbHelper.getManageMajorDao();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         edtTxTeacherNumber = (EditText) findViewById(R.id.edtTx_teacher_detail_workNumber);
         edtTxPassword = (EditText) findViewById(R.id.edtTx_teacher_detail_password);
         edtTxTeacherName = (EditText) findViewById(R.id.edtTx_teacher_detail_name);
@@ -93,7 +110,11 @@ public class TeacherDetailActivity extends AppCompatActivity {
             Loger.i("str2", "工号" + queryWorkNumber + "身份" + queryIdentity);
         }
 
-        setUserData(queryIdentity, queryWorkNumber);
+        try {
+            setUserData(queryIdentity, queryWorkNumber);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -102,41 +123,38 @@ public class TeacherDetailActivity extends AppCompatActivity {
      * @param queryIdentity   当前用户的身份
      * @param queryWorkNumber 被查询信息的用户的工号
      */
-    private void setUserData(String queryIdentity, String queryWorkNumber) {
+    private void setUserData(String queryIdentity, String queryWorkNumber) throws SQLException {
         switch (queryIdentity) {
             case ConstantStr.ID_TEACHING_OFFICE: {
-                TableUserTeachingOffice Information =
-                        dbHelper.findById(queryWorkNumber, TableUserTeachingOffice.class);
-                if (Information != null) {
-                    edtTxTeacherNumber.setText(Information.getWorkNumber());
-                    edtTxPassword.setText(Information.getPassword());
-                    edtTxTeacherName.setText(Information.getName());
-                    edtTxPhoneNumber.setText(Information.getTelephone());
-                    edtTxEmail.setText(Information.getEmail());
+                TableUserTeachingOffice information = officeDao.queryForId(queryWorkNumber);
+                if (information != null) {
+                    edtTxTeacherNumber.setText(information.getWorkNumber());
+                    edtTxPassword.setText(information.getPassword());
+                    edtTxTeacherName.setText(information.getName());
+                    edtTxPhoneNumber.setText(information.getTelephone());
+                    edtTxEmail.setText(information.getEmail());
                     edtTxDepartment.setVisibility(View.GONE);
                 }
                 break;
             }
 
             case ConstantStr.ID_DEPARTMENT_HEAD: {
-                TableUserDepartmentHead Information =
-                        dbHelper.findById(queryWorkNumber, TableUserDepartmentHead.class);
-                List<TableManageMajor> manageMajorList =
-                        dbHelper.findAllByWhere(TableManageMajor.class,
-                                "workNumber = '" + queryWorkNumber + "'");
+                TableUserDepartmentHead information =departmentHeadDao.queryForId(queryWorkNumber);
 
+                List<TableManageMajor> manageMajorList =
+                        manageMajorDao.queryForEq("workNumber",queryWorkNumber);
                 String majorText = "";
                 for (int i = 0; i < manageMajorList.size(); i++) {
                     String major = TransferUtils.en2Zh(manageMajorList.get(i).getMajor());
                     majorText = majorText + major + "\n";
                 }
 
-                if (Information != null) {
-                    edtTxTeacherNumber.setText(Information.getWorkNumber());
-                    edtTxPassword.setText(Information.getPassword());
-                    edtTxTeacherName.setText(Information.getName());
-                    edtTxPhoneNumber.setText(Information.getTelephone());
-                    edtTxDepartment.setText(Information.getDepartment());
+                if (information != null) {
+                    edtTxTeacherNumber.setText(information.getWorkNumber());
+                    edtTxPassword.setText(information.getPassword());
+                    edtTxTeacherName.setText(information.getName());
+                    edtTxPhoneNumber.setText(information.getTelephone());
+                    edtTxDepartment.setText(information.getDepartment());
                     edtTxMajor.setVisibility(View.VISIBLE);
 
                     edtTxMajor.setText(majorText);
@@ -145,14 +163,14 @@ public class TeacherDetailActivity extends AppCompatActivity {
             }
 
             case ConstantStr.ID_TEACHER: {
-                TableUserTeacher Information =
-                        dbHelper.findById(queryWorkNumber, TableUserTeacher.class);
-                if (Information != null) {
-                    edtTxTeacherNumber.setText(Information.getWorkNumber());
-                    edtTxPassword.setText(Information.getPassword());
-                    edtTxTeacherName.setText(Information.getName());
-                    edtTxPhoneNumber.setText(Information.getTelephone());
-                    edtTxDepartment.setText(Information.getDepartment());
+                TableUserTeacher information =teacherDao.queryForId(queryWorkNumber);
+                if (information != null) {
+                    edtTxTeacherNumber.setText(information.getWorkNumber());
+                    edtTxPassword.setText(information.getPassword());
+                    edtTxTeacherName.setText(information.getName());
+                    edtTxPhoneNumber.setText(information.getTelephone());
+                    edtTxDepartment.setText(information.getDepartment());
+                    edtTxTeacherName.setEnabled(false);
                 }
                 break;
             }
@@ -292,16 +310,17 @@ public class TeacherDetailActivity extends AppCompatActivity {
      * @param queryIdentity 要更新的用户的身份
      */
     private void submitToServerAndUpdateLocal(String queryIdentity) {
-        Object user = getUserData();
+        Person person = (Person) getUserData();
+
         switch (queryIdentity) {
 
             case ConstantStr.ID_TEACHER:
                 try {
                     Loger.i("updateTeacher", "开始发送服务器");
                     String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHER,
-                            JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
+                            JsonTools.getJsonString(person), null, NetworkManager.UPDATE_USER_DATA);
                     Loger.i("updateTeacher", result);
-                    dbHelper.update(user);
+                    teacherDao.update((TableUserTeacher) person);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -311,11 +330,11 @@ public class TeacherDetailActivity extends AppCompatActivity {
                 List<TableManageMajor> manageMajorList = getUIManageMajorData();
                 try {
                     String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_DEPARTMENT_HEAD,
-                            JsonTools.getJsonString(user),
+                            JsonTools.getJsonString(person),
                             JsonTools.getJsonString(manageMajorList), NetworkManager.UPDATE_USER_DATA);
                     Loger.i("updateTeacher", result);
-                    dbHelper.update(user);
-                    dbHelper.updateAll(manageMajorList);
+                    departmentHeadDao.update((TableUserDepartmentHead) person);
+                    manageMajorDao.createOrUpdate((TableManageMajor) manageMajorList);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -324,9 +343,9 @@ public class TeacherDetailActivity extends AppCompatActivity {
             case ConstantStr.ID_TEACHING_OFFICE:
                 try {
                     String result = NetworkManager.updateUserData(ConstantStr.TABLE_USER_TEACHING_OFFICE,
-                            JsonTools.getJsonString(user), null, NetworkManager.UPDATE_USER_DATA);
+                            JsonTools.getJsonString(person), null, NetworkManager.UPDATE_USER_DATA);
                     Loger.i("updateTeacher", result);
-                    dbHelper.update(user);
+                    officeDao.update((TableUserTeachingOffice) person);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -338,10 +357,5 @@ public class TeacherDetailActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dbHelper.close();
-    }
 
 }
